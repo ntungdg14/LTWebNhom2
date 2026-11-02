@@ -1,6 +1,11 @@
 {% extends "layouts/base_admin.html" %}
 {% block title %}Khách hàng - Freesion Admin{% endblock %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/users.css') }}">
+{% endblock %}
+
 {% block content %}
 <main class="admin-content stack-gap">
     <header class="row-between">
@@ -15,19 +20,19 @@
                     <tr><th>Ảnh đại diện</th><th>Họ tên</th><th>Email</th><th>Số điện thoại</th><th>Tổng số đơn</th><th>Ngày tham gia</th><th>Thao tác</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td><div class="avatar media-cream">MA</div></td><td>Nguyễn Minh Anh</td><td>minhanh@example.com</td><td>0901 234 567</td><td>12</td><td>15/03/2026</td><td><a href="{{ url_for('profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="avatar media-beige">TN</div></td><td>Trần Hoàng Nam</td><td>hoangnam@example.com</td><td>0912 345 678</td><td>8</td><td>22/04/2026</td><td><a href="{{ url_for('profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="avatar media-denim">LK</div></td><td>Lê Khánh Linh</td><td>khanhlinh@example.com</td><td>0987 654 321</td><td>15</td><td>09/01/2026</td><td><a href="{{ url_for('profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="avatar media-rose">PK</div></td><td>Phạm Minh Khoa</td><td>minhkhoa@example.com</td><td>0933 222 111</td><td>5</td><td>18/06/2026</td><td><a href="{{ url_for('profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="avatar media-olive">VH</div></td><td>Võ Ngọc Hân</td><td>ngochan@example.com</td><td>0966 888 999</td><td>3</td><td>27/08/2026</td><td><a href="{{ url_for('profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><div class="avatar media-cream">MA</div></td><td>Nguyễn Minh Anh</td><td>minhanh@example.com</td><td>0901 234 567</td><td>12</td><td>15/03/2026</td><td><a href="{{ url_for('account.profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><div class="avatar media-beige">TN</div></td><td>Trần Hoàng Nam</td><td>hoangnam@example.com</td><td>0912 345 678</td><td>8</td><td>22/04/2026</td><td><a href="{{ url_for('account.profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><div class="avatar media-denim">LK</div></td><td>Lê Khánh Linh</td><td>khanhlinh@example.com</td><td>0987 654 321</td><td>15</td><td>09/01/2026</td><td><a href="{{ url_for('account.profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><div class="avatar media-rose">PK</div></td><td>Phạm Minh Khoa</td><td>minhkhoa@example.com</td><td>0933 222 111</td><td>5</td><td>18/06/2026</td><td><a href="{{ url_for('account.profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><div class="avatar media-olive">VH</div></td><td>Võ Ngọc Hân</td><td>ngochan@example.com</td><td>0966 888 999</td><td>3</td><td>27/08/2026</td><td><a href="{{ url_for('account.profile') }}" class="link-underline">Xem chi tiết</a></td></tr>
                 </tbody>
             </table>
         </div>
         <nav class="pagination" aria-label="Phân trang khách hàng">
-            <a href="{{ url_for('admin_users') }}" class="page-num page-num-sm is-active">1</a>
-            <a href="{{ url_for('admin_users') }}" class="page-num page-num-sm">2</a>
-            <a href="{{ url_for('admin_users') }}" class="page-num page-num-sm">3</a>
-            <a href="{{ url_for('admin_users') }}" class="page-num page-num-sm">Tiếp →</a>
+            <a href="{{ url_for('admin.users') }}" class="page-num page-num-sm is-active">1</a>
+            <a href="{{ url_for('admin.users') }}" class="page-num page-num-sm">2</a>
+            <a href="{{ url_for('admin.users') }}" class="page-num page-num-sm">3</a>
+            <a href="{{ url_for('admin.users') }}" class="page-num page-num-sm">Tiếp →</a>
         </nav>
     </section>
 </main>

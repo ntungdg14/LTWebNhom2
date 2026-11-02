@@ -1,0 +1,47 @@
+/* ==========================================================================
+   Khung trang quản trị: sidebar và vùng nội dung (layouts/base_admin.html).
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.admin-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 15rem;
+    flex-shrink: 0;
+    background: var(--stone-900);
+    color: var(--stone-300);
+    padding: 1.5rem 1rem;
+}
+
+.admin-sidebar .logo {
+    color: var(--white);
+    font-size: 1.125rem;
+    display: block;
+    margin-bottom: 2rem;
+}
+
+.admin-sidebar a {
+    display: block;
+    padding: 0.75rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+}
+
+.admin-sidebar a:hover {
+    background: var(--stone-800);
+    color: var(--white);
+}
+
+.admin-sidebar a.is-active {
+    background: var(--stone-800);
+    color: var(--white);
+}
+
+.admin-content {
+    flex: 1;
+    background: var(--stone-50);
+    padding: 2rem;
+}

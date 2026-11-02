@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Đặt hàng thành công (checkout/order_success.html): biểu tượng, hộp chi tiết, hành động.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.page-success {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    text-align: center;
+}
+
+.success-icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto;
+    border-radius: 999px;
+    background: var(--stone-900);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.success-box {
+    margin-top: 2rem;
+    border: 1px solid var(--stone-200);
+    background: var(--stone-50);
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.success-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (min-width: 640px) {
+    .success-actions {
+        flex-direction: row;
+    }
+}

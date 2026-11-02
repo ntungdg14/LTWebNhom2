@@ -1,8 +1,0 @@
-<aside class="account-nav">
-    <h2>Tài khoản</h2>
-    <a href="{{ url_for('profile') }}" class="{% if request.endpoint == 'profile' %}is-active{% endif %}">Hồ sơ của tôi</a>
-    <a href="{{ url_for('order_history') }}" class="{% if request.endpoint == 'order_history' %}is-active{% endif %}">Đơn hàng của tôi</a>
-    <a href="{{ url_for('address') }}" class="{% if request.endpoint == 'address' %}is-active{% endif %}">Sổ địa chỉ</a>
-    <a href="{{ url_for('wishlist') }}" class="{% if request.endpoint == 'wishlist' %}is-active{% endif %}">Sản phẩm yêu thích</a>
-    <a href="{{ url_for('login') }}">Đăng xuất</a>
-</aside>

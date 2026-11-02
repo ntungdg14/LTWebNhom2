@@ -1,0 +1,45 @@
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{{ url_for('store.home') }}" class="logo">FREESION</a>
+                <h2>Freesion - Tự do diện, hiện cá tính</h2>
+                <p>Thời trang tinh gọn, chất liệu bền đẹp, đủ chỗ cho bạn phối theo cách riêng.</p>
+            </div>
+
+            <div>
+                <h2>Mua sắm</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('store.shop') }}">Nữ</a>
+                    <a href="{{ url_for('store.shop') }}">Nam</a>
+                    <a href="{{ url_for('store.shop') }}">Phụ kiện</a>
+                    <a href="{{ url_for('store.shop') }}">Hàng mới về</a>
+                    <a href="{{ url_for('store.shop') }}">Sale</a>
+                </div>
+            </div>
+
+            <div>
+                <h2>Hỗ trợ</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('store.product_detail') }}">Hướng dẫn chọn size</a>
+                    <a href="{{ url_for('store.cart') }}">Chính sách đổi trả</a>
+                    <a href="{{ url_for('checkout.checkout') }}">Vận chuyển &amp; thanh toán</a>
+                    <a href="{{ url_for('auth.login') }}">Liên hệ</a>
+                </div>
+            </div>
+
+            <div>
+                <h2>Tài khoản</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('auth.login') }}">Đăng nhập</a>
+                    <a href="{{ url_for('auth.register') }}">Đăng ký</a>
+                    <a href="{{ url_for('account.order_history') }}">Đơn hàng</a>
+                    <a href="{{ url_for('account.wishlist') }}">Yêu thích</a>
+                    <a href="{{ url_for('admin.dashboard') }}">Trang quản trị</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-copy">© 2026 Freesion. Tự do diện, hiện cá tính.</div>
+    </div>
+</footer>

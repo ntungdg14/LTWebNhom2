@@ -1,0 +1,36 @@
+/* ==========================================================================
+   Thanh toán (checkout/checkout.html): ô nhập địa chỉ và lựa chọn vận chuyển / thanh toán.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.choice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border: 1px solid var(--stone-300);
+    background: var(--white);
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: var(--stone-700);
+}
+
+.choice-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (min-width: 640px) {
+    .grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}

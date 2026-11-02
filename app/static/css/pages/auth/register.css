@@ -1,0 +1,12 @@
+/* ==========================================================================
+   Đăng ký (auth/register.html): dòng điều khoản nhiều chữ.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+/* Dòng điều khoản dài hơn các dòng còn lại trong biểu mẫu. */
+.terms {
+    align-items: flex-start;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--stone-600);
+}

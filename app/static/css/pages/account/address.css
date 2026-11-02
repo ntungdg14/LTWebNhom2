@@ -1,0 +1,24 @@
+/* ==========================================================================
+   Sổ địa chỉ (account/address.html): lưới thẻ địa chỉ.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.address-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.address-card {
+    border: 1px solid var(--stone-200);
+    background: var(--white);
+    padding: 1.5rem;
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+    .address-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

@@ -1,0 +1,7 @@
+{# Khung chung cho 3 trang xác thực: cùng dùng biểu mẫu hẹp ở giữa trang. #}
+{% extends "layouts/base_store.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/auth/auth.css') }}">
+{% endblock %}

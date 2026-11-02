@@ -1,16 +1,21 @@
 {% extends "layouts/base_admin.html" %}
 {% block title %}Đơn hàng - Freesion Admin{% endblock %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/orders.css') }}">
+{% endblock %}
+
 {% block content %}
 <main class="admin-content stack-gap">
     <header class="row-between">
         <h1 class="page-title">Quản lý đơn hàng</h1>
         <div class="toolbar">
-            <a href="{{ url_for('admin_orders') }}" class="btn">Tất cả</a>
-            <a href="{{ url_for('admin_orders') }}" class="btn btn-ghost">Chờ xử lý</a>
-            <a href="{{ url_for('admin_orders') }}" class="btn btn-ghost">Đang giao</a>
-            <a href="{{ url_for('admin_orders') }}" class="btn btn-ghost">Đã hoàn thành</a>
-            <a href="{{ url_for('admin_orders') }}" class="btn btn-ghost">Đã hủy</a>
+            <a href="{{ url_for('admin.orders') }}" class="btn">Tất cả</a>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Chờ xử lý</a>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Đang giao</a>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Đã hoàn thành</a>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Đã hủy</a>
         </div>
     </header>
 
@@ -21,19 +26,19 @@
                     <tr><th>Mã đơn hàng</th><th>Tên khách hàng</th><th>Ngày đặt</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thao tác</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>#FS9482</td><td>Nguyễn Minh Anh</td><td>02/11/2026</td><td>1.906.000₫</td><td><span class="badge badge-warn">Chờ xử lý</span></td><td><a href="{{ url_for('order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9481</td><td>Trần Hoàng Nam</td><td>01/11/2026</td><td>899.000₫</td><td><span class="badge badge-warn">Đang giao</span></td><td><a href="{{ url_for('order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9480</td><td>Lê Khánh Linh</td><td>31/10/2026</td><td>1.248.000₫</td><td><span class="badge badge-ok">Đã hoàn thành</span></td><td><a href="{{ url_for('order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9479</td><td>Phạm Minh Khoa</td><td>30/10/2026</td><td>649.000₫</td><td><span class="badge badge-ok">Đã hoàn thành</span></td><td><a href="{{ url_for('order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9478</td><td>Võ Ngọc Hân</td><td>29/10/2026</td><td>329.000₫</td><td><span class="badge badge-danger">Đã hủy</span></td><td><a href="{{ url_for('order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td>#FS9482</td><td>Nguyễn Minh Anh</td><td>02/11/2026</td><td>1.906.000₫</td><td><span class="badge badge-warn">Chờ xử lý</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td>#FS9481</td><td>Trần Hoàng Nam</td><td>01/11/2026</td><td>899.000₫</td><td><span class="badge badge-warn">Đang giao</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td>#FS9480</td><td>Lê Khánh Linh</td><td>31/10/2026</td><td>1.248.000₫</td><td><span class="badge badge-ok">Đã hoàn thành</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td>#FS9479</td><td>Phạm Minh Khoa</td><td>30/10/2026</td><td>649.000₫</td><td><span class="badge badge-ok">Đã hoàn thành</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td>#FS9478</td><td>Võ Ngọc Hân</td><td>29/10/2026</td><td>329.000₫</td><td><span class="badge badge-danger">Đã hủy</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
                 </tbody>
             </table>
         </div>
         <nav class="pagination" aria-label="Phân trang đơn hàng">
-            <a href="{{ url_for('admin_orders') }}" class="page-num page-num-sm is-active">1</a>
-            <a href="{{ url_for('admin_orders') }}" class="page-num page-num-sm">2</a>
-            <a href="{{ url_for('admin_orders') }}" class="page-num page-num-sm">3</a>
-            <a href="{{ url_for('admin_orders') }}" class="page-num page-num-sm">Tiếp →</a>
+            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm is-active">1</a>
+            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm">2</a>
+            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm">3</a>
+            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm">Tiếp →</a>
         </nav>
     </section>
 </main>

@@ -1,10 +1,15 @@
-{% extends "layouts/base_store.html" %}
+{% extends "layouts/base_account.html" %}
 {% block title %}Đơn hàng của tôi - FREESION{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/account/order_history.css') }}">
+{% endblock %}
 
 {% block content %}
 <div class="page">
     <div class="account-layout">
-        {% include "layouts/_account_nav.html" %}
+        {% include "layouts/partials/_account_nav.html" %}
         <section class="grow">
             <h1 class="page-title mb-6">Đơn hàng của tôi</h1>
 
@@ -34,8 +39,8 @@
                 <footer class="row-between mt-4">
                     <p class="muted">Tổng thanh toán: <strong>1.906.000₫</strong></p>
                     <div class="toolbar">
-                        <a href="{{ url_for('order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
-                        <a href="{{ url_for('cart') }}" class="btn">Mua lại</a>
+                        <a href="{{ url_for('checkout.order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="{{ url_for('store.cart') }}" class="btn">Mua lại</a>
                     </div>
                 </footer>
             </article>
@@ -56,17 +61,17 @@
                 <footer class="row-between mt-4">
                     <p class="muted">Tổng thanh toán: <strong>899.000₫</strong></p>
                     <div class="toolbar">
-                        <a href="{{ url_for('order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
-                        <a href="{{ url_for('cart') }}" class="btn">Mua lại</a>
+                        <a href="{{ url_for('checkout.order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="{{ url_for('store.cart') }}" class="btn">Mua lại</a>
                     </div>
                 </footer>
             </article>
 
             <nav class="pagination" aria-label="Phân trang đơn hàng">
-                <a href="{{ url_for('order_history') }}" class="page-num is-active">1</a>
-                <a href="{{ url_for('order_history') }}" class="page-num">2</a>
-                <a href="{{ url_for('order_history') }}" class="page-num">3</a>
-                <a href="{{ url_for('order_history') }}" class="page-num">Tiếp →</a>
+                <a href="{{ url_for('account.order_history') }}" class="page-num is-active">1</a>
+                <a href="{{ url_for('account.order_history') }}" class="page-num">2</a>
+                <a href="{{ url_for('account.order_history') }}" class="page-num">3</a>
+                <a href="{{ url_for('account.order_history') }}" class="page-num">Tiếp →</a>
             </nav>
         </section>
     </div>

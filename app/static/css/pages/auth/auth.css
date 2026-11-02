@@ -1,0 +1,37 @@
+/* ==========================================================================
+   Biểu mẫu xác thực dùng chung cho các trang đăng nhập / đăng ký / quên mật khẩu (base_auth.html).
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.page-narrow {
+    max-width: 28rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+}
+
+.auth-header {
+    text-align: center;
+}
+
+.auth-header h1 {
+    margin: 0;
+    font-size: 1.875rem;
+}
+
+.auth-header p {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    color: var(--stone-600);
+}
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-switch {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--stone-600);
+}

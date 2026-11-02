@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Khung tài khoản dùng chung cho 4 trang account (base_account.html): bố cục và menu bên trái.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.account-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.5rem;
+}
+
+.account-nav {
+    display: none;
+    width: 16rem;
+    flex-shrink: 0;
+}
+
+.account-nav h2 {
+    margin: 0 0 1.25rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.account-nav a {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--stone-600);
+}
+
+.account-nav a:hover {
+    color: var(--stone-900);
+}
+
+.account-nav a.is-active {
+    border-left: 2px solid var(--stone-900);
+    background: var(--white);
+    color: var(--stone-900);
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+    .account-nav {
+        display: block;
+    }
+}

@@ -1,0 +1,12 @@
+/* ==========================================================================
+   Đăng nhập (auth/login.html): dòng phụ ghi nhớ đăng nhập / quên mật khẩu.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.auth-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--stone-600);
+}

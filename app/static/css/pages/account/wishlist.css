@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Sản phẩm yêu thích (account/wishlist.html): nút xóa khỏi danh sách.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.wishlist-media {
+    position: relative;
+}
+
+.remove-fav {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    font-size: 1.125rem;
+}

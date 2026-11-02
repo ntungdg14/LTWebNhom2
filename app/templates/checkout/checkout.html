@@ -1,10 +1,15 @@
 {% extends "layouts/base_store.html" %}
 {% block title %}Thanh toán - FREESION{% endblock %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/checkout/checkout.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="page">
     <h1 class="page-title mb-6">Thanh toán đơn hàng</h1>
-    <form class="split" action="{{ url_for('order_success') }}" method="get">
+    <form class="split" action="{{ url_for('checkout.order_success') }}" method="get">
         <div class="split-main form-stack">
             <section class="form-stack">
                 <h2>Thông tin nhận hàng</h2>

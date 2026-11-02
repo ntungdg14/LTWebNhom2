@@ -1,0 +1,11 @@
+/* ==========================================================================
+   Lịch sử đơn hàng (account/order_history.html): thẻ đơn hàng.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.order-card {
+    border: 1px solid var(--stone-200);
+    background: var(--white);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
