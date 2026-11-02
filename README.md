@@ -61,16 +61,7 @@ python -m unittest discover -s tests -v
 └── run.py                       # entry point chạy development server
 ```
 
-## CSS: đã dọn gì?
-
-* **Xóa `app/static/css/main.css`** (1 file 1.106 dòng) → tách thành các file nhỏ theo từng tầng và từng trang.
-* **Loại bỏ CSS bên ngoài không dùng**: bỏ hoàn toàn `<link>` Google Fonts / `preconnect`
-  trong layout. `--font` trong `base.css` giờ dùng system font stack, nên trang web
-  không còn phụ thuộc CDN, tải offline được và không có request ra ngoài.
-  Không còn Bootstrap / Tailwind / thư viện CSS bên thứ ba nào; đồng thời xóa các
-  rule chết không được template nào dùng (`.container`, `.text-center`, `.mt-2`).
-* Mỗi trang HTML có **đúng 1 stylesheet riêng**, nạp qua `{% block styles %}{{ super() }}`.
-  Thứ tự nạp (cascade) luôn là: nền tảng → thành phần → layout → khu vực → trang.
+## CSS:
 
 ```
 app/static/css/
@@ -86,21 +77,3 @@ app/static/css/
     ├── account/     account.css (dùng chung)  profile.css  order_history.css  address.css  wishlist.css
     └── admin/       admin.css (dùng chung)  dashboard.css  products.css  orders.css  users.css
 ```
-
-| Trang HTML | Stylesheet riêng | CSS chung của khu vực |
-| --- | --- | --- |
-| `store/*.html` | `pages/store/<tên trang>.css` | `layouts/store.css` |
-| `auth/*.html` | `pages/auth/<tên trang>.css` | `pages/auth/auth.css` (qua `base_auth.html`) |
-| `checkout/*.html` | `pages/checkout/<tên trang>.css` | `layouts/store.css` |
-| `account/*.html` | `pages/account/<tên trang>.css` | `pages/account/account.css` (qua `base_account.html`) |
-| `admin/*.html` | `pages/admin/<tên trang>.css` | `layouts/admin.css` + `pages/admin/admin.css` |
-
-> `base.html` nạp `base.css` và `components.css` cho mọi trang. Các file trong
-> `pages/` chỉ chứa rule riêng của trang đó; rule dùng từ 2 trang trở lên nằm ở
-> `components.css` hoặc file CSS chung của khu vực để tránh lặp code.
-
-## Endpoint (sau khi tách blueprint)
-
-`url_for()` trong template dùng tên có namespace, ví dụ `url_for('store.home')`,
-`url_for('auth.login')`, `url_for('admin.products')`. Đường dẫn URL công khai vẫn
-giữ nguyên như cũ.
