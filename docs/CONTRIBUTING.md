@@ -34,7 +34,7 @@ Tên branch nên ngắn gọn, viết thường, không dấu và dùng dấu g�
 
 Các loại commit:
 
-| Type | Ý nghĩa |s
+| Type | Ý nghĩa |
 |---|---|
 | `feat` | Thêm chức năng |
 | `fix` | Sửa lỗi |
