@@ -1,0 +1,90 @@
+/* ==========================================================================
+   Footer cửa hàng (dùng bởi layouts/base_store.html).
+   Tách riêng khỏi store.css để việc sửa header 2 hàng không ảnh hưởng footer.
+   Mọi màu vẫn lấy từ design tokens trong base.css, không thêm màu mới.
+   ========================================================================== */
+
+/* Giữ footer luôn ở đáy trang trên các trang ngắn (login, register...).
+   Chỉ áp dụng cho layout cửa hàng: admin không nạp file này. */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.site-main {
+    flex: 1 0 auto;
+}
+
+.site-header,
+.site-footer {
+    flex-shrink: 0;
+}
+
+.site-footer {
+    width: 100%;
+    background: var(--stone-950);
+    color: var(--stone-300);
+    padding: 3.5rem 0 0;
+    border-top: 1px solid var(--stone-800);
+}
+
+.footer-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.footer-brand .logo {
+    color: var(--white);
+}
+
+.footer-brand h2 {
+    margin: 1rem 0 0;
+    font-size: 0.875rem;
+    color: var(--white);
+    font-weight: 500;
+}
+
+.footer-brand p {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.site-footer h2 {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--white);
+}
+
+.footer-links {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.footer-copy {
+    border-top: 1px solid var(--stone-800);
+    margin-top: 2.5rem;
+    padding: 1.5rem 0;
+    font-size: 0.75rem;
+    color: var(--stone-500);
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

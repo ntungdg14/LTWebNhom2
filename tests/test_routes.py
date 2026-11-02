@@ -126,5 +126,44 @@ class HeaderLayoutTests(unittest.TestCase):
         self.assertLess(row.index(">Nữ<"), row.index(">Nam<"))
 
 
+class FooterLayoutTests(unittest.TestCase):
+    """Footer tách riêng khỏi store.css, luôn được nạp trên các trang cửa hàng."""
+
+    STORE_PAGES = PAGES[:13]
+    ADMIN_PAGES = PAGES[13:]
+    CSS_DIR = STATIC_DIR / "css"
+
+    def setUp(self):
+        self.client = create_app("testing").test_client()
+
+    def test_footer_stylesheet_is_loaded(self):
+        for url in self.STORE_PAGES:
+            with self.subTest(url=url):
+                html = self.client.get(url).get_data(as_text=True)
+                self.assertIn("/static/css/layouts/footer.css", html)
+                self.assertIn('class="site-footer"', html)
+                self.assertIn('class="footer-grid"', html)
+                self.assertIn('class="footer-copy"', html)
+
+    def test_admin_pages_do_not_load_store_layout_assets(self):
+        for url in self.ADMIN_PAGES:
+            with self.subTest(url=url):
+                html = self.client.get(url).get_data(as_text=True)
+                self.assertNotIn("/static/css/layouts/store.css", html)
+                self.assertNotIn("/static/css/layouts/footer.css", html)
+
+    def test_header_and_footer_css_are_separated(self):
+        store_css = (self.CSS_DIR / "layouts/store.css").read_text(encoding="utf-8")
+        footer_css = (self.CSS_DIR / "layouts/footer.css").read_text(encoding="utf-8")
+        self.assertNotIn(".site-footer", store_css)
+        self.assertNotIn(".footer-grid", store_css)
+        self.assertIn(".site-footer", footer_css)
+        self.assertIn(".footer-grid", footer_css)
+        self.assertIn("@media (min-width: 768px)", footer_css)
+        for name, text in (("store.css", store_css), ("footer.css", footer_css)):
+            with self.subTest(file=name):
+                self.assertEqual(text.count("{"), text.count("}"), name)
+
+
 if __name__ == "__main__":
     unittest.main()

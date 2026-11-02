@@ -71,7 +71,8 @@ app/static/css/
 ├── base.css                    # :root design tokens, reset, typography, utilities
 ├── components.css              # nút, input, thẻ sản phẩm, badge, phân trang, summary…
 ├── layouts/
-│   ├── store.css               # header / nav / footer
+│   ├── store.css               # chỉ header 2 hàng + ô tìm kiếm
+│   ├── footer.css              # footer (tách riêng, không phụ thuộc store.css)
 │   └── admin.css               # sidebar / vùng nội dung admin
 └── pages/                      # mirror theo cây templates/
     ├── store/       home.css  shop.css  product_detail.css  cart.css
@@ -84,7 +85,9 @@ app/static/css/
 ## Header cửa hàng
 
 `layouts/partials/_site_header.html` gồm **2 hàng** (bố cục tham khảo header CANIFA),
-toàn bộ style nằm ở `css/layouts/store.css`:
+toàn bộ style nằm ở `css/layouts/store.css`. Footer được tách riêng sang
+`css/layouts/footer.css` (nạp ngay sau `store.css` trong `base_store.html`) để
+việc chỉnh header không bao giờ làm ảnh hưởng footer:
 
 1. **Hàng trên**: logo `FREESION` bên trái → ô **tìm kiếm** (`<form method="get">`
    gửi `q` tới `/shop`) → 3 tiện ích có icon phía trên nhãn: Cửa hàng, Tài khoản,

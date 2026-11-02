@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Khung trang cửa hàng: header 2 hàng + footer (layouts/base_store.html).
-   File này chỉ định bố cục; mọi màu đều lấy từ design tokens trong base.css,
-   nên bảng màu của dự án không thay đổi. Không dùng thư viện CSS bên ngoài.
+   Header cửa hàng 2 hàng (layouts/partials/_site_header.html).
+   File này CHỈ chứa bố cục header; footer nằm riêng ở layouts/footer.css.
+   Mọi màu đều lấy từ design tokens trong base.css, không dùng thư viện ngoài.
    ========================================================================== */
 
 .site-header {
@@ -186,72 +186,10 @@
     color: var(--orange-600);
 }
 
-/* --- Phần còn lại của layout cửa hàng ------------------------------------ */
-
 .site-main {
     min-height: 60vh;
     background: var(--bg);
     color: var(--stone-900);
-}
-
-.site-footer {
-    background: var(--stone-950);
-    color: var(--stone-300);
-    padding: 3.5rem 0 0;
-    border-top: 1px solid var(--stone-800);
-}
-
-.footer-inner {
-    max-width: var(--max);
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
-
-.footer-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-}
-
-.footer-brand .logo {
-    color: var(--white);
-}
-
-.footer-brand h2 {
-    margin: 1rem 0 0;
-    font-size: 0.875rem;
-    color: var(--white);
-    font-weight: 500;
-}
-
-.footer-brand p {
-    margin: 0.75rem 0 0;
-    font-size: 0.875rem;
-    line-height: 1.6;
-}
-
-.site-footer h2 {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--white);
-}
-
-.footer-links {
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    font-size: 0.875rem;
-}
-
-.footer-copy {
-    border-top: 1px solid var(--stone-800);
-    margin-top: 2.5rem;
-    padding: 1.5rem 0;
-    font-size: 0.75rem;
-    color: var(--stone-500);
 }
 
 /* Responsive ------------------------------------------------------------- */
@@ -297,11 +235,5 @@
 
     .nav-actions {
         gap: 1.25rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .footer-grid {
-        grid-template-columns: repeat(4, 1fr);
     }
 }
