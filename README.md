@@ -77,3 +77,7 @@ app/static/css/
     ├── account/     account.css (dùng chung)  profile.css  order_history.css  address.css  wishlist.css
     └── admin/       admin.css (dùng chung)  dashboard.css  products.css  orders.css  users.css
 ```
+
+## Đóng góp
+
+Xem [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
