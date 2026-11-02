@@ -1,4 +1,3 @@
-"""Điểm khởi chạy server phát triển: python run.py."""
 from __future__ import annotations
 
 import os

@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Cài Python 3.14 (theo pyproject.toml / uv.lock)
+        run: uv python install 3.14
+      - name: Build - cài dependencies theo lock
+        run: uv sync --frozen
+      - name: Build - biên dịch & kiểm tra import app
+        run: |
+          uv run python -m compileall -q app tests
+          uv run python -c "from app import create_app; create_app('testing')"
+      - name: Chạy test
+        run: uv run python -m unittest discover -s tests -v
