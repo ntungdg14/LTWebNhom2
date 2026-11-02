@@ -1,6 +1,11 @@
 {% extends "layouts/base_store.html" %}
 {% block title %}Đặt hàng thành công - FREESION{% endblock %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/checkout/order_success.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="page-success">
     <div class="success-icon" aria-label="Đặt hàng thành công">✓</div>
@@ -19,8 +24,8 @@
     </section>
 
     <div class="success-actions">
-        <a href="{{ url_for('shop') }}" class="btn">Tiếp tục mua sắm</a>
-        <a href="{{ url_for('order_history') }}" class="btn btn-ghost">Xem lịch sử đơn hàng</a>
+        <a href="{{ url_for('store.shop') }}" class="btn">Tiếp tục mua sắm</a>
+        <a href="{{ url_for('account.order_history') }}" class="btn btn-ghost">Xem lịch sử đơn hàng</a>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,18 @@
+/* ==========================================================================
+   Quản lý sản phẩm (admin/products.html): thanh tìm kiếm / lọc.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.admin-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+    .admin-filters {
+        flex-direction: row;
+    }
+}

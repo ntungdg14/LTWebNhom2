@@ -1,0 +1,17 @@
+/* ==========================================================================
+   Hồ sơ (account/profile.html): bảng thông tin cá nhân.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.panel {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--stone-200);
+    padding: 2rem;
+}
+
+.panel h1 {
+    margin: 0 0 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--stone-200);
+}

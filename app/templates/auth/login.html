@@ -1,5 +1,10 @@
-{% extends "layouts/base_store.html" %}
+{% extends "layouts/base_auth.html" %}
 {% block title %}Đăng nhập - FREESION{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/auth/login.css') }}">
+{% endblock %}
 
 {% block content %}
 <div class="page-narrow">
@@ -7,7 +12,7 @@
         <h1>Đăng nhập</h1>
         <p>Chào mừng bạn trở lại với Freesion</p>
     </header>
-    <form class="form-stack mt-8" action="{{ url_for('profile') }}" method="get">
+    <form class="form-stack mt-8" action="{{ url_for('account.profile') }}" method="get">
         <div class="field">
             <label for="email">Email</label>
             <input id="email" class="input" type="email" placeholder="Nhập email của bạn" required>
@@ -18,10 +23,10 @@
         </div>
         <div class="auth-meta">
             <label class="remember"><input type="checkbox"> Ghi nhớ đăng nhập</label>
-            <a href="{{ url_for('forgot_password') }}">Quên mật khẩu?</a>
+            <a href="{{ url_for('auth.forgot_password') }}">Quên mật khẩu?</a>
         </div>
         <button type="submit" class="btn btn-block">Đăng nhập</button>
     </form>
-    <p class="auth-switch mt-4">Chưa có tài khoản? <a href="{{ url_for('register') }}" class="link-underline">Đăng ký ngay</a></p>
+    <p class="auth-switch mt-4">Chưa có tài khoản? <a href="{{ url_for('auth.register') }}" class="link-underline">Đăng ký ngay</a></p>
 </div>
 {% endblock %}

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Flask / biến môi trường / dữ liệu local
+instance/
+.env
+.flaskenv
+*.log
+*.sqlite3
+
+# IDE & hệ điều hành
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

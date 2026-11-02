@@ -1,0 +1,10 @@
+/* ==========================================================================
+   Quản lý đơn hàng (admin/orders.html): cột trạng thái và thao tác.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+/* Cột trạng thái / thao tác không được bẻ dòng. */
+.admin-table th:last-child,
+.admin-table td:last-child {
+    white-space: nowrap;
+}

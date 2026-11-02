@@ -1,6 +1,11 @@
 {% extends "layouts/base_store.html" %}
 {% block title %}Giỏ hàng - FREESION{% endblock %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/store/cart.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="page">
     <h1 class="page-title mb-6">Giỏ hàng của bạn</h1>
@@ -9,44 +14,44 @@
             <article class="cart-item">
                 <div class="media media-thumb media-beige">Ảnh sản phẩm</div>
                 <div class="grow">
-                    <h2><a href="{{ url_for('product_detail') }}">Áo sơ mi Linen Basic</a></h2>
+                    <h2><a href="{{ url_for('store.product_detail') }}">Áo sơ mi Linen Basic</a></h2>
                     <p class="meta">Màu: Be tự nhiên · Size: M</p>
                     <p class="price">549.000₫</p>
                 </div>
                 <div class="qty">
-                    <a href="{{ url_for('cart') }}">−</a>
+                    <a href="{{ url_for('store.cart') }}">−</a>
                     <span>1</span>
-                    <a href="{{ url_for('cart') }}">+</a>
+                    <a href="{{ url_for('store.cart') }}">+</a>
                 </div>
-                <a href="{{ url_for('cart') }}" class="link-underline">Xóa</a>
+                <a href="{{ url_for('store.cart') }}" class="link-underline">Xóa</a>
             </article>
             <article class="cart-item">
                 <div class="media media-thumb media-denim">Ảnh sản phẩm</div>
                 <div class="grow">
-                    <h2><a href="{{ url_for('product_detail') }}">Quần jean Straight Fit</a></h2>
+                    <h2><a href="{{ url_for('store.product_detail') }}">Quần jean Straight Fit</a></h2>
                     <p class="meta">Màu: Xanh denim · Size: L</p>
                     <p class="price">699.000₫</p>
                 </div>
                 <div class="qty">
-                    <a href="{{ url_for('cart') }}">−</a>
+                    <a href="{{ url_for('store.cart') }}">−</a>
                     <span>1</span>
-                    <a href="{{ url_for('cart') }}">+</a>
+                    <a href="{{ url_for('store.cart') }}">+</a>
                 </div>
-                <a href="{{ url_for('cart') }}" class="link-underline">Xóa</a>
+                <a href="{{ url_for('store.cart') }}" class="link-underline">Xóa</a>
             </article>
             <article class="cart-item">
                 <div class="media media-thumb media-rose">Ảnh sản phẩm</div>
                 <div class="grow">
-                    <h2><a href="{{ url_for('product_detail') }}">Áo thun Essential</a></h2>
+                    <h2><a href="{{ url_for('store.product_detail') }}">Áo thun Essential</a></h2>
                     <p class="meta">Màu: Hồng đất · Size: S</p>
                     <p class="price">329.000₫</p>
                 </div>
                 <div class="qty">
-                    <a href="{{ url_for('cart') }}">−</a>
+                    <a href="{{ url_for('store.cart') }}">−</a>
                     <span>2</span>
-                    <a href="{{ url_for('cart') }}">+</a>
+                    <a href="{{ url_for('store.cart') }}">+</a>
                 </div>
-                <a href="{{ url_for('cart') }}" class="link-underline">Xóa</a>
+                <a href="{{ url_for('store.cart') }}" class="link-underline">Xóa</a>
             </article>
         </section>
 
@@ -56,7 +61,7 @@
             <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
             <p class="meta">Miễn phí cho đơn từ 499.000₫</p>
             <div class="summary-total"><span>Tổng cộng</span><span>1.906.000₫</span></div>
-            <a href="{{ url_for('checkout') }}" class="btn btn-block mt-4">Tiến hành thanh toán</a>
+            <a href="{{ url_for('checkout.checkout') }}" class="btn btn-block mt-4">Tiến hành thanh toán</a>
         </aside>
     </div>
 </div>

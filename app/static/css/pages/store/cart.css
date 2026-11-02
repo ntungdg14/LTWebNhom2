@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Giỏ hàng (store/cart.html): dòng sản phẩm và bộ đếm số lượng.
+   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   ========================================================================== */
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--stone-200);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.cart-item h2 {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.qty {
+    display: flex;
+    width: 7rem;
+    align-items: center;
+    border: 1px solid var(--stone-300);
+    background: var(--white);
+}
+
+.qty a {
+    display: flex;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.qty span {
+    display: flex;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}

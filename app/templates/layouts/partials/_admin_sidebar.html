@@ -1,0 +1,8 @@
+<aside class="admin-sidebar">
+    <a href="{{ url_for('admin.dashboard') }}" class="logo">FREESION</a>
+    <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}is-active{% endif %}">Tổng quan</a>
+    <a href="{{ url_for('admin.products') }}" class="{% if request.endpoint == 'admin.products' %}is-active{% endif %}">Sản phẩm</a>
+    <a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint == 'admin.orders' %}is-active{% endif %}">Đơn hàng</a>
+    <a href="{{ url_for('admin.users') }}" class="{% if request.endpoint == 'admin.users' %}is-active{% endif %}">Khách hàng</a>
+    <a href="{{ url_for('store.home') }}">Về cửa hàng</a>
+</aside>
