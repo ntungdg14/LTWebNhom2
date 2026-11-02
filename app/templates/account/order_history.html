@@ -1,0 +1,74 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Đơn hàng của tôi - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="account-layout">
+        {% include "layouts/_account_nav.html" %}
+        <section class="grow">
+            <h1 class="page-title mb-6">Đơn hàng của tôi</h1>
+
+            <article class="order-card">
+                <header class="row-between">
+                    <div>
+                        <p><strong>Mã đơn hàng #FS9482</strong></p>
+                        <p class="meta">Đặt ngày 02 tháng 11, 2026</p>
+                    </div>
+                    <span class="badge badge-warn">Đang giao hàng</span>
+                </header>
+                <div class="order-line">
+                    <div class="media media-sm media-beige">Ảnh sản phẩm</div>
+                    <div class="grow"><h2>Áo sơ mi Linen Basic</h2><p class="meta">Số lượng: 1 · Be tự nhiên</p></div>
+                    <span>549.000₫</span>
+                </div>
+                <div class="order-line">
+                    <div class="media media-sm media-denim">Ảnh sản phẩm</div>
+                    <div class="grow"><h2>Quần jean Straight Fit</h2><p class="meta">Số lượng: 1 · Xanh denim</p></div>
+                    <span>699.000₫</span>
+                </div>
+                <div class="order-line">
+                    <div class="media media-sm media-rose">Ảnh sản phẩm</div>
+                    <div class="grow"><h2>Áo thun Essential</h2><p class="meta">Số lượng: 2 · Hồng đất</p></div>
+                    <span>658.000₫</span>
+                </div>
+                <footer class="row-between mt-4">
+                    <p class="muted">Tổng thanh toán: <strong>1.906.000₫</strong></p>
+                    <div class="toolbar">
+                        <a href="{{ url_for('order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="{{ url_for('cart') }}" class="btn">Mua lại</a>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="order-card">
+                <header class="row-between">
+                    <div>
+                        <p><strong>Mã đơn hàng #FS9341</strong></p>
+                        <p class="meta">Đặt ngày 18 tháng 10, 2026</p>
+                    </div>
+                    <span class="badge badge-ok">Đã giao hàng</span>
+                </header>
+                <div class="order-line">
+                    <div class="media media-sm media-olive">Ảnh sản phẩm</div>
+                    <div class="grow"><h2>Áo khoác Corduroy</h2><p class="meta">Số lượng: 1 · Xanh rêu</p></div>
+                    <span>899.000₫</span>
+                </div>
+                <footer class="row-between mt-4">
+                    <p class="muted">Tổng thanh toán: <strong>899.000₫</strong></p>
+                    <div class="toolbar">
+                        <a href="{{ url_for('order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="{{ url_for('cart') }}" class="btn">Mua lại</a>
+                    </div>
+                </footer>
+            </article>
+
+            <nav class="pagination" aria-label="Phân trang đơn hàng">
+                <a href="{{ url_for('order_history') }}" class="page-num is-active">1</a>
+                <a href="{{ url_for('order_history') }}" class="page-num">2</a>
+                <a href="{{ url_for('order_history') }}" class="page-num">3</a>
+                <a href="{{ url_for('order_history') }}" class="page-num">Tiếp →</a>
+            </nav>
+        </section>
+    </div>
+</div>
+{% endblock %}

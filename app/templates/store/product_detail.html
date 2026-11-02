@@ -1,0 +1,91 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Áo sơ mi Linen Basic - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="detail-layout">
+        <section aria-label="Hình ảnh sản phẩm">
+            <div class="media media-card media-beige">Ảnh sản phẩm</div>
+            <div class="gallery-thumbs">
+                <div class="media media-card media-beige">Ảnh sản phẩm</div>
+                <div class="media media-card media-cream">Ảnh sản phẩm</div>
+                <div class="media media-card media-olive">Ảnh sản phẩm</div>
+            </div>
+        </section>
+
+        <section class="product-info">
+            <header>
+                <p class="eyebrow">Freesion Essentials</p>
+                <h1>Áo sơ mi Linen Basic</h1>
+                <p class="price-lg">549.000₫</p>
+            </header>
+            <p class="muted">Thiết kế từ chất liệu linen mềm mại, thoáng mát với phom dáng relaxed vừa vặn. Một lựa chọn tối giản và linh hoạt cho mọi ngày.</p>
+
+            <div>
+                <div class="row-between">
+                    <h2>Màu sắc</h2>
+                    <span class="muted">Be tự nhiên</span>
+                </div>
+                <div class="swatches mt-3">
+                    <a href="{{ url_for('product_detail') }}" class="swatch media-beige is-active" aria-label="Màu be tự nhiên"></a>
+                    <a href="{{ url_for('product_detail') }}" class="swatch media-denim" aria-label="Màu xanh denim"></a>
+                    <a href="{{ url_for('product_detail') }}" class="swatch media-olive" aria-label="Màu xanh rêu"></a>
+                </div>
+            </div>
+
+            <div>
+                <div class="row-between">
+                    <h2>Kích thước</h2>
+                    <a href="{{ url_for('product_detail') }}" class="link-underline">Hướng dẫn chọn size</a>
+                </div>
+                <div class="size-row mt-3">
+                    <a href="{{ url_for('product_detail') }}" class="size-btn">S</a>
+                    <a href="{{ url_for('product_detail') }}" class="size-btn">M</a>
+                    <a href="{{ url_for('product_detail') }}" class="size-btn">L</a>
+                    <a href="{{ url_for('product_detail') }}" class="size-btn">XL</a>
+                </div>
+            </div>
+
+            <div>
+                <a href="{{ url_for('cart') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
+                <a href="{{ url_for('checkout') }}" class="btn btn-outline btn-block mt-3">Mua ngay</a>
+            </div>
+
+            <div class="notes">
+                <p><strong>Đổi trả dễ dàng:</strong> Đổi trả trong vòng 30 ngày.</p>
+                <p><strong>Vận chuyển:</strong> Miễn phí vận chuyển cho đơn từ 499.000₫.</p>
+            </div>
+        </section>
+    </div>
+
+    <section class="related">
+        <h2 class="page-title mb-6">Sản phẩm liên quan</h2>
+        <div class="product-grid">
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-denim">Ảnh sản phẩm</div>
+                <h3>Quần jean Straight Fit</h3>
+                <p class="meta">Xanh denim</p>
+                <p class="price">699.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-rose">Ảnh sản phẩm</div>
+                <h3>Áo thun Essential</h3>
+                <p class="meta">Hồng đất</p>
+                <p class="price">329.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-olive">Ảnh sản phẩm</div>
+                <h3>Áo khoác Corduroy</h3>
+                <p class="meta">Xanh rêu</p>
+                <p class="price">899.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-cream">Ảnh sản phẩm</div>
+                <h3>Quần dài Relaxed</h3>
+                <p class="meta">Kem sáng</p>
+                <p class="price">649.000₫</p>
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}

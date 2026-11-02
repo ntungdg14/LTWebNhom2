@@ -1,0 +1,43 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Sổ địa chỉ - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="account-layout">
+        {% include "layouts/_account_nav.html" %}
+        <section class="grow">
+            <header class="row-between mb-6">
+                <h1 class="page-title">Sổ địa chỉ của tôi</h1>
+                <a href="{{ url_for('address') }}" class="btn">Thêm địa chỉ mới</a>
+            </header>
+            <div class="address-grid">
+                <article class="address-card">
+                    <div class="row-between">
+                        <h2>Nguyễn Minh Anh</h2>
+                        <span class="badge">Mặc định</span>
+                    </div>
+                    <p class="muted">0901 234 567</p>
+                    <p class="muted">24 Nguyễn Huệ<br>Phường Bến Nghé, Quận 1<br>TP. Hồ Chí Minh</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('address') }}" class="link-underline">Chỉnh sửa</a>
+                        &nbsp;
+                        <a href="{{ url_for('address') }}" class="link-underline">Xóa</a>
+                    </div>
+                </article>
+                <article class="address-card">
+                    <h2>Nguyễn Minh Anh</h2>
+                    <p class="muted">0901 234 567</p>
+                    <p class="muted">118 Lê Lợi<br>Phường Bến Thành, Quận 1<br>TP. Hồ Chí Minh</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('address') }}" class="link-underline">Chỉnh sửa</a>
+                        &nbsp;
+                        <a href="{{ url_for('address') }}" class="link-underline">Xóa</a>
+                        &nbsp;
+                        <a href="{{ url_for('address') }}" class="link-underline">Đặt làm mặc định</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

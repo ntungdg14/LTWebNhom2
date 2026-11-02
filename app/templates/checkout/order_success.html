@@ -1,0 +1,26 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Đặt hàng thành công - FREESION{% endblock %}
+
+{% block content %}
+<div class="page-success">
+    <div class="success-icon" aria-label="Đặt hàng thành công">✓</div>
+    <h1 class="page-title mt-4">Đặt hàng thành công!</h1>
+    <p class="muted">Cảm ơn bạn đã mua sắm tại Freesion. Mã đơn hàng của bạn là <strong>#FS9482</strong>, chúng tôi đã gửi email xác nhận.</p>
+
+    <section class="success-box">
+        <h2>Chi tiết đơn hàng</h2>
+        <div class="summary-row"><span>Địa chỉ nhận hàng</span><span>Nguyễn Minh Anh, 24 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</span></div>
+        <div class="summary-row"><span>Phương thức thanh toán</span><span>Thanh toán khi nhận hàng COD</span></div>
+        <div class="summary-row"><span>Dự kiến giao hàng</span><span>04 - 06 tháng 11, 2026</span></div>
+        <div class="summary-row"><span>Áo sơ mi Linen Basic × 1</span><span>549.000₫</span></div>
+        <div class="summary-row"><span>Quần jean Straight Fit × 1</span><span>699.000₫</span></div>
+        <div class="summary-row"><span>Áo thun Essential × 2</span><span>658.000₫</span></div>
+        <div class="summary-total"><span>Tổng thanh toán</span><span>1.906.000₫</span></div>
+    </section>
+
+    <div class="success-actions">
+        <a href="{{ url_for('shop') }}" class="btn">Tiếp tục mua sắm</a>
+        <a href="{{ url_for('order_history') }}" class="btn btn-ghost">Xem lịch sử đơn hàng</a>
+    </div>
+</div>
+{% endblock %}

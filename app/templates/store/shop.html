@@ -1,0 +1,94 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Tất cả sản phẩm - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <header class="shop-head">
+        <h1 class="page-title">Tất cả sản phẩm</h1>
+        <form class="sort-form" action="{{ url_for('shop') }}">
+            <label for="sort">Sắp xếp:</label>
+            <select id="sort" class="input" name="sort">
+                <option>Mới nhất</option>
+                <option>Giá tăng dần</option>
+                <option>Giá giảm dần</option>
+            </select>
+        </form>
+    </header>
+
+    <div class="shop-layout">
+        <aside class="filters">
+            <section class="filter-group">
+                <h2>Danh mục</h2>
+                <div class="filter-list">
+                    <label><input type="checkbox"> Áo sơ mi</label>
+                    <label><input type="checkbox"> Quần</label>
+                    <label><input type="checkbox"> Phụ kiện</label>
+                </div>
+            </section>
+            <section class="filter-group">
+                <h2>Khoảng giá</h2>
+                <div class="filter-list">
+                    <label><input type="radio" name="price"> Dưới 500.000₫</label>
+                    <label><input type="radio" name="price"> 500.000₫ - 1.000.000₫</label>
+                    <label><input type="radio" name="price"> Trên 1.000.000₫</label>
+                </div>
+            </section>
+            <section class="filter-group">
+                <h2>Kích thước</h2>
+                <div class="size-chips">
+                    <a href="{{ url_for('shop') }}" class="chip">S</a>
+                    <a href="{{ url_for('shop') }}" class="chip">M</a>
+                    <a href="{{ url_for('shop') }}" class="chip">L</a>
+                    <a href="{{ url_for('shop') }}" class="chip">XL</a>
+                </div>
+            </section>
+        </aside>
+
+        <section class="product-grid-3">
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-beige">Ảnh sản phẩm</div>
+                <h2>Áo sơ mi Linen Basic</h2>
+                <p class="meta">Be tự nhiên</p>
+                <p class="price">549.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-denim">Ảnh sản phẩm</div>
+                <h2>Quần jean Straight Fit</h2>
+                <p class="meta">Xanh denim</p>
+                <p class="price">699.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-rose">Ảnh sản phẩm</div>
+                <h2>Áo thun Essential</h2>
+                <p class="meta">Hồng đất</p>
+                <p class="price">329.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-olive">Ảnh sản phẩm</div>
+                <h2>Áo khoác Corduroy</h2>
+                <p class="meta">Xanh rêu</p>
+                <p class="price">899.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-cream">Ảnh sản phẩm</div>
+                <h2>Quần dài Relaxed</h2>
+                <p class="meta">Kem sáng</p>
+                <p class="price">649.000₫</p>
+            </a>
+            <a href="{{ url_for('product_detail') }}" class="product-card">
+                <div class="media media-card media-taupe">Ảnh sản phẩm</div>
+                <h2>Áo len cổ tròn</h2>
+                <p class="meta">Xám olive</p>
+                <p class="price">579.000₫</p>
+            </a>
+        </section>
+    </div>
+
+    <nav class="pagination" aria-label="Phân trang">
+        <a href="{{ url_for('shop') }}" class="page-num is-active">1</a>
+        <a href="{{ url_for('shop') }}" class="page-num">2</a>
+        <a href="{{ url_for('shop') }}" class="page-num">3</a>
+        <a href="{{ url_for('shop') }}" class="page-num">Tiếp →</a>
+    </nav>
+</div>
+{% endblock %}

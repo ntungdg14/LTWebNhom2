@@ -1,0 +1,28 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Hồ sơ - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="account-layout">
+        {% include "layouts/_account_nav.html" %}
+        <section class="panel">
+            <h1>Hồ sơ của tôi</h1>
+            <form class="form-stack" action="{{ url_for('profile') }}" method="get">
+                <div class="field"><label for="full-name">Họ và tên</label><input id="full-name" class="input" type="text" value="Nguyễn Minh Anh"></div>
+                <div class="field"><label for="email">Email</label><input id="email" class="input" type="email" value="minhanh@example.com"></div>
+                <div class="field"><label for="phone">Số điện thoại</label><input id="phone" class="input" type="tel" value="0901 234 567"></div>
+                <div class="field">
+                    <label for="gender">Giới tính</label>
+                    <select id="gender" class="input">
+                        <option>Nữ</option>
+                        <option>Nam</option>
+                        <option>Khác</option>
+                    </select>
+                </div>
+                <div class="field"><label for="birth-date">Ngày sinh</label><input id="birth-date" class="input" type="date" value="1998-06-15"></div>
+                <button type="submit" class="btn">Lưu thay đổi</button>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}

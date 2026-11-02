@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Freesion Admin{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <a href="{{ url_for('admin_dashboard') }}" class="logo">FREESION</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}is-active{% endif %}">Tổng quan</a>
+            <a href="{{ url_for('admin_products') }}" class="{% if request.endpoint == 'admin_products' %}is-active{% endif %}">Sản phẩm</a>
+            <a href="{{ url_for('admin_orders') }}" class="{% if request.endpoint == 'admin_orders' %}is-active{% endif %}">Đơn hàng</a>
+            <a href="{{ url_for('admin_users') }}" class="{% if request.endpoint == 'admin_users' %}is-active{% endif %}">Khách hàng</a>
+            <a href="{{ url_for('home') }}">Về cửa hàng</a>
+        </aside>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

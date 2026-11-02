@@ -1,0 +1,58 @@
+{% extends "layouts/base_store.html" %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Bộ sưu tập Thu Đông 2026</p>
+        <h1>Tự do diện,<br>hiện cá tính</h1>
+        <p class="lead">Những thiết kế tối giản, thoải mái và đầy dấu ấn riêng cho hành trình tự tin thể hiện phong cách mỗi ngày.</p>
+        <a href="{{ url_for('shop') }}" class="btn mt-8">Mua sắm ngay</a>
+    </div>
+    <div class="media media-hero media-beige">Ảnh sản phẩm</div>
+</section>
+
+<nav class="category-bar" aria-label="Danh mục sản phẩm">
+    <div class="category-bar-inner">
+        <a href="{{ url_for('shop') }}" class="is-active">Áo sơ mi</a>
+        <a href="{{ url_for('shop') }}">Quần jean</a>
+        <a href="{{ url_for('shop') }}">Áo thun</a>
+        <a href="{{ url_for('shop') }}">Quần dài</a>
+        <a href="{{ url_for('shop') }}">Áo len</a>
+        <a href="{{ url_for('shop') }}">Áo khoác</a>
+    </div>
+</nav>
+
+<section class="section">
+    <div class="section-head">
+        <h2>Freesion được yêu thích</h2>
+        <a href="{{ url_for('shop') }}" class="link-underline">Xem tất cả</a>
+    </div>
+
+    <div class="product-grid">
+        <a href="{{ url_for('product_detail') }}" class="product-card">
+            <div class="media media-card media-beige">Ảnh sản phẩm</div>
+            <h3>Áo sơ mi Linen Basic</h3>
+            <p class="meta">Be tự nhiên</p>
+            <p class="price">549.000₫</p>
+        </a>
+        <a href="{{ url_for('product_detail') }}" class="product-card">
+            <div class="media media-card media-denim">Ảnh sản phẩm</div>
+            <h3>Quần jean Straight Fit</h3>
+            <p class="meta">Xanh denim</p>
+            <p class="price">699.000₫</p>
+        </a>
+        <a href="{{ url_for('product_detail') }}" class="product-card">
+            <div class="media media-card media-rose">Ảnh sản phẩm</div>
+            <h3>Áo thun Essential</h3>
+            <p class="meta">Hồng đất</p>
+            <p class="price">329.000₫</p>
+        </a>
+        <a href="{{ url_for('product_detail') }}" class="product-card">
+            <div class="media media-card media-olive">Ảnh sản phẩm</div>
+            <h3>Áo khoác Corduroy</h3>
+            <p class="meta">Xanh rêu</p>
+            <p class="price">899.000₫</p>
+        </a>
+    </div>
+</section>
+{% endblock %}

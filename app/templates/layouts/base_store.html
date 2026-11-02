@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FREESION - Tự do diện, hiện cá tính{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+
+    <header class="site-header">
+        <nav class="site-nav">
+            <div class="nav-links">
+                <a href="{{ url_for('shop') }}">Nữ</a>
+                <a href="{{ url_for('shop') }}">Nam</a>
+                <a href="{{ url_for('shop') }}">Phụ kiện</a>
+                <a href="{{ url_for('shop') }}">Hàng mới</a>
+                <a href="{{ url_for('shop') }}" class="nav-sale">Sale</a>
+            </div>
+
+            <a href="{{ url_for('home') }}" class="logo">FREESION</a>
+
+            <div class="nav-actions">
+                <a href="{{ url_for('shop') }}">Tìm kiếm</a>
+                <a href="{{ url_for('profile') }}">Tài khoản</a>
+                <a href="{{ url_for('cart') }}">Giỏ hàng (2)</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="site-main">{% block content %}{% endblock %}</main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="{{ url_for('home') }}" class="logo">FREESION</a>
+                    <h2>Freesion - Tự do diện, hiện cá tính</h2>
+                    <p>Thời trang tinh gọn, chất liệu bền đẹp, đủ chỗ cho bạn phối theo cách riêng.</p>
+                </div>
+
+                <div>
+                    <h2>Mua sắm</h2>
+                    <div class="footer-links">
+                        <a href="{{ url_for('shop') }}">Nữ</a>
+                        <a href="{{ url_for('shop') }}">Nam</a>
+                        <a href="{{ url_for('shop') }}">Phụ kiện</a>
+                        <a href="{{ url_for('shop') }}">Hàng mới về</a>
+                        <a href="{{ url_for('shop') }}">Sale</a>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Hỗ trợ</h2>
+                    <div class="footer-links">
+                        <a href="{{ url_for('product_detail') }}">Hướng dẫn chọn size</a>
+                        <a href="{{ url_for('cart') }}">Chính sách đổi trả</a>
+                        <a href="{{ url_for('checkout') }}">Vận chuyển &amp; thanh toán</a>
+                        <a href="{{ url_for('login') }}">Liên hệ</a>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Tài khoản</h2>
+                    <div class="footer-links">
+                        <a href="{{ url_for('login') }}">Đăng nhập</a>
+                        <a href="{{ url_for('register') }}">Đăng ký</a>
+                        <a href="{{ url_for('order_history') }}">Đơn hàng</a>
+                        <a href="{{ url_for('wishlist') }}">Yêu thích</a>
+                        <a href="{{ url_for('admin_dashboard') }}">Trang quản trị</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-copy">© 2026 Freesion. Tự do diện, hiện cá tính.</div>
+        </div>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

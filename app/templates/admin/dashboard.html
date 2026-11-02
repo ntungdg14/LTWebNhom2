@@ -1,0 +1,32 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Tổng quan - Freesion Admin{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="row-between">
+        <h1 class="page-title">Tổng quan hệ thống</h1>
+        <p class="meta">02 tháng 11, 2026</p>
+    </header>
+
+    <section class="stat-grid">
+        <article class="stat-card"><p>Doanh thu tổng</p><strong>128.450.000₫</strong><p class="up">+12,5% so với tháng trước</p></article>
+        <article class="stat-card"><p>Tổng đơn hàng</p><strong>1.248</strong><p class="up">+8,2% so với tháng trước</p></article>
+        <article class="stat-card"><p>Khách hàng mới</p><strong>186</strong><p class="up">+5,4% so với tháng trước</p></article>
+        <article class="stat-card"><p>Sản phẩm tồn kho</p><strong>3.642</strong><p class="warn">24 sản phẩm sắp hết</p></article>
+    </section>
+
+    <section class="admin-dash">
+        <div class="admin-card chart-placeholder">Biểu đồ doanh thu theo thời gian</div>
+        <section class="admin-card">
+            <div class="row-between">
+                <h2>Đơn hàng mới nhất</h2>
+                <a href="{{ url_for('admin_orders') }}" class="link-underline">Xem tất cả</a>
+            </div>
+            <div class="order-line"><div class="grow"><p><strong>#FS9482</strong></p><p class="meta">Nguyễn Minh Anh</p></div><span class="warn">Đang xử lý</span></div>
+            <div class="order-line"><div class="grow"><p><strong>#FS9481</strong></p><p class="meta">Trần Hoàng Nam</p></div><span class="warn">Chờ xác nhận</span></div>
+            <div class="order-line"><div class="grow"><p><strong>#FS9480</strong></p><p class="meta">Lê Khánh Linh</p></div><span class="up">Đã thanh toán</span></div>
+            <div class="order-line"><div class="grow"><p><strong>#FS9479</strong></p><p class="meta">Phạm Minh Khoa</p></div><span class="up">Đã thanh toán</span></div>
+        </section>
+    </section>
+</main>
+{% endblock %}

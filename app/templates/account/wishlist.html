@@ -1,0 +1,48 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Yêu thích - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="account-layout">
+        {% include "layouts/_account_nav.html" %}
+        <section class="grow">
+            <header class="mb-6">
+                <h1 class="page-title">Sản phẩm yêu thích</h1>
+                <p class="meta">Bạn đang lưu 3 sản phẩm</p>
+            </header>
+            <div class="product-grid-3">
+                <article class="product-card">
+                    <div class="wishlist-media">
+                        <div class="media media-card media-beige">Ảnh sản phẩm</div>
+                        <a href="{{ url_for('wishlist') }}" class="remove-fav" aria-label="Xóa Áo sơ mi Linen Basic khỏi danh sách yêu thích">×</a>
+                    </div>
+                    <h2><a href="{{ url_for('product_detail') }}">Áo sơ mi Linen Basic</a></h2>
+                    <p class="meta">Be tự nhiên</p>
+                    <p class="price">549.000₫</p>
+                    <a href="{{ url_for('cart') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
+                </article>
+                <article class="product-card">
+                    <div class="wishlist-media">
+                        <div class="media media-card media-denim">Ảnh sản phẩm</div>
+                        <a href="{{ url_for('wishlist') }}" class="remove-fav" aria-label="Xóa Quần jean Straight Fit khỏi danh sách yêu thích">×</a>
+                    </div>
+                    <h2><a href="{{ url_for('product_detail') }}">Quần jean Straight Fit</a></h2>
+                    <p class="meta">Xanh denim</p>
+                    <p class="price">699.000₫</p>
+                    <a href="{{ url_for('cart') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
+                </article>
+                <article class="product-card">
+                    <div class="wishlist-media">
+                        <div class="media media-card media-olive">Ảnh sản phẩm</div>
+                        <a href="{{ url_for('wishlist') }}" class="remove-fav" aria-label="Xóa Áo khoác Corduroy khỏi danh sách yêu thích">×</a>
+                    </div>
+                    <h2><a href="{{ url_for('product_detail') }}">Áo khoác Corduroy</a></h2>
+                    <p class="meta">Xanh rêu</p>
+                    <p class="price">899.000₫</p>
+                    <a href="{{ url_for('cart') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
+                </article>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Sản phẩm - Freesion Admin{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="row-between">
+        <h1 class="page-title">Quản lý sản phẩm</h1>
+        <a href="{{ url_for('admin_products') }}" class="btn">Thêm sản phẩm mới</a>
+    </header>
+
+    <form class="admin-filters" action="{{ url_for('admin_products') }}">
+        <input class="input input-rounded grow" type="search" placeholder="Tìm kiếm sản phẩm...">
+        <select class="input input-rounded">
+            <option>Tất cả danh mục</option>
+            <option>Áo sơ mi</option>
+            <option>Quần</option>
+            <option>Phụ kiện</option>
+        </select>
+        <select class="input input-rounded">
+            <option>Mới nhất</option>
+            <option>Giá tăng dần</option>
+            <option>Giá giảm dần</option>
+        </select>
+    </form>
+
+    <section class="admin-card">
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr><th>Hình ảnh</th><th>Tên sản phẩm</th><th>Danh mục</th><th>Giá bán</th><th>Tồn kho</th><th>Thao tác</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><div class="media media-xs media-beige">Ảnh</div></td><td><a href="{{ url_for('product_detail') }}">Áo sơ mi Linen Basic</a></td><td>Áo sơ mi</td><td>549.000₫</td><td>124</td><td><a href="{{ url_for('admin_products') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin_products') }}" class="link-underline">Xóa</a></td></tr>
+                    <tr><td><div class="media media-xs media-denim">Ảnh</div></td><td><a href="{{ url_for('product_detail') }}">Quần jean Straight Fit</a></td><td>Quần</td><td>699.000₫</td><td>86</td><td><a href="{{ url_for('admin_products') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin_products') }}" class="link-underline">Xóa</a></td></tr>
+                    <tr><td><div class="media media-xs media-rose">Ảnh</div></td><td><a href="{{ url_for('product_detail') }}">Áo thun Essential</a></td><td>Áo thun</td><td>329.000₫</td><td>215</td><td><a href="{{ url_for('admin_products') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin_products') }}" class="link-underline">Xóa</a></td></tr>
+                    <tr><td><div class="media media-xs media-olive">Ảnh</div></td><td><a href="{{ url_for('product_detail') }}">Áo khoác Corduroy</a></td><td>Áo khoác</td><td>899.000₫</td><td class="warn">24</td><td><a href="{{ url_for('admin_products') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin_products') }}" class="link-underline">Xóa</a></td></tr>
+                    <tr><td><div class="media media-xs media-cream">Ảnh</div></td><td><a href="{{ url_for('product_detail') }}">Quần dài Relaxed</a></td><td>Quần</td><td>649.000₫</td><td>72</td><td><a href="{{ url_for('admin_products') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin_products') }}" class="link-underline">Xóa</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <nav class="pagination" aria-label="Phân trang sản phẩm">
+            <a href="{{ url_for('admin_products') }}" class="page-num page-num-sm is-active">1</a>
+            <a href="{{ url_for('admin_products') }}" class="page-num page-num-sm">2</a>
+            <a href="{{ url_for('admin_products') }}" class="page-num page-num-sm">3</a>
+            <a href="{{ url_for('admin_products') }}" class="page-num page-num-sm">Tiếp →</a>
+        </nav>
+    </section>
+</main>
+{% endblock %}

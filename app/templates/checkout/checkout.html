@@ -1,0 +1,65 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Thanh toán - FREESION{% endblock %}
+
+{% block content %}
+<div class="page">
+    <h1 class="page-title mb-6">Thanh toán đơn hàng</h1>
+    <form class="split" action="{{ url_for('order_success') }}" method="get">
+        <div class="split-main form-stack">
+            <section class="form-stack">
+                <h2>Thông tin nhận hàng</h2>
+                <input class="input" type="text" name="name" placeholder="Họ tên" required>
+                <input class="input" type="tel" name="phone" placeholder="Số điện thoại" required>
+                <input class="input" type="email" name="email" placeholder="Email" required>
+                <input class="input" type="text" name="address" placeholder="Địa chỉ chi tiết" required>
+                <div class="grid-2">
+                    <input class="input" type="text" name="city" placeholder="Tỉnh/Thành phố">
+                    <input class="input" type="text" name="district" placeholder="Quận/Huyện">
+                </div>
+            </section>
+
+            <section class="form-stack">
+                <h2>Phương thức vận chuyển</h2>
+                <label class="choice">
+                    <span class="choice-left"><input type="radio" name="shipping" checked> Giao hàng tiêu chuẩn</span>
+                    <span>Miễn phí</span>
+                </label>
+                <label class="choice">
+                    <span class="choice-left"><input type="radio" name="shipping"> Giao hàng nhanh</span>
+                    <span>35.000₫</span>
+                </label>
+            </section>
+
+            <section class="form-stack">
+                <h2>Phương thức thanh toán</h2>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment" checked> Thanh toán khi nhận hàng COD</span></label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Chuyển khoản ngân hàng QR</span></label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Thẻ tín dụng/ATM</span></label>
+            </section>
+        </div>
+
+        <aside class="summary split-side">
+            <h2>Đơn hàng của bạn</h2>
+            <div class="order-line">
+                <div class="media media-sm media-beige">Ảnh sản phẩm</div>
+                <div class="grow"><h3>Áo sơ mi Linen Basic</h3><p class="meta">Số lượng: 1</p></div>
+                <span>549.000₫</span>
+            </div>
+            <div class="order-line">
+                <div class="media media-sm media-denim">Ảnh sản phẩm</div>
+                <div class="grow"><h3>Quần jean Straight Fit</h3><p class="meta">Số lượng: 1</p></div>
+                <span>699.000₫</span>
+            </div>
+            <div class="order-line">
+                <div class="media media-sm media-rose">Ảnh sản phẩm</div>
+                <div class="grow"><h3>Áo thun Essential</h3><p class="meta">Số lượng: 2</p></div>
+                <span>658.000₫</span>
+            </div>
+            <div class="summary-row"><span>Tạm tính</span><span>1.906.000₫</span></div>
+            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
+            <div class="summary-total"><span>Tổng cộng</span><span>1.906.000₫</span></div>
+            <button type="submit" class="btn btn-block mt-4">Đặt hàng ngay</button>
+        </aside>
+    </form>
+</div>
+{% endblock %}
