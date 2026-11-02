@@ -55,7 +55,10 @@ python -m unittest discover -s tests -v
 │       ├── css/                 # (xem sơ đồ bên dưới)
 │       ├── js/                  # dành cho JavaScript về sau
 │       └── images/              # dành cho ảnh sản phẩm về sau
-├── tests/test_routes.py         # kiểm thử route + stylesheet bằng unittest
+├── tests/test_routes.py         # kiểm thử route, stylesheet và bố cục header
+├── .github/
+│   ├── workflows/ci.yml         # build + test trên mỗi PR (GitHub Actions)
+│   └── pull_request_template.md # mẫu mô tả PR
 ├── .gitignore
 ├── pyproject.toml / uv.lock
 └── run.py                       # entry point chạy development server
@@ -68,7 +71,8 @@ app/static/css/
 ├── base.css                    # :root design tokens, reset, typography, utilities
 ├── components.css              # nút, input, thẻ sản phẩm, badge, phân trang, summary…
 ├── layouts/
-│   ├── store.css               # header / nav / footer
+│   ├── store.css               # chỉ header 2 hàng + ô tìm kiếm
+│   ├── footer.css              # footer (tách riêng, không phụ thuộc store.css)
 │   └── admin.css               # sidebar / vùng nội dung admin
 └── pages/                      # mirror theo cây templates/
     ├── store/       home.css  shop.css  product_detail.css  cart.css
@@ -77,6 +81,32 @@ app/static/css/
     ├── account/     account.css (dùng chung)  profile.css  order_history.css  address.css  wishlist.css
     └── admin/       admin.css (dùng chung)  dashboard.css  products.css  orders.css  users.css
 ```
+
+## Header cửa hàng
+
+`layouts/partials/_site_header.html` gồm **2 hàng** (bố cục tham khảo header CANIFA),
+toàn bộ style nằm ở `css/layouts/store.css`. Footer được tách riêng sang
+`css/layouts/footer.css` (nạp ngay sau `store.css` trong `base_store.html`) để
+việc chỉnh header không bao giờ làm ảnh hưởng footer:
+
+1. **Hàng trên**: logo `FREESION` bên trái → ô **tìm kiếm** (`<form method="get">`
+   gửi `q` tới `/shop`) → 3 tiện ích có icon phía trên nhãn: Cửa hàng, Tài khoản,
+   Giỏ hàng. Icon là **SVG inline** (`currentColor`), không dùng thư viện icon hay CDN.
+2. **Hàng dưới**: thanh danh mục ngang (Nữ, Nam, Phụ kiện, Hàng mới, Sale), có thể
+   cuộn ngang trên màn hình hẹp; mục đang chọn được đánh dấu bằng gạch chân.
+
+Chỉ thay đổi **bố cục**: mọi màu vẫn lấy từ design tokens trong `base.css`
+(`--bg`, `--white`, `--stone-*`, `--orange-600`), không đưa thêm màu mới.
+Responsive: dưới 768px ô tìm kiếm xuống hàng riêng, dưới 480px các tiện ích chỉ
+giữ icon (nhãn vẫn có trong DOM để hỗ trợ trình đọc màn hình).
+
+## CI
+
+`.github/workflows/ci.yml` chạy trên mỗi PR vào `master` (và khi push `master`):
+cài Python 3.14 + `uv`, `uv sync --frozen`, biên dịch/import ứng dụng rồi chạy
+`python -m unittest discover -s tests -v`. Khi mở PR, nội dung được điền sẵn từ
+`.github/pull_request_template.md` (mô tả, loại thay đổi, ảnh chụp màn hình,
+checklist).
 
 ## Đóng góp
 

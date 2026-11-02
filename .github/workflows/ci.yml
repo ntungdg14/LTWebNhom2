@@ -1,5 +1,6 @@
 name: CI
 
+# Chạy build + test trên mọi pull request (và cả khi push thẳng vào master).
 on:
   pull_request:
     branches: [master]
@@ -9,21 +10,33 @@ on:
 permissions:
   contents: read
 
+env:
+  UV_PYTHON: "3.14"
+
 jobs:
   build-and-test:
+    name: Build & test
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài uv
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - name: Cài Python 3.14 (theo pyproject.toml / uv.lock)
+
+      - name: Cài Python theo pyproject.toml
         run: uv python install 3.14
-      - name: Build - cài dependencies theo lock
+
+      - name: Build - đồng bộ dependencies từ uv.lock
         run: uv sync --frozen
-      - name: Build - biên dịch & kiểm tra import app
+
+      - name: Build - biên dịch và kiểm tra import ứng dụng
         run: |
           uv run python -m compileall -q app tests
           uv run python -c "from app import create_app; create_app('testing')"
+
       - name: Chạy test
         run: uv run python -m unittest discover -s tests -v

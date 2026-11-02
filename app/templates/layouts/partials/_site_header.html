@@ -1,19 +1,54 @@
 <header class="site-header">
-    <nav class="site-nav">
-        <div class="nav-links">
-            <a href="{{ url_for('store.shop') }}">Nữ</a>
+    {# Hàng 1: logo bên trái - ô tìm kiếm - các tiện ích bên phải #}
+    <div class="header-inner">
+        <a href="{{ url_for('store.home') }}" class="logo">FREESION</a>
+
+        <form class="site-search" action="{{ url_for('store.shop') }}" method="get" role="search">
+            <label class="sr-only" for="site-search-input">Tìm kiếm sản phẩm</label>
+            <input id="site-search-input" type="search" name="q" placeholder="Tìm kiếm" autocomplete="off">
+            <button type="submit" aria-label="Tìm kiếm">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+                </svg>
+            </button>
+        </form>
+
+        <nav class="nav-actions" aria-label="Tiện ích">
+            <a class="nav-action" href="{{ url_for('store.shop') }}">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 9h16v11H4z"></path>
+                    <path d="M3 9l1.5-5h15L21 9"></path>
+                    <path d="M9 20v-6h6v6"></path>
+                </svg>
+                <span class="nav-action-label">Cửa hàng</span>
+            </a>
+            <a class="nav-action" href="{{ url_for('account.profile') }}">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <circle cx="12" cy="9.5" r="2.75"></circle>
+                    <path d="M5.5 19a7 7 0 0 1 13 0"></path>
+                </svg>
+                <span class="nav-action-label">Tài khoản</span>
+            </a>
+            <a class="nav-action" href="{{ url_for('store.cart') }}">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M5 8h14l-1 12H6L5 8z"></path>
+                    <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+                </svg>
+                <span class="nav-action-label">Giỏ hàng (2)</span>
+            </a>
+        </nav>
+    </div>
+
+    {# Hàng 2: thanh danh mục ngang, mục đầu tiên được đánh dấu hoạt động #}
+    <nav class="header-nav" aria-label="Danh mục chính">
+        <div class="nav-inner">
+            <a href="{{ url_for('store.shop') }}" class="is-active">Nữ</a>
             <a href="{{ url_for('store.shop') }}">Nam</a>
             <a href="{{ url_for('store.shop') }}">Phụ kiện</a>
             <a href="{{ url_for('store.shop') }}">Hàng mới</a>
             <a href="{{ url_for('store.shop') }}" class="nav-sale">Sale</a>
-        </div>
-
-        <a href="{{ url_for('store.home') }}" class="logo">FREESION</a>
-
-        <div class="nav-actions">
-            <a href="{{ url_for('store.shop') }}">Tìm kiếm</a>
-            <a href="{{ url_for('account.profile') }}">Tài khoản</a>
-            <a href="{{ url_for('store.cart') }}">Giỏ hàng (2)</a>
         </div>
     </nav>
 </header>
