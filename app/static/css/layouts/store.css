@@ -189,11 +189,9 @@
     transition: transform 0.3s ease, width 0.3s ease, opacity 0.2s ease;
 }
 
-
-.nav-link.is-active {
-    color: var(--stone-900);
-    border-bottom-color: var(--stone-900);
-}
+/* Không định nghĩa `.nav-link.is-active`: navbar không có tab active cố định.
+   Vạch đen duy nhất là .nav-indicator, chỉ hiện khi hover/focus rồi biến mất
+   khi rời navbar, nên không bị kẹt dưới tab "Nữ". */
 
 .nav-link.nav-sale {
     color: var(--orange-600);

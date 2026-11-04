@@ -165,6 +165,8 @@ Các liên kết lọc/phân trang dùng query string riêng biệt (`?page=2`, 
 ## Hiệu ứng navbar
 
 Giữ nguyên cấu trúc, vị trí và nội dung header/navbar. Các nút navbar dùng cùng hiệu ứng chuyển màu mượt (`transition: color 0.2s ease`) với Cửa hàng / Tài khoản / Giỏ hàng; thêm `.nav-indicator` — thanh ngang `var(--stone-950)` trượt theo tab đang hover nhờ `transition: transform, width` trong `store.css`. `static/js/nav-indicator.js` (JavaScript thuần, không thư viện) chỉ đo vị trí/độ rộng bằng `getBoundingClientRect()`; không có JS thì navbar vẫn hoạt động bình thường.
+
+**Không có tab active cố định.** Navbar không render `nav-link is-active` và `store.css` không định nghĩa rule đó: một `border-bottom` tĩnh dưới tab "Nữ" sẽ không biến mất khi chuột chuyển sang Nam / Phụ kiện / Hàng mới. Vạch đen duy nhất là `.nav-indicator`: hiện khi `mouseenter`/`focus`, trượt theo tab, và `opacity: 0` khi rời toàn bộ navbar (`mouseleave`/`focusout`). `tests/test_routes.py` có test chốt thiết kế này để tránh thêm lại `active: true`.
 ## CI
 
 `.github/workflows/ci.yml` chạy trên mỗi PR vào `master` (và khi push `master`):

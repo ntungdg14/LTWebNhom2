@@ -158,12 +158,17 @@ class HeaderLayoutTests(unittest.TestCase):
         self.assertIn("Giỏ hàng", html)
         self.assertGreaterEqual(html.count("<svg"), 4)
 
-    def test_category_row_order_and_active_item(self):
+    def test_category_row_order_without_sticky_active_item(self):
         html = self.client.get("/").get_data(as_text=True)
         links = re.findall(r'<a class="nav-link[^"]*"[^>]*>([^<]+)</a>', html)
         self.assertEqual(links, ["Nữ", "Nam", "Phụ kiện", "Hàng mới", "Sale"])
-        self.assertIn('class="nav-link is-active"', html)
         self.assertIn('nav-link nav-sale', html)
+        # Không có tab active cố định: nếu có, border-bottom của tab "Nữ" sẽ
+        # đứng yên khi chuột chuyển sang Nam / Phụ kiện / Hàng mới.
+        for url in STORE_LAYOUT_PAGES:
+            with self.subTest(url=url):
+                header = self.client.get(url).get_data(as_text=True).split("</header>", 1)[0]
+                self.assertNotIn('nav-link is-active', header)
 
     def test_reference_only_items_are_excluded(self):
         header = self.client.get("/").get_data(as_text=True).split("</header>", 1)[0]
@@ -199,6 +204,19 @@ class NavIndicatorTests(unittest.TestCase):
         for handler in ("onmouseover", "onmouseenter", "onclick", "onfocus"):
             self.assertNotIn(handler, self.html)
         self.assertNotIn("<script src=\"http", self.html)
+
+    def test_indicator_disappears_when_leaving_navbar(self):
+        """Vạch đen không được kẹt dưới tab mặc định khi rời chuột."""
+        js = (STATIC_DIR / "js/nav-indicator.js").read_text(encoding="utf-8")
+        css = (STATIC_DIR / "css/layouts/store.css").read_text(encoding="utf-8")
+        css_rules = re.sub(r"/\*.*?\*/", "", css, flags=re.S)  # bỏ comment giải thích
+        self.assertNotIn("defaultLink", js)
+        self.assertNotIn(".nav-link.is-active", js)
+        self.assertNotIn(".nav-link.is-active", css_rules)
+        self.assertIn("addEventListener('mouseleave', hide)", js)
+        self.assertIn("indicator.style.opacity = '0'", js)
+        self.assertIn("indicator.style.opacity = '1'", js)
+        self.assertIn("getBoundingClientRect", js)
 
 
 class MegaMenuTests(unittest.TestCase):

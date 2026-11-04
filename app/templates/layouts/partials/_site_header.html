@@ -9,6 +9,9 @@
 {% set accessories = ['Túi xách', 'Mũ', 'Khăn quàng cổ', 'Thắt lưng', 'Khẩu trang', 'Khăn mặt', 'Tất / Vớ'] %}
 {% set collections = ['Thu Đông 2026', 'Freesion Essentials', 'Linen Basic', 'Denim Edit', 'Tối giản hằng ngày'] %}
 
+{# Không có tab active cố định: vạch đen chỉ hiện dưới tab đang hover/focus
+   (nav-indicator.js). Một tab active tĩnh sẽ để lại vạch đen đứng yên dưới
+   "Nữ" khi chuột chuyển sang Nam / Phụ kiện / Hàng mới. #}
 {% set menus = [
     {'label': 'Nữ', 'categories': [
         ('Áo khoác', true), ('Áo sơ mi & Áo kiểu', true), ('Áo len', false),
@@ -135,7 +138,7 @@
         <div class="nav-inner">
             {% for item in menus %}
             <div class="nav-item">
-                <a class="nav-link{% if item.active %} is-active{% endif %}{% if item.sale %} nav-sale{% endif %}"
+                <a class="nav-link{% if item.sale %} nav-sale{% endif %}"
                    href="{{ url_for('store.shop') }}">{{ item.label }}</a>
                 {{ mega_panel(item.categories, quick_links, accessories, collections) }}
             </div>
