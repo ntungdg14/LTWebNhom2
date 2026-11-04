@@ -1,0 +1,90 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Đơn hàng #{{ order_id }} - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/orders.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Đơn hàng</a> / <a href="{{ url_for('admin.orders') }}">Danh sách</a> / #{{ order_id }}</p>
+            <h1 class="page-title">Đơn hàng #{{ order_id }}</h1>
+            <p class="meta">Đặt lúc 10:28, 01/11/2026 · Cửa hàng trực tuyến · 1 sản phẩm · Phụ trách: Minh Anh</p>
+        </div>
+        <div class="toolbar">
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">← Danh sách đơn</a>
+        </div>
+    </header>
+
+    <section class="admin-card">
+        <div class="admin-tabs">
+            <a href="{{ url_for('admin.order_detail', order_id=order_id) }}" class="is-active">Đã đặt hàng · 01/11 10:28</a>
+            <a href="{{ url_for('admin.order_detail', order_id=order_id, step='confirmed') }}">Đã xác nhận · 01/11 10:35</a>
+            <a href="{{ url_for('admin.order_detail', order_id=order_id, step='packed') }}">Đang đóng gói · 01/11 10:40</a>
+            <a href="{{ url_for('admin.order_detail', order_id=order_id, step='shipping') }}">Chờ giao hàng</a>
+        </div>
+    </section>
+
+    <div class="form-columns">
+        <div class="stack-gap">
+            <section class="admin-card">
+                <div class="admin-card-head"><h2>Sản phẩm trong đơn</h2><span class="muted">1 sản phẩm</span></div>
+                <div class="table-wrap">
+                    <table class="admin-table">
+                        <thead><tr><th>Sản phẩm</th><th>Đơn giá × Số lượng</th><th>Thành tiền</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><strong>Áo khoác bomber Uniform</strong><p class="meta">Nâu dừa / M · SKU: FR-BOM-002-ND-M</p></div></div></td>
+                                <td>899.000₫ × 1</td><td>899.000₫</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="summary-row"><span>Tạm tính (1 sản phẩm)</span><span>899.000₫</span></div>
+                <div class="summary-row"><span>Giảm giá đơn hàng</span><span>0₫</span></div>
+                <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
+                <div class="summary-total"><span>Tổng cộng</span><span>899.000₫</span></div>
+            </section>
+
+            <section class="admin-card">
+                <h2 style="margin:0 0 1rem; font-size:1.125rem;">Thanh toán</h2>
+                <div class="summary-row"><span>Chuyển khoản ngân hàng</span><span><span class="badge badge-ok">Đã thanh toán</span></span></div>
+                <div class="summary-row"><span>Vietcombank · Mã giao dịch: VCB0112610285</span><span></span></div>
+                <div class="summary-row"><span>Đã nhận lúc 10:30, 01/11/2026</span><span>899.000₫</span></div>
+                <div class="summary-row"><span>Còn phải thu</span><span>0₫</span></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-card-head"><h2>Lịch sử xử lý</h2></div>
+                <div class="field"><label for="admin-note">Thêm ghi chú nội bộ</label><textarea class="input" id="admin-note" rows="3" placeholder="Nhập nội dung trao đổi với đơn hàng..."></textarea></div>
+                <p class="muted" style="margin-top:1rem;">10:40 · Minh Anh chuyển đơn sang Đang đóng gói.<br>10:35 · Minh Anh xác nhận đơn hàng.<br>10:30 · Hệ thống ghi nhận thanh toán 899.000₫.<br>10:28 · Trần Hoàng Nam đặt đơn hàng.</p>
+            </section>
+        </div>
+
+        <aside class="stack-gap">
+            <section class="admin-card">
+                <div class="admin-card-head"><h2>Khách hàng</h2><a href="{{ url_for('admin.users') }}" class="link-underline">Xem hồ sơ →</a></div>
+                <p><strong>Trần Hoàng Nam</strong><br><span class="muted">KH00042 · Khách hàng quay lại</span></p>
+                <div class="summary-row"><span>090 456 7821</span><span></span></div>
+                <div class="summary-row"><span>nam.tran@gmail.com</span><span></span></div>
+                <div class="summary-row"><span>3 đơn hàng · Tổng chi tiêu 2.257.000₫</span><span></span></div>
+            </section>
+            <section class="admin-card">
+                <div class="admin-card-head"><h2>Địa chỉ nhận hàng</h2></div>
+                <p>Trần Hoàng Nam<br>090 456 7821<br>45 Nguyễn Đình Chiểu, Phường Xuân Hòa, TP. Hồ Chí Minh<br>Việt Nam</p>
+                <p class="muted">Ghi chú của khách: Vui lòng gọi trước khi giao khoảng 15 phút.</p>
+            </section>
+            <section class="admin-card">
+                <h2 style="margin:0 0 1rem; font-size:1.125rem;">Thông tin bổ sung</h2>
+                <div class="summary-row"><span>Nguồn</span><span>Cửa hàng trực tuyến</span></div>
+                <div class="summary-row"><span>Thiết bị</span><span>Điện thoại</span></div>
+                <div class="summary-row"><span>Mã khuyến mãi</span><span>Không áp dụng</span></div>
+            </section>
+        </aside>
+    </div>
+</main>
+{% endblock %}

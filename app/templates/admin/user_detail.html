@@ -1,0 +1,48 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Khách hàng {{ customer_id }} - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Khách hàng</a> / <a href="{{ url_for('admin.users') }}">Danh sách</a> / {{ customer_id }}</p>
+            <h1 class="page-title">Hồ sơ khách hàng {{ customer_id }}</h1>
+        </div>
+        <div class="toolbar">
+            <a href="{{ url_for('admin.permissions') }}" class="btn btn-ghost">Phân quyền</a>
+            <a href="{{ url_for('admin.user_new') }}" class="btn">+ Thêm khách hàng</a>
+        </div>
+    </header>
+
+    <section class="stat-grid">
+        <article class="stat-card"><p>Tổng số đơn</p><strong>4</strong><p>1 đơn đang xử lý</p></article>
+        <article class="stat-card"><p>Tổng chi tiêu</p><strong>3.565.300₫</strong><p>Tính đến 01/11/2026</p></article>
+        <article class="stat-card"><p>Giá trị đơn TB</p><strong>891.325₫</strong><p>So với 690.591₫ chung</p></article>
+        <article class="stat-card"><p>Nhóm khách hàng</p><strong>Thân thiết</strong><p>Tham gia 08/2026</p></article>
+    </section>
+
+    <div class="form-columns">
+        <section class="admin-card form-stack">
+            <h2>Thông tin liên hệ</h2>
+            <div class="summary-row"><span>Họ và tên</span><span>Nguyễn Minh Anh</span></div>
+            <div class="summary-row"><span>Email</span><span>minhanh.nguyen@gmail.com</span></div>
+            <div class="summary-row"><span>Số điện thoại</span><span>090 123 4567</span></div>
+            <div class="summary-row"><span>Địa chỉ mặc định</span><span>28 Nguyễn Thị Minh Khai, TP. Hồ Chí Minh</span></div>
+            <div class="summary-row"><span>Trạng thái</span><span><span class="badge badge-ok">Hoạt động</span></span></div>
+        </section>
+        <aside class="admin-card form-stack">
+            <h2>Đơn hàng gần đây</h2>
+            <div class="summary-row"><a href="{{ url_for('admin.order_detail', order_id='FR261101028') }}">#FR261101028</a><span>1.257.300₫</span></div>
+            <div class="summary-row"><a href="{{ url_for('admin.order_detail', order_id='FR261101026') }}">#FR261101026</a><span>1.108.000₫</span></div>
+            <div class="summary-row"><a href="{{ url_for('admin.order_detail', order_id='FR261015092') }}">#FR261015092</a><span>489.000₫</span></div>
+            <div class="summary-row"><a href="{{ url_for('admin.order_detail', order_id='FR261002036') }}">#FR261002036</a><span>649.000₫</span></div>
+            <a href="{{ url_for('admin.orders') }}" class="link-underline">Xem tất cả đơn hàng →</a>
+        </aside>
+    </div>
+</main>
+{% endblock %}

@@ -19,32 +19,32 @@
                 <article class="product-card">
                     <div class="wishlist-media">
                         <div class="media media-card media-beige">Ảnh sản phẩm</div>
-                        <a href="{{ url_for('account.wishlist') }}" class="remove-fav" aria-label="Xóa Áo sơ mi Linen Basic khỏi danh sách yêu thích">×</a>
+                        <a href="{{ url_for('account.wishlist', remove='FR-OXF-001') }}" class="remove-fav" aria-label="Xóa Áo sơ mi Linen Basic khỏi danh sách yêu thích">×</a>
                     </div>
-                    <h2><a href="{{ url_for('store.product_detail') }}">Áo sơ mi Linen Basic</a></h2>
+                    <h2><a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}">Áo sơ mi Linen Basic</a></h2>
                     <p class="meta">Be tự nhiên</p>
                     <p class="price">549.000₫</p>
-                    <a href="{{ url_for('store.cart') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
+                    <a href="{{ url_for('store.cart', add='FR-OXF-001') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
                 </article>
                 <article class="product-card">
                     <div class="wishlist-media">
                         <div class="media media-card media-denim">Ảnh sản phẩm</div>
-                        <a href="{{ url_for('account.wishlist') }}" class="remove-fav" aria-label="Xóa Quần jean Straight Fit khỏi danh sách yêu thích">×</a>
+                        <a href="{{ url_for('account.wishlist', remove='FR-JEA-003') }}" class="remove-fav" aria-label="Xóa Quần jean Straight Fit khỏi danh sách yêu thích">×</a>
                     </div>
-                    <h2><a href="{{ url_for('store.product_detail') }}">Quần jean Straight Fit</a></h2>
+                    <h2><a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}">Quần jean Straight Fit</a></h2>
                     <p class="meta">Xanh denim</p>
                     <p class="price">699.000₫</p>
-                    <a href="{{ url_for('store.cart') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
+                    <a href="{{ url_for('store.cart', add='FR-JEA-003') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
                 </article>
                 <article class="product-card">
                     <div class="wishlist-media">
                         <div class="media media-card media-olive">Ảnh sản phẩm</div>
-                        <a href="{{ url_for('account.wishlist') }}" class="remove-fav" aria-label="Xóa Áo khoác Corduroy khỏi danh sách yêu thích">×</a>
+                        <a href="{{ url_for('account.wishlist', remove='FR-OVS-006') }}" class="remove-fav" aria-label="Xóa Áo khoác Corduroy khỏi danh sách yêu thích">×</a>
                     </div>
-                    <h2><a href="{{ url_for('store.product_detail') }}">Áo khoác Corduroy</a></h2>
+                    <h2><a href="{{ url_for('store.product_detail', sku='FR-OVS-006') }}">Áo khoác Corduroy</a></h2>
                     <p class="meta">Xanh rêu</p>
                     <p class="price">899.000₫</p>
-                    <a href="{{ url_for('store.cart') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
+                    <a href="{{ url_for('store.cart', add='FR-OVS-006') }}" class="btn btn-block mt-3">Thêm vào giỏ hàng</a>
                 </article>
             </div>
         </section>

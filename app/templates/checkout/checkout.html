@@ -3,67 +3,74 @@
 
 {% block styles %}
 {{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/checkout/steps.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/checkout/checkout.css') }}">
 {% endblock %}
 
 {% block content %}
+{% set active_step = 3 %}
+{% include "layouts/partials/_checkout_steps.html" %}
+
 <div class="page">
-    <h1 class="page-title mb-6">Thanh toán đơn hàng</h1>
-    <form class="split" action="{{ url_for('checkout.order_success') }}" method="get">
+    <h1 class="page-title mb-6">Thanh toán</h1>
+    <p class="muted">Kiểm tra thông tin và chọn cách thanh toán phù hợp với bạn.</p>
+
+    <form class="split mt-8" action="{{ url_for('checkout.order_success') }}" method="get">
         <div class="split-main form-stack">
             <section class="form-stack">
-                <h2>Thông tin nhận hàng</h2>
-                <input class="input" type="text" name="name" placeholder="Họ tên" required>
-                <input class="input" type="tel" name="phone" placeholder="Số điện thoại" required>
-                <input class="input" type="email" name="email" placeholder="Email" required>
-                <input class="input" type="text" name="address" placeholder="Địa chỉ chi tiết" required>
-                <div class="grid-2">
-                    <input class="input" type="text" name="city" placeholder="Tỉnh/Thành phố">
-                    <input class="input" type="text" name="district" placeholder="Quận/Huyện">
+                <div class="row-between">
+                    <h2>Giao đến</h2>
+                    <a href="{{ url_for('checkout.shipping') }}" class="link-underline">Chỉnh sửa</a>
+                </div>
+                <div class="choice">
+                    <span>
+                        <strong>Nguyễn Minh Anh</strong> · 090 123 4567<br>
+                        28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh<br>
+                        minhanh.nguyen@gmail.com<br>
+                        <small>Giao hàng tiêu chuẩn · Dự kiến 04–06/11/2026 · Miễn phí</small>
+                    </span>
                 </div>
             </section>
 
             <section class="form-stack">
-                <h2>Phương thức vận chuyển</h2>
+                <h2>Phương thức thanh toán</h2>
+                <p class="muted" style="font-size:0.75rem;">Tất cả giao dịch được bảo mật. Freesion không lưu thông tin thẻ của bạn.</p>
                 <label class="choice">
-                    <span class="choice-left"><input type="radio" name="shipping" checked> Giao hàng tiêu chuẩn</span>
-                    <span>Miễn phí</span>
+                    <span class="choice-left"><input type="radio" name="payment" checked> Thanh toán khi nhận hàng (COD)<br><small>Thanh toán bằng tiền mặt cho nhân viên giao hàng.</small></span>
+                    <span>COD</span>
                 </label>
-                <label class="choice">
-                    <span class="choice-left"><input type="radio" name="shipping"> Giao hàng nhanh</span>
-                    <span>35.000₫</span>
-                </label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> VNPAY / Thẻ ATM nội địa<br><small>Quét mã QR hoặc thanh toán qua ứng dụng ngân hàng.</small></span><span>VNPAY</span></label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Ví điện tử MoMo<br><small>Chuyển đến ứng dụng MoMo để xác nhận thanh toán.</small></span><span>MoMo</span></label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Thẻ quốc tế<br><small>Visa, Mastercard, JCB · Xác thực an toàn qua 3D Secure.</small></span><span>THẺ</span></label>
+                <label class="form-check"><input type="checkbox" name="vat"> Tôi cần xuất hóa đơn GTGT cho đơn hàng này</label>
+                <label class="form-check"><input type="checkbox" name="terms" checked> Tôi đồng ý với Điều khoản mua hàng và Chính sách bảo mật của Freesion.</label>
             </section>
 
-            <section class="form-stack">
-                <h2>Phương thức thanh toán</h2>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment" checked> Thanh toán khi nhận hàng COD</span></label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Chuyển khoản ngân hàng QR</span></label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Thẻ tín dụng/ATM</span></label>
-            </section>
+            <div class="form-stack">
+                <button type="submit" class="btn btn-block">Đặt hàng · 1.257.300₫</button>
+                <p class="muted" style="text-align:center; font-size:0.75rem;">Thông tin của bạn luôn được bảo mật.</p>
+                <a href="{{ url_for('checkout.shipping') }}" class="link-underline">← Quay lại thông tin giao hàng</a>
+            </div>
         </div>
 
         <aside class="summary split-side">
-            <h2>Đơn hàng của bạn</h2>
+            <h2>Tóm tắt đơn hàng</h2>
+            <p class="muted" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
+            <div class="order-line">
+                <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
+                <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
+                <span>498.000₫</span>
+            </div>
             <div class="order-line">
                 <div class="media media-sm media-beige">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo sơ mi Linen Basic</h3><p class="meta">Số lượng: 1</p></div>
-                <span>549.000₫</span>
+                <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
+                <span>899.000₫</span>
             </div>
-            <div class="order-line">
-                <div class="media media-sm media-denim">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Quần jean Straight Fit</h3><p class="meta">Số lượng: 1</p></div>
-                <span>699.000₫</span>
-            </div>
-            <div class="order-line">
-                <div class="media media-sm media-rose">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo thun Essential</h3><p class="meta">Số lượng: 2</p></div>
-                <span>658.000₫</span>
-            </div>
-            <div class="summary-row"><span>Tạm tính</span><span>1.906.000₫</span></div>
+            <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
+            <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
             <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.906.000₫</span></div>
-            <button type="submit" class="btn btn-block mt-4">Đặt hàng ngay</button>
+            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+            <p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>
         </aside>
     </form>
 </div>

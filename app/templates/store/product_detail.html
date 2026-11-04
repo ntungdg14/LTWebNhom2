@@ -1,5 +1,5 @@
 {% extends "layouts/base_store.html" %}
-{% block title %}Áo sơ mi Linen Basic - FREESION{% endblock %}
+{% block title %}Áo khoác bomber Uniform - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -8,88 +8,101 @@
 
 {% block content %}
 <div class="page">
+    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Áo khoác bomber Uniform</p>
+
     <div class="detail-layout">
         <section aria-label="Hình ảnh sản phẩm">
-            <div class="media media-card media-beige">Ảnh sản phẩm</div>
-            <div class="gallery-thumbs">
-                <div class="media media-card media-beige">Ảnh sản phẩm</div>
-                <div class="media media-card media-cream">Ảnh sản phẩm</div>
-                <div class="media media-card media-olive">Ảnh sản phẩm</div>
+            <div class="product-gallery">
+                <div class="media media-card media-beige">Ảnh 1 · Mặt trước</div>
+                <div class="media media-card media-taupe">Ảnh 2 · Mặt sau</div>
+                <div class="media media-card media-cream">Ảnh 3 · Cổ gập</div>
+                <div class="media media-card media-taupe">Ảnh 4 · Ống tay</div>
+                <div class="media media-card media-beige">Ảnh 5 · Người mẫu</div>
+                <div class="media media-card media-cream">Ảnh 6 · Chi tiết</div>
             </div>
         </section>
 
         <section class="product-info">
             <header>
-                <p class="eyebrow">Freesion Essentials</p>
-                <h1>Áo sơ mi Linen Basic</h1>
-                <p class="price-lg">549.000₫</p>
+                <p class="eyebrow">Áo khoác · Nam</p>
+                <h1>Áo khoác bomber Uniform</h1>
+                <p class="product-rating">★★★★★ <span>4,9</span> · 128 đánh giá</p>
+                <p class="price-lg">899.000₫ <s>1.199.000₫</s></p>
             </header>
-            <p class="muted">Thiết kế từ chất liệu linen mềm mại, thoáng mát với phom dáng relaxed vừa vặn. Một lựa chọn tối giản và linh hoạt cho mọi ngày.</p>
 
             <div>
-                <div class="row-between">
-                    <h2>Màu sắc</h2>
-                    <span class="muted">Be tự nhiên</span>
-                </div>
+                <div class="row-between"><h2>Màu sắc: Nâu dừa</h2></div>
                 <div class="swatches mt-3">
-                    <a href="{{ url_for('store.product_detail') }}" class="swatch media-beige is-active" aria-label="Màu be tự nhiên"></a>
-                    <a href="{{ url_for('store.product_detail') }}" class="swatch media-denim" aria-label="Màu xanh denim"></a>
-                    <a href="{{ url_for('store.product_detail') }}" class="swatch media-olive" aria-label="Màu xanh rêu"></a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='nau-dua') }}" class="swatch media-beige is-active" aria-label="Nâu dừa"></a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='den') }}" class="swatch media-stone" aria-label="Đen"></a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='xanh-reu') }}" class="swatch media-olive" aria-label="Xanh rêu"></a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='be') }}" class="swatch media-cream" aria-label="Be"></a>
                 </div>
             </div>
 
             <div>
                 <div class="row-between">
-                    <h2>Kích thước</h2>
-                    <a href="{{ url_for('store.product_detail') }}" class="link-underline">Hướng dẫn chọn size</a>
+                    <h2>Kích cỡ</h2>
+                    <a href="{{ url_for('store.help_page') }}" class="link-underline">Hướng dẫn chọn size</a>
                 </div>
                 <div class="size-row mt-3">
-                    <a href="{{ url_for('store.product_detail') }}" class="size-btn">S</a>
-                    <a href="{{ url_for('store.product_detail') }}" class="size-btn">M</a>
-                    <a href="{{ url_for('store.product_detail') }}" class="size-btn">L</a>
-                    <a href="{{ url_for('store.product_detail') }}" class="size-btn">XL</a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='S') }}" class="size-btn">S</a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='M') }}" class="size-btn is-active">M</a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='L') }}" class="size-btn">L</a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='XL') }}" class="size-btn">XL</a>
+                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='XXL') }}" class="size-btn">XXL</a>
                 </div>
             </div>
 
-            <div>
-                <a href="{{ url_for('store.cart') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
-                <a href="{{ url_for('checkout.checkout') }}" class="btn btn-outline btn-block mt-3">Mua ngay</a>
+            <div class="form-stack">
+                <a href="{{ url_for('store.cart', add='FR-BOM-002') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
+                <a href="{{ url_for('checkout.checkout') }}" class="btn btn-accent btn-block">Mua ngay</a>
+            </div>
+
+            <div class="product-perks">
+                <p>✓ <strong>Đổi trả dễ dàng</strong><br><span>Chỉ đổi 1 lần, miễn phí trong vòng 30 ngày.</span></p>
+                <p>✓ <strong>Giao hàng miễn phí</strong><br><span>Cho đơn từ 499.000₫ trên toàn quốc.</span></p>
             </div>
 
             <div class="notes">
-                <p><strong>Đổi trả dễ dàng:</strong> Đổi trả trong vòng 30 ngày.</p>
-                <p><strong>Vận chuyển:</strong> Miễn phí vận chuyển cho đơn từ 499.000₫.</p>
+                <h2>Mô tả sản phẩm</h2>
+                <p>Áo khoác bomber dáng suông, cổ bo gọn với khóa kéo kim loại. Lớp lót mỏng giữ ấm vừa đủ cho những ngày se lạnh, dễ mặc ngoài áo thun hay sơ mi.</p>
+                <div class="summary-row"><span>Chất liệu</span><span>65% polyester tái chế, 35% cotton</span></div>
+                <div class="summary-row"><span>Người mẫu</span><span>Cao 1m78, mặc size M</span></div>
+                <div class="summary-row"><span>Ghi chú</span><span>Giặt máy nhẹ nhàng, không dùng chất tẩy</span></div>
             </div>
         </section>
     </div>
 
     <section class="related">
-        <h2 class="page-title mb-6">Sản phẩm liên quan</h2>
+        <h2 class="page-title mb-6">Có thể bạn cũng thích</h2>
         <div class="product-grid">
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-denim">Ảnh sản phẩm</div>
-                <h3>Quần jean Straight Fit</h3>
-                <p class="meta">Xanh denim</p>
-                <p class="price">699.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-rose">Ảnh sản phẩm</div>
-                <h3>Áo thun Essential</h3>
-                <p class="meta">Hồng đất</p>
-                <p class="price">329.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-olive">Ảnh sản phẩm</div>
-                <h3>Áo khoác Corduroy</h3>
-                <p class="meta">Xanh rêu</p>
-                <p class="price">899.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-cream">Ảnh sản phẩm</div>
-                <h3>Quần dài Relaxed</h3>
-                <p class="meta">Kem sáng</p>
-                <p class="price">649.000₫</p>
-            </a>
+            <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h3>Áo thun cotton Essential</h3><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h3>Áo len dệt waffle cổ tròn</h3><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
+        </div>
+    </section>
+
+    <section class="reviews">
+        <h2 class="page-title">Đánh giá từ khách hàng</h2>
+        <div class="reviews-grid">
+            <div class="reviews-score">
+                <strong>4,9</strong>
+                <span>★★★★★</span>
+                <p class="muted">128 đánh giá</p>
+                <div class="review-bars">
+                    <div><span>5 sao</span><i style="width:82%"></i><em>104</em></div>
+                    <div><span>4 sao</span><i style="width:14%"></i><em>17</em></div>
+                    <div><span>3 sao</span><i style="width:7%"></i><em>5</em></div>
+                    <div><span>2 sao</span><i style="width:2%"></i><em>1</em></div>
+                    <div><span>1 sao</span><i style="width:1%"></i><em>1</em></div>
+                </div>
+            </div>
+            <div class="review-list">
+                <article><p class="eyebrow">★★★★★ · 14 ngày trước</p><h3>Åm vừa đủ, dễ phối</h3><p class="muted">Mặc đi làm lẫn đi chơi đều được, form vừa phối, mặc thêm lớp áo cũng vẫn gọn. Chắc sẽ mua thêm màu khác.</p><p class="meta">Minh Anh · TP. Hồ Chí Minh · Đã mua hàng · Size M</p></article>
+                <article><p class="eyebrow">★★★★★ · 21 ngày trước</p><h3>Đúng với mô tả</h3><p class="muted">Chất dày dặn, đường may chắc chắn. Giao nhanh, đóng gói cẩn thận.</p><p class="meta">Quốc Huy · Hà Nội · Đã mua hàng · Size L</p></article>
+            </div>
         </div>
     </section>
 </div>

@@ -8,56 +8,65 @@
 {% block content %}
 <section class="hero">
     <div>
-        <p class="eyebrow">Bộ sưu tập Thu Đông 2026</p>
         <h1>Tự do diện,<br>hiện cá tính</h1>
-        <p class="lead">Những thiết kế tối giản, thoải mái và đầy dấu ấn riêng cho hành trình tự tin thể hiện phong cách mỗi ngày.</p>
-        <a href="{{ url_for('store.shop') }}" class="btn mt-8">Mua sắm ngay</a>
+        <p class="lead">Freesion mang đến những thiết kế tối giản, bền vững và đủ chỗ cho riêng bạn.</p>
+        <div class="toolbar mt-8">
+            <a href="{{ url_for('store.shop', category='hang-moi') }}" class="btn">Mua sắm ngay</a>
+            <a href="{{ url_for('store.shop', category='tat-ca') }}" class="btn btn-outline">Xem bộ sưu tập</a>
+        </div>
     </div>
-    <div class="media media-hero media-beige">Ảnh sản phẩm</div>
+    <div class="media media-hero media-beige">Ảnh sản phẩm · Ngày mới Freesion</div>
 </section>
 
-<nav class="category-bar" aria-label="Danh mục sản phẩm">
-    <div class="category-bar-inner">
-        <a href="{{ url_for('store.shop') }}" class="is-active">Áo sơ mi</a>
-        <a href="{{ url_for('store.shop') }}">Quần jean</a>
-        <a href="{{ url_for('store.shop') }}">Áo thun</a>
-        <a href="{{ url_for('store.shop') }}">Quần dài</a>
-        <a href="{{ url_for('store.shop') }}">Áo len</a>
-        <a href="{{ url_for('store.shop') }}">Áo khoác</a>
+<section class="section">
+    <h2 class="section-title">Mua sắm theo danh mục</h2>
+    <nav class="category-tiles" aria-label="Danh mục sản phẩm">
+        <a href="{{ url_for('store.shop', category='ao-so-mi') }}"><div class="media media-tile media-beige">Ảnh sản phẩm</div><span>Áo sơ mi</span></a>
+        <a href="{{ url_for('store.shop', category='quan-jean') }}"><div class="media media-tile media-denim">Ảnh sản phẩm</div><span>Quần jean</span></a>
+        <a href="{{ url_for('store.shop', category='ao-thun') }}"><div class="media media-tile media-cream">Ảnh sản phẩm</div><span>Áo thun</span></a>
+        <a href="{{ url_for('store.shop', category='quan-dai') }}"><div class="media media-tile media-taupe">Ảnh sản phẩm</div><span>Quần dài</span></a>
+        <a href="{{ url_for('store.shop', category='ao-len') }}"><div class="media media-tile media-rose">Ảnh sản phẩm</div><span>Áo len</span></a>
+        <a href="{{ url_for('store.shop', category='ao-khoac') }}"><div class="media media-tile media-olive">Ảnh sản phẩm</div><span>Áo khoác</span></a>
+    </nav>
+</section>
+
+<section class="collection-section">
+    <div class="page">
+        <div class="collection-grid">
+            <a href="{{ url_for('store.shop', category='hang-moi') }}" class="collection-card">
+                <div class="media media-card media-denim">Ảnh sản phẩm</div>
+                <h2>Hàng mới về</h2>
+                <p>Những thiết kế đầu tiên của mùa Thu Đông cơ bản.</p>
+                <span class="link-underline">Xem hàng mới</span>
+            </a>
+            <a href="{{ url_for('store.shop', collection='cong-so') }}" class="collection-card">
+                <div class="media media-card media-cream">Ảnh sản phẩm</div>
+                <h2>Bộ sưu tập Cộng sở</h2>
+                <p>Đơn giản, thanh thoát, mặc đi làm mỗi ngày vẫn mới.</p>
+                <span class="link-underline">Khám phá ngay</span>
+            </a>
+            <a href="{{ url_for('store.shop', category='sale') }}" class="collection-card">
+                <div class="media media-card media-taupe">Ảnh sản phẩm</div>
+                <h2>Ưu đãi đến 40%</h2>
+                <p>Cơ hội cuối để sở hữu mẫu yêu thích với giá tốt nhất.</p>
+                <span class="link-underline">Mua ngay</span>
+            </a>
+        </div>
     </div>
-</nav>
+</section>
 
 <section class="section">
     <div class="section-head">
-        <h2>Freesion được yêu thích</h2>
-        <a href="{{ url_for('store.shop') }}" class="link-underline">Xem tất cả</a>
+        <h2>Sản phẩm được yêu thích</h2>
     </div>
 
     <div class="product-grid">
-        <a href="{{ url_for('store.product_detail') }}" class="product-card">
-            <div class="media media-card media-beige">Ảnh sản phẩm</div>
-            <h3>Áo sơ mi Linen Basic</h3>
-            <p class="meta">Be tự nhiên</p>
-            <p class="price">549.000₫</p>
-        </a>
-        <a href="{{ url_for('store.product_detail') }}" class="product-card">
-            <div class="media media-card media-denim">Ảnh sản phẩm</div>
-            <h3>Quần jean Straight Fit</h3>
-            <p class="meta">Xanh denim</p>
-            <p class="price">699.000₫</p>
-        </a>
-        <a href="{{ url_for('store.product_detail') }}" class="product-card">
-            <div class="media media-card media-rose">Ảnh sản phẩm</div>
-            <h3>Áo thun Essential</h3>
-            <p class="meta">Hồng đất</p>
-            <p class="price">329.000₫</p>
-        </a>
-        <a href="{{ url_for('store.product_detail') }}" class="product-card">
-            <div class="media media-card media-olive">Ảnh sản phẩm</div>
-            <h3>Áo khoác Corduroy</h3>
-            <p class="meta">Xanh rêu</p>
-            <p class="price">899.000₫</p>
-        </a>
+        <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
+        <a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Áo khoác bomber Uniform</h3><p class="meta">Nâu dừa</p><p class="price">899.000₫</p></a>
+        <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
+        <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h3>Áo thun cotton Essential</h3><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
     </div>
+    <br></br>
+    <div class="shop-more" align="center"><a href="{{ url_for('store.shop') }}" class="btn btn-outline">Xem tất cả sản phẩm</a></div>
 </section>
 {% endblock %}

@@ -1,0 +1,111 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}Thông tin giao hàng - FREESION{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/checkout/steps.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/checkout/checkout.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set active_step = 2 %}
+{% include "layouts/partials/_checkout_steps.html" %}
+
+<div class="page">
+    <h1 class="page-title mb-6">Thông tin giao hàng</h1>
+    <p class="muted">Thêm địa chỉ để Freesion giao những món đồ bạn yêu thích đến tận nơi.</p>
+
+    <form class="split mt-8" action="{{ url_for('checkout.checkout') }}" method="get">
+        <div class="split-main form-stack">
+            <section class="form-stack">
+                <h2>Thông tin liên hệ</h2>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="ship-name">Họ và tên *</label>
+                        <input class="input" id="ship-name" name="name" value="Nguyễn Minh Anh" required>
+                    </div>
+                    <div class="field">
+                        <label for="ship-phone">Số điện thoại *</label>
+                        <input class="input" id="ship-phone" name="phone" type="tel" value="090 123 4567" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="ship-email">Email *</label>
+                    <input class="input" id="ship-email" name="email" type="email" value="minhanh.nguyen@gmail.com" required>
+                    <p class="form-hint">Thông tin xác nhận và cập nhật đơn hàng sẽ được gửi đến email này.</p>
+                </div>
+            </section>
+
+            <section class="form-stack">
+                <div class="row-between">
+                    <h2>Địa chỉ nhận hàng</h2>
+                    <a href="{{ url_for('account.address') }}" class="link-underline">Chọn từ sổ địa chỉ</a>
+                </div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="ship-city">Tỉnh / Thành phố *</label>
+                        <select class="input" id="ship-city" name="city">
+                            <option>TP. Hồ Chí Minh</option>
+                            <option>Hà Nội</option>
+                            <option>Đà Nẵng</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="ship-ward">Phường / Xã *</label>
+                        <select class="input" id="ship-ward" name="ward">
+                            <option>Phường Sài Gòn</option>
+                            <option>Phường Bến Thành</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="ship-address">Địa chỉ cụ thể *</label>
+                    <input class="input" id="ship-address" name="address" value="28 Nguyễn Thị Minh Khai" required>
+                    <p class="form-hint">Nhập số nhà, tên đường, tòa nhà hoặc số căn hộ (nếu có).</p>
+                </div>
+                <label class="form-check"><input type="checkbox" name="default" checked> Lưu làm địa chỉ giao hàng mặc định</label>
+            </section>
+
+            <section class="form-stack">
+                <h2>Phương thức giao hàng</h2>
+                <label class="choice">
+                    <span class="choice-left"><input type="radio" name="shipping" checked> Giao hàng tiêu chuẩn<br><small>Dự kiến nhận hàng: 04–06/11/2026 · 3–5 ngày làm việc</small></span>
+                    <span>Miễn phí</span>
+                </label>
+                <label class="choice">
+                    <span class="choice-left"><input type="radio" name="shipping"> Giao hàng nhanh nội thành<br><small>Dự kiến nhận hàng: 02–03/11/2026 · 1–2 ngày làm việc</small></span>
+                    <span>35.000₫</span>
+                </label>
+                <div class="field">
+                    <label for="ship-note">Ghi chú đơn hàng (không bắt buộc)</label>
+                    <textarea class="input" id="ship-note" name="note" rows="3" placeholder="Vui lòng gọi trước khi giao khoảng 15 phút."></textarea>
+                </div>
+            </section>
+
+            <div class="row-between">
+                <a href="{{ url_for('store.cart') }}" class="link-underline">← Quay lại giỏ hàng</a>
+                <button type="submit" class="btn">Tiếp tục đến thanh toán →</button>
+            </div>
+        </div>
+
+        <aside class="summary split-side">
+            <h2>Tóm tắt đơn hàng</h2>
+            <p class="muted" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
+            <div class="order-line">
+                <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
+                <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
+                <span>498.000₫</span>
+            </div>
+            <div class="order-line">
+                <div class="media media-sm media-beige">Ảnh sản phẩm</div>
+                <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
+                <span>899.000₫</span>
+            </div>
+            <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
+            <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
+            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
+            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+        </aside>
+    </form>
+</div>
+{% endblock %}

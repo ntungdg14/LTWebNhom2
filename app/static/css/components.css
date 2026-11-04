@@ -41,6 +41,18 @@
     color: var(--stone-900);
 }
 
+/* Đường dẫn phân cấp dùng chung cho các trang cửa hàng */
+.shop-breadcrumb {
+    margin: 0 0 1.5rem;
+    font-size: 0.75rem;
+    color: var(--stone-500);
+}
+
+.shop-breadcrumb a:hover {
+    color: var(--stone-900);
+    text-decoration: underline;
+}
+
 .product-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -258,11 +270,24 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 .field label {
     font-size: 0.875rem;
     color: var(--stone-700);
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
 }
 
 .input {
@@ -339,6 +364,59 @@ select.input {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+}
+
+/* Tiện ích biểu mẫu / trợ năng dùng chung cho mọi layout */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--stone-700);
+}
+
+.form-hint {
+    margin: -0.25rem 0 0;
+    font-size: 0.75rem;
+    color: var(--stone-500);
+}
+
+/* Thanh tab trạng thái dùng chung (admin + tài khoản khách hàng) */
+.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--stone-200);
+    background: var(--white);
+    padding: 0 1.5rem;
+}
+
+.admin-tabs a {
+    padding: 1rem 0;
+    font-size: 0.875rem;
+    color: var(--stone-600);
+    border-bottom: 2px solid transparent;
+}
+
+.admin-tabs a:hover {
+    color: var(--stone-900);
+}
+
+.admin-tabs a.is-active {
+    color: var(--stone-900);
+    border-bottom-color: var(--stone-900);
 }
 
 /* Responsive ------------------------------------------------------------- */

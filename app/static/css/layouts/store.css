@@ -1,7 +1,8 @@
 /* ==========================================================================
-   Header cửa hàng 2 hàng (layouts/partials/_site_header.html).
-   File này CHỈ chứa bố cục header; footer nằm riêng ở layouts/footer.css.
-   Mọi màu đều lấy từ design tokens trong base.css, không dùng thư viện ngoài.
+   Header cửa hàng 2 hàng + mega menu (layouts/partials/_site_header.html).
+   Menu thả xuống dùng thuần CSS (:hover / :focus-within), không JavaScript.
+   File này CHỈ chứa header; footer nằm riêng ở layouts/footer.css.
+   Mọi màu lấy từ design tokens trong base.css, không dùng thư viện ngoài.
    ========================================================================== */
 
 .site-header {
@@ -118,6 +119,8 @@
     line-height: 1;
     white-space: nowrap;
     color: var(--stone-900);
+    /* Cùng hiệu ứng chuyển màu mượt với các nút trên navbar (Task 4) */
+    transition: color 0.2s ease;
 }
 
 .nav-action:hover {
@@ -129,22 +132,11 @@
     height: 1.375rem;
 }
 
-/* Ẩn nhãn khỏi màn hình nhưng vẫn đọc được bởi trình đọc màn hình */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* --- Hàng 2: thanh danh mục --------------------------------------------- */
+/* --- Hàng 2: thanh menu + mega menu ------------------------------------- */
 
 .header-nav {
+    position: relative;
+    z-index: 2;
     border-top: 1px solid var(--stone-200);
 }
 
@@ -152,16 +144,18 @@
     display: flex;
     align-items: stretch;
     gap: 2rem;
-    overflow-x: auto;
-    scrollbar-width: none;
 }
 
-.nav-inner::-webkit-scrollbar {
-    display: none;
-}
-
-.nav-inner a {
+/* position: static để panel được định vị theo .header-nav (rộng toàn trang),
+   thay vì theo từng mục menu. */
+.nav-item {
+    position: static;
+    display: flex;
+    align-items: stretch;
     flex-shrink: 0;
+}
+
+.nav-link {
     display: flex;
     align-items: center;
     padding: 0.875rem 0;
@@ -171,19 +165,149 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--stone-600);
+    /* Giống hiệu ứng hover của Cửa hàng / Tài khoản / Giỏ hàng */
+    transition: color 0.2s ease;
 }
 
-.nav-inner a:hover {
+.nav-link:hover {
     color: var(--stone-900);
 }
 
-.nav-inner a.is-active {
+/* Thanh ngang màu đen trượt mượt mà theo nút đang được hover.
+   Vị trí/độ rộng chính xác do js/nav-indicator.js đo; CSS đảm nhận chuyển động. */
+.nav-indicator {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 3;
+    width: 0;
+    height: 2px;
+    background: var(--stone-950);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(0);
+    transition: transform 0.3s ease, width 0.3s ease, opacity 0.2s ease;
+}
+
+
+.nav-link.is-active {
     color: var(--stone-900);
     border-bottom-color: var(--stone-900);
 }
 
-.nav-inner a.nav-sale {
+.nav-link.nav-sale {
     color: var(--orange-600);
+}
+
+/* Mục đang di chuột nổi thành "tab" trắng nối liền với panel bên dưới */
+.nav-item:hover > .nav-link,
+.nav-item:focus-within > .nav-link {
+    color: var(--stone-900);
+    background: var(--white);
+    border-bottom-color: var(--white);
+}
+
+.nav-item:hover > .nav-link.nav-sale,
+.nav-item:focus-within > .nav-link.nav-sale {
+    color: var(--orange-600);
+}
+
+/* Panel ------------------------------------------------------------------ */
+
+.mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: var(--white);
+    border: 1px solid var(--stone-200);
+    border-top: 0;
+    box-shadow: 0 0.75rem 1.5rem var(--stone-200);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.5rem);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+
+/* Di chuột vào tab HOẶC focus bằng bàn phím đều mở panel.
+   Panel là con của .nav-item nên đưa chuột xuống panel vẫn giữ trạng thái mở. */
+.nav-item:hover > .mega-menu,
+.nav-item:focus-within > .mega-menu {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    transition-delay: 0s;
+}
+
+.mega-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 2.25rem 1.5rem 2.75rem;
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2.5rem;
+}
+
+.mega-quick {
+    border-right: 1px solid var(--stone-200);
+    padding-right: 1.5rem;
+}
+
+.mega-title {
+    margin: 0 0 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone-900);
+}
+
+.mega-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    font-size: 0.875rem;
+    color: var(--stone-600);
+}
+
+/* Danh mục sản phẩm chia 2 cột như ảnh tham khảo */
+.mega-list-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem 1.5rem;
+}
+
+.mega-list li {
+    min-width: 0;
+}
+
+.mega-list a {
+    color: inherit;
+}
+
+.mega-list a:hover {
+    color: var(--stone-900);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.mega-hot {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    background: var(--red-600);
+    color: var(--white);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    vertical-align: 1px;
 }
 
 .site-main {
@@ -193,6 +317,28 @@
 }
 
 /* Responsive ------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+    .mega-inner {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.75rem 2.5rem;
+        padding-top: 1.75rem;
+        padding-bottom: 2rem;
+    }
+
+    .mega-quick {
+        grid-column: 1 / -1;
+        border-right: 0;
+        border-bottom: 1px solid var(--stone-200);
+        padding: 0 0 1.25rem;
+    }
+
+    .mega-quick .mega-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.5rem;
+    }
+}
 
 @media (max-width: 767px) {
     .header-inner {
@@ -215,7 +361,26 @@
     }
 
     .nav-inner {
+        flex-wrap: wrap;
+        gap: 0 1.5rem;
+    }
+
+    .nav-link {
+        padding: 0.75rem 0;
+    }
+
+    .mega-inner {
+        grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    .mega-list-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .mega-menu {
+        max-height: 70vh;
+        overflow-y: auto;
     }
 }
 
