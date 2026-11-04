@@ -8,7 +8,7 @@ from typing import Any
 
 from flask import g, jsonify, request, session
 
-from ...db import get_db
+from app.database import get_db
 from . import api_bp
 
 VN_TZ = timezone(timedelta(hours=7))
