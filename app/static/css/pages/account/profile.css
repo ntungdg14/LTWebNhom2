@@ -15,3 +15,32 @@
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--stone-200);
 }
+
+/* Hồ sơ tài khoản theo ảnh: các nhóm thông tin và thẻ địa chỉ */
+.profile-section {
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--stone-200);
+}
+
+.profile-section h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.125rem;
+}
+
+.profile-address {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--stone-100);
+}
+
+.profile-address h2 {
+    margin: 0 0 1rem;
+    font-size: 1.125rem;
+}
+
+.profile-note {
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--stone-100);
+    font-size: 0.875rem;
+}

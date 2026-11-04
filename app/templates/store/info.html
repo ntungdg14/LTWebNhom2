@@ -1,0 +1,20 @@
+{% extends "layouts/base_store.html" %}
+{% block title %}{{ title }} - FREESION{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/store/home.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:48rem;">
+    <p class="eyebrow">Freesion · Trợ giúp</p>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="muted">{{ content }}</p>
+    <p class="muted">Nếu cần hỗ trợ thêm, liên hệ 1900 636 028 hoặc hello@freesion.vn, 8:30–21:00 mỗi ngày.</p>
+    <div class="toolbar mt-8">
+        <a href="{{ url_for('store.home') }}" class="btn">Về trang chủ</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Tài khoản của bạn</a>
+    </div>
+</div>
+{% endblock %}

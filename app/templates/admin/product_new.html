@@ -1,0 +1,94 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}{% if editing %}Chỉnh sửa sản phẩm{% else %}Thêm sản phẩm{% endif %} - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Sản phẩm</a> / <a href="{{ url_for('admin.products') }}">Danh sách</a> / {% if editing %}Chỉnh sửa sản phẩm{% else %}Thêm sản phẩm{% endif %}</p>
+            <h1 class="page-title">{% if editing %}Chỉnh sửa sản phẩm {{ sku }}{% else %}Thêm sản phẩm{% endif %}</h1>
+            <p class="meta">Điền thông tin để đưa sản phẩm mới lên cửa hàng.</p>
+        </div>
+        <a href="{{ url_for('admin.products') }}" class="btn btn-ghost">Hủy</a>
+    </header>
+
+    <form class="form-stack" action="{{ url_for('admin.product_new') }}" method="post">
+        <div class="form-columns">
+            <section class="admin-card form-stack form-card">
+                <h2>Thông tin cơ bản</h2>
+                <div class="field">
+                    <label for="product-name">Tên sản phẩm *</label>
+                    <input class="input" id="product-name" name="name" type="text" placeholder="Áo khoác bomber Uniform" required>
+                </div>
+                <div class="form-grid-2">
+                    <div class="field">
+                        <label for="product-sku">SKU *</label>
+                        <input class="input" id="product-sku" name="sku" type="text" placeholder="FR-BOM-002" required>
+                    </div>
+                    <div class="field">
+                        <label for="product-category">Danh mục *</label>
+                        <select class="input" id="product-category" name="category" required>
+                            <option value="">Chọn danh mục</option>
+                            <option>Áo sơ mi</option>
+                            <option>Áo thun</option>
+                            <option>Áo khoác</option>
+                            <option>Quần jean</option>
+                            <option>Quần dài</option>
+                            <option>Áo len</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="product-description">Mô tả sản phẩm</label>
+                    <textarea class="input" id="product-description" name="description" rows="5" placeholder="Chất liệu, form dáng, cách phối..."></textarea>
+                </div>
+
+                <h2>Giá bán</h2>
+                <div class="form-grid-2">
+                    <div class="field">
+                        <label for="product-price">Giá bán *</label>
+                        <input class="input" id="product-price" name="price" type="number" min="0" placeholder="899000" required>
+                    </div>
+                    <div class="field">
+                        <label for="product-compare-price">Giá so sánh</label>
+                        <input class="input" id="product-compare-price" name="compare_price" type="number" min="0" placeholder="1199000">
+                    </div>
+                </div>
+                <label class="form-check"><input type="checkbox" name="tax_included" checked> Giá đã bao gồm thuế GTGT</label>
+            </section>
+
+            <aside class="admin-card form-stack form-card">
+                <h2>Xuất bản</h2>
+                <div class="field">
+                    <label for="product-status">Trạng thái *</label>
+                    <select class="input" id="product-status" name="status">
+                        <option>Đang bán</option>
+                        <option>Bản nháp</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="product-brand">Thương hiệu</label>
+                    <input class="input" id="product-brand" name="brand" type="text" value="FREESION">
+                </div>
+                <div class="field">
+                    <label for="product-stock">Tồn kho *</label>
+                    <input class="input" id="product-stock" name="stock" type="number" min="0" value="0" required>
+                </div>
+                <label class="form-check"><input type="checkbox" name="online" checked> Hiển thị trên cửa hàng</label>
+                <label class="form-check"><input type="checkbox" name="shipping" checked> Sản phẩm cần vận chuyển</label>
+                <p class="form-hint">* Trường bắt buộc</p>
+            </aside>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('admin.products') }}" class="btn btn-ghost">Hủy</a>
+            <button type="submit" class="btn">{% if editing %}Lưu thay đổi{% else %}Lưu sản phẩm{% endif %}</button>
+        </div>
+    </form>
+</main>
+{% endblock %}

@@ -1,0 +1,18 @@
+{# Thanh tiến trình 4 bước. Biến active_step: 1=Giỏ hàng, 2=Giao hàng, 3=Thanh toán, 4=Xác nhận #}
+{% set steps = [
+    (1, 'Shopping Cart', 'Giỏ hàng', url_for('store.cart')),
+    (2, 'Shipping Information', 'Thông tin giao hàng', url_for('checkout.shipping')),
+    (3, 'Payment', 'Thanh toán', url_for('checkout.checkout')),
+    (4, 'Confirmation', 'Xác nhận', url_for('checkout.order_success'))
+] %}
+<nav class="checkout-steps" aria-label="Tiến trình đặt hàng">
+    {% for number, label, vi, href in steps %}
+    {% if not loop.first %}<span class="checkout-step-sep" aria-hidden="true">→</span>{% endif %}
+    <a href="{{ href }}" class="checkout-step {% if number < active_step %}is-done{% elif number == active_step %}is-active{% endif %}"
+       {% if number == active_step %}aria-current="step"{% endif %}>
+        <span class="checkout-step-number">{% if number < active_step %}✓{% else %}{{ number }}{% endif %}</span>
+        <span class="checkout-step-label">{{ label }}</span>
+        <span class="sr-only">{{ vi }}</span>
+    </a>
+    {% endfor %}
+</nav>

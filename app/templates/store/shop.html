@@ -1,5 +1,5 @@
 {% extends "layouts/base_store.html" %}
-{% block title %}Tất cả sản phẩm - FREESION{% endblock %}
+{% block title %}Hàng mới về - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -8,92 +8,89 @@
 
 {% block content %}
 <div class="page">
+    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Hàng mới về</p>
+
     <header class="shop-head">
-        <h1 class="page-title">Tất cả sản phẩm</h1>
-        <form class="sort-form" action="{{ url_for('store.shop') }}">
+        <div>
+            <h1 class="page-title">Hàng mới về cho nữ</h1>
+            <p class="muted">Chất liệu bền, phom gọn, dễ phối. Mỗi tuần có thêm mẫu mới.</p>
+            <p class="muted" style="font-size:0.75rem;">128 sản phẩm</p>
+        </div>
+        <form class="sort-form" action="{{ url_for('store.shop') }}" method="get">
             <label for="sort">Sắp xếp:</label>
             <select id="sort" class="input" name="sort">
+                <option>Nổi bật</option>
                 <option>Mới nhất</option>
                 <option>Giá tăng dần</option>
                 <option>Giá giảm dần</option>
             </select>
+            <button type="submit" class="btn btn-ghost">Áp dụng</button>
         </form>
     </header>
 
     <div class="shop-layout">
         <aside class="filters">
-            <section class="filter-group">
-                <h2>Danh mục</h2>
-                <div class="filter-list">
-                    <label><input type="checkbox"> Áo sơ mi</label>
-                    <label><input type="checkbox"> Quần</label>
-                    <label><input type="checkbox"> Phụ kiện</label>
-                </div>
-            </section>
-            <section class="filter-group">
-                <h2>Khoảng giá</h2>
-                <div class="filter-list">
-                    <label><input type="radio" name="price"> Dưới 500.000₫</label>
-                    <label><input type="radio" name="price"> 500.000₫ - 1.000.000₫</label>
-                    <label><input type="radio" name="price"> Trên 1.000.000₫</label>
-                </div>
-            </section>
-            <section class="filter-group">
-                <h2>Kích thước</h2>
-                <div class="size-chips">
-                    <a href="{{ url_for('store.shop') }}" class="chip">S</a>
-                    <a href="{{ url_for('store.shop') }}" class="chip">M</a>
-                    <a href="{{ url_for('store.shop') }}" class="chip">L</a>
-                    <a href="{{ url_for('store.shop') }}" class="chip">XL</a>
-                </div>
-            </section>
+            <form action="{{ url_for('store.shop') }}" method="get">
+                <section class="filter-group">
+                    <div class="row-between"><h2>Danh mục</h2><span>−</span></div>
+                    <div class="filter-list">
+                        <label><input type="checkbox" name="cat" value="ao-so-mi" checked> Áo sơ mi (24)</label>
+                        <label><input type="checkbox" name="cat" value="ao-thun"> Áo thun (31)</label>
+                        <label><input type="checkbox" name="cat" value="quan-dai"> Quần dài (18)</label>
+                        <label><input type="checkbox" name="cat" value="quan-jean"> Quần jean (22)</label>
+                        <label><input type="checkbox" name="cat" value="ao-len"> Áo len (15)</label>
+                        <label><input type="checkbox" name="cat" value="ao-khoac"> Áo khoác (18)</label>
+                    </div>
+                </section>
+                <section class="filter-group">
+                    <div class="row-between"><h2>Màu sắc</h2><span>−</span></div>
+                    <div class="color-swatches">
+                        <a href="{{ url_for('store.shop', color='den') }}" class="color-swatch media-stone" aria-label="Đen"></a>
+                        <a href="{{ url_for('store.shop', color='trang') }}" class="color-swatch media-cream" aria-label="Trắng"></a>
+                        <a href="{{ url_for('store.shop', color='be') }}" class="color-swatch media-beige" aria-label="Be"></a>
+                        <a href="{{ url_for('store.shop', color='xanh-dam') }}" class="color-swatch media-denim" aria-label="Xanh đậm"></a>
+                        <a href="{{ url_for('store.shop', color='xanh-reu') }}" class="color-swatch media-olive" aria-label="Xanh rêu"></a>
+                        <a href="{{ url_for('store.shop', color='hong-dat') }}" class="color-swatch media-rose" aria-label="Hồng đất"></a>
+                        <a href="{{ url_for('store.shop', color='nau') }}" class="color-swatch media-taupe" aria-label="Nâu"></a>
+                    </div>
+                </section>
+                <section class="filter-group">
+                    <div class="row-between"><h2>Kích cỡ</h2><span>−</span></div>
+                    <div class="size-chips">
+                        <a href="{{ url_for('store.shop', size='S') }}" class="chip">S</a>
+                        <a href="{{ url_for('store.shop', size='M') }}" class="chip is-active">M</a>
+                        <a href="{{ url_for('store.shop', size='L') }}" class="chip">L</a>
+                        <a href="{{ url_for('store.shop', size='XL') }}" class="chip">XL</a>
+                        <a href="{{ url_for('store.shop', size='XXL') }}" class="chip">XXL</a>
+                    </div>
+                </section>
+                <section class="filter-group">
+                    <div class="row-between"><h2>Mức giá</h2><span>−</span></div>
+                    <div class="filter-list">
+                        <label><input type="radio" name="price"> Dưới 500.000₫</label>
+                        <label><input type="radio" name="price" checked> 500.000₫ – 1.000.000₫</label>
+                        <label><input type="radio" name="price"> Trên 1.000.000₫</label>
+                    </div>
+                </section>
+                <button type="submit" class="btn btn-ghost btn-block">Áp dụng bộ lọc</button>
+            </form>
         </aside>
 
         <section class="product-grid-3">
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-beige">Ảnh sản phẩm</div>
-                <h2>Áo sơ mi Linen Basic</h2>
-                <p class="meta">Be tự nhiên</p>
-                <p class="price">549.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-denim">Ảnh sản phẩm</div>
-                <h2>Quần jean Straight Fit</h2>
-                <p class="meta">Xanh denim</p>
-                <p class="price">699.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-rose">Ảnh sản phẩm</div>
-                <h2>Áo thun Essential</h2>
-                <p class="meta">Hồng đất</p>
-                <p class="price">329.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-olive">Ảnh sản phẩm</div>
-                <h2>Áo khoác Corduroy</h2>
-                <p class="meta">Xanh rêu</p>
-                <p class="price">899.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-cream">Ảnh sản phẩm</div>
-                <h2>Quần dài Relaxed</h2>
-                <p class="meta">Kem sáng</p>
-                <p class="price">649.000₫</p>
-            </a>
-            <a href="{{ url_for('store.product_detail') }}" class="product-card">
-                <div class="media media-card media-taupe">Ảnh sản phẩm</div>
-                <h2>Áo len cổ tròn</h2>
-                <p class="meta">Xám olive</p>
-                <p class="price">579.000₫</p>
-            </a>
+            <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h2>Áo sơ mi Oxford dáng rộng</h2><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h2>Áo khoác bomber Uniform</h2><p class="meta">Nâu dừa</p><p class="price">899.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h2>Quần jean ống suông Indigo</h2><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h2>Áo thun cotton Essential</h2><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h2>Áo len dệt waffle cổ tròn</h2><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-OVS-006') }}" class="product-card"><div class="media media-card media-olive">Ảnh sản phẩm</div><h2>Áo overshirt Heavyweight</h2><p class="meta">Rêu</p><p class="price">799.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-CHI-007') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h2>Quần dài ống đứng Chino</h2><p class="meta">Be cát</p><p class="price">529.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-BOX-008') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h2>Áo thun Boxy dày dặn</h2><p class="meta">Trắng</p><p class="price">289.000₫</p></a>
+            <a href="{{ url_for('store.product_detail', sku='FR-SKI-009') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h2>Quần jean slim co giãn</h2><p class="meta">Indigo đậm</p><p class="price">699.000₫</p></a>
         </section>
     </div>
 
-    <nav class="pagination" aria-label="Phân trang">
-        <a href="{{ url_for('store.shop') }}" class="page-num is-active">1</a>
-        <a href="{{ url_for('store.shop') }}" class="page-num">2</a>
-        <a href="{{ url_for('store.shop') }}" class="page-num">3</a>
-        <a href="{{ url_for('store.shop') }}" class="page-num">Tiếp →</a>
-    </nav>
+    <div class="shop-more">
+        <a href="{{ url_for('store.shop', page=2) }}" class="btn btn-outline">Xem thêm sản phẩm</a>
+    </div>
 </div>
 {% endblock %}

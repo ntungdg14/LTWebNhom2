@@ -1,0 +1,75 @@
+{% extends "layouts/base_account.html" %}
+{% block title %}Chi tiết đơn hàng #{{ order_id }} - FREESION{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/account/order_history.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <p class="form-breadcrumb" style="font-size:0.75rem; color:var(--stone-500);">
+        <a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('account.profile') }}">Tài khoản</a> /
+        <a href="{{ url_for('account.order_history') }}">Đơn hàng của tôi</a> / #{{ order_id }}
+    </p>
+
+    <div class="account-layout">
+        {% include "layouts/partials/_account_nav.html" %}
+
+        <section class="grow">
+            <a href="{{ url_for('account.order_history') }}" class="link-underline">← Quay lại đơn hàng của tôi</a>
+            <div class="row-between mt-4" style="align-items:flex-start;">
+                <div>
+                    <h1 class="page-title">#{{ order_id }}</h1>
+                    <p class="muted">Đặt lúc 10:32, 01/11/2026 · 2 dòng sản phẩm · Số lượng: 3</p>
+                </div>
+                <span class="badge badge-warn">Đang chuẩn bị hàng</span>
+            </div>
+
+            <section class="order-card">
+                <strong>Dự kiến nhận: 04–06/11/2026</strong>
+                <p class="muted">Đơn hàng được xác nhận. Freesion đang đóng gói sản phẩm cho bạn.</p>
+                <div class="admin-tabs" style="padding:0; margin:1.5rem 0 0.5rem;">
+                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='placed') }}" class="is-active">✓ Đã đặt hàng<br><small>01/11 · 10:32</small></a>
+                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='preparing') }}" style="color:var(--orange-600);">Đang chuẩn bị<br><small>01/11 · 11:05</small></a>
+                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='shipping') }}">Đang giao hàng<br><small>Chưa bàn giao</small></a>
+                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='delivered') }}">Đã giao hàng<br><small>Dự kiến 04–06/11</small></a>
+                </div>
+                <p class="muted">Đơn vị vận chuyển và mã vận đơn sẽ hiện thị khi đơn hàng được bàn giao.</p>
+            </section>
+
+            <section class="order-card">
+                <h2>Sản phẩm trong đơn</h2>
+                <div class="order-line"><div class="media media-sm media-taupe">Ảnh sản phẩm</div><div class="grow"><strong>Áo thun cotton Essential</strong><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div><span>498.000₫</span></div>
+                <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><strong>Áo khoác bomber Uniform</strong><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div><span>899.000₫</span></div>
+            </section>
+
+            <div class="row-between" style="align-items:flex-start; flex-wrap:wrap; gap:2rem;">
+                <section style="flex:1 1 18rem;">
+                    <h2>Địa chỉ nhận hàng</h2>
+                    <p><strong>Nguyễn Minh Anh : 090 123 4567</strong><br>28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh<br>minhanh.nguyen@gmail.com</p>
+                    <p class="muted">Ghi chú: Vui lòng gọi trước khi giao khoảng 15 phút.</p>
+                    <h2 style="margin-top:2rem;">Thanh toán &amp; giao hàng</h2>
+                    <p>Thanh toán khi nhận hàng (COD)<br><span style="color:var(--orange-600);">Chưa thanh toán · Cần trả 1.257.300₫</span><br>Giao hàng tiêu chuẩn · Miễn phí</p>
+                    <p class="muted">Bạn có thể yêu cầu hủy trước khi đơn được giao cho vận chuyển. Đổi size, đổi màu trong vòng 30 ngày kể từ khi nhận hàng.</p>
+                </section>
+                <aside class="summary" style="flex:0 1 20rem;">
+                    <h2>Tóm tắt thanh toán</h2>
+                    <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
+                    <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
+                    <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
+                    <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+                    <p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>
+                </aside>
+            </div>
+
+            <div class="order-card" style="background:var(--stone-100);">
+                <div class="row-between">
+                    <div><h2 style="margin:0;">Cần giúp với đơn hàng của bạn?</h2><p class="muted">1900 636 028 · hello@freesion.vn · 8:30–21:00 mỗi ngày</p></div>
+                    <a href="{{ url_for('auth.login') }}" class="link-underline">Liên hệ Freesion</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -9,3 +9,12 @@
     padding: 1.5rem;
     margin-bottom: 1.5rem;
 }
+
+.account-order-toolbar {
+    margin: 1.5rem 0;
+}
+
+.order-card h2 {
+    margin: 0;
+    font-size: 0.875rem;
+}

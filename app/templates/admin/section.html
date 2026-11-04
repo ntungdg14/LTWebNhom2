@@ -1,0 +1,37 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}{{ title }} - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Quản lý cửa hàng</a> / {{ title }}</p>
+            <h1 class="page-title">{{ title }}</h1>
+            <p class="meta">{{ description }}</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">← Tổng quan</a>
+    </header>
+
+    <section class="stat-grid">
+        <article class="stat-card"><p>Cập nhật gần nhất</p><strong>01/11/2026</strong><p>10:45 · Minh Anh</p></article>
+        <article class="stat-card"><p>Đối tượng theo dõi</p><strong>128</strong><p>Sản phẩm đang bán</p></article>
+        <article class="stat-card"><p>Cần xử lý</p><strong>8</strong><p>Mục cảnh báo tồn kho</p></article>
+        <article class="stat-card"><p>Trạng thái</p><strong>Ổn định</strong><p>Đồng bộ dữ liệu mỗi ngày</p></article>
+    </section>
+
+    <section class="admin-card form-stack">
+        <h2>Tóm tắt</h2>
+        <p class="muted">{{ description }} Dữ liệu chi tiết được cập nhật từ phân hệ tương ứng của Freesion Việt Nam.</p>
+        <div class="toolbar">
+            <a href="{{ url_for('admin.products') }}" class="link-underline">Quản lý sản phẩm →</a>
+            <a href="{{ url_for('admin.orders') }}" class="link-underline">Quản lý đơn hàng →</a>
+            <a href="{{ url_for('admin.users') }}" class="link-underline">Quản lý khách hàng →</a>
+        </div>
+    </section>
+</main>
+{% endblock %}

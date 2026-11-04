@@ -1,0 +1,100 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Thêm khách hàng - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Khách hàng</a> / <a href="{{ url_for('admin.users') }}">Danh sách</a> / Thêm khách hàng</p>
+            <h1 class="page-title">Thêm khách hàng</h1>
+            <p class="meta">Tạo hồ sơ khách hàng và cấp quyền truy cập cửa hàng.</p>
+        </div>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-ghost">Hủy</a>
+    </header>
+
+    <form class="form-stack" action="{{ url_for('admin.user_new') }}" method="post">
+        <div class="form-columns">
+            <section class="admin-card form-stack form-card">
+                <h2>Thông tin cá nhân</h2>
+                <div class="form-grid-2">
+                    <div class="field">
+                        <label for="customer-name">Họ và tên *</label>
+                        <input class="input" id="customer-name" name="name" type="text" placeholder="Nguyễn Minh Anh" required>
+                    </div>
+                    <div class="field">
+                        <label for="customer-phone">Số điện thoại *</label>
+                        <input class="input" id="customer-phone" name="phone" type="tel" placeholder="090 123 4567" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="customer-email">Email *</label>
+                    <input class="input" id="customer-email" name="email" type="email" placeholder="minhanh.nguyen@gmail.com" required>
+                </div>
+                <div class="form-grid-2">
+                    <div class="field">
+                        <label for="customer-birthday">Ngày sinh</label>
+                        <input class="input" id="customer-birthday" name="birthday" type="date">
+                    </div>
+                    <div class="field">
+                        <label for="customer-gender">Giới tính</label>
+                        <select class="input" id="customer-gender" name="gender">
+                            <option value="">Chọn giới tính</option>
+                            <option>Nữ</option>
+                            <option>Nam</option>
+                            <option>Khác</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="customer-address">Địa chỉ mặc định</label>
+                    <input class="input" id="customer-address" name="address" type="text" placeholder="28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh">
+                </div>
+                <div class="field">
+                    <label for="customer-note">Ghi chú nội bộ</label>
+                    <textarea class="input" id="customer-note" name="note" rows="3" placeholder="Khách hàng thích size M, thường mua cuối tuần..."></textarea>
+                </div>
+            </section>
+
+            <aside class="admin-card form-stack form-card">
+                <h2>Tài khoản &amp; phân nhóm</h2>
+                <div class="field">
+                    <label for="customer-password">Mật khẩu *</label>
+                    <input class="input" id="customer-password" name="password" type="password" minlength="8" required>
+                </div>
+                <div class="field">
+                    <label for="customer-password-confirm">Xác nhận mật khẩu *</label>
+                    <input class="input" id="customer-password-confirm" name="password_confirm" type="password" minlength="8" required>
+                    <p class="form-hint">Ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số.</p>
+                </div>
+                <div class="field">
+                    <label for="customer-group">Nhóm khách hàng</label>
+                    <select class="input" id="customer-group" name="group">
+                        <option>Khách mới</option>
+                        <option>Quay lại</option>
+                        <option>Thân thiết</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="customer-role">Quyền mặc định</label>
+                    <select class="input" id="customer-role" name="role">
+                        <option value="customer">Khách hàng</option>
+                        <option value="admin">Quản trị viên</option>
+                    </select>
+                </div>
+                <label class="form-check"><input type="checkbox" name="active" checked> Tài khoản hoạt động</label>
+                <p class="form-hint">Có thể đổi quyền sau tại <a class="link-underline" href="{{ url_for('admin.permissions') }}">Phân quyền tài khoản</a>.</p>
+            </aside>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('admin.users') }}" class="btn btn-ghost">Hủy</a>
+            <button type="submit" class="btn">Lưu khách hàng</button>
+        </div>
+    </form>
+</main>
+{% endblock %}

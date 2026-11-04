@@ -10,36 +10,42 @@
             <div>
                 <h2>Mua sắm</h2>
                 <div class="footer-links">
-                    <a href="{{ url_for('store.shop') }}">Nữ</a>
-                    <a href="{{ url_for('store.shop') }}">Nam</a>
-                    <a href="{{ url_for('store.shop') }}">Phụ kiện</a>
-                    <a href="{{ url_for('store.shop') }}">Hàng mới về</a>
-                    <a href="{{ url_for('store.shop') }}">Sale</a>
+                    <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a>
+                    <a href="{{ url_for('store.shop', category='nam') }}">Nam</a>
+                    <a href="{{ url_for('store.shop', category='phu-kien') }}">Phụ kiện</a>
+                    <a href="{{ url_for('store.shop', category='hang-moi') }}">Hàng mới về</a>
+                    <a href="{{ url_for('store.shop', category='sale') }}">Sale</a>
                 </div>
             </div>
 
             <div>
                 <h2>Hỗ trợ</h2>
                 <div class="footer-links">
-                    <a href="{{ url_for('store.product_detail') }}">Hướng dẫn chọn size</a>
-                    <a href="{{ url_for('store.cart') }}">Chính sách đổi trả</a>
-                    <a href="{{ url_for('checkout.checkout') }}">Vận chuyển &amp; thanh toán</a>
-                    <a href="{{ url_for('auth.login') }}">Liên hệ</a>
+                    <a href="{{ url_for('store.help_page') }}">Hướng dẫn chọn size</a>
+                    <a href="{{ url_for('store.terms') }}">Chính sách đổi trả</a>
+                    <a href="{{ url_for('checkout.shipping') }}">Vận chuyển &amp; thanh toán</a>
+                    <a href="{{ url_for('store.help_page', topic='contact') }}">Liên hệ</a>
                 </div>
             </div>
 
             <div>
-                <h2>Tài khoản</h2>
+                <h2>Kết nối</h2>
                 <div class="footer-links">
-                    <a href="{{ url_for('auth.login') }}">Đăng nhập</a>
-                    <a href="{{ url_for('auth.register') }}">Đăng ký</a>
-                    <a href="{{ url_for('account.order_history') }}">Đơn hàng</a>
-                    <a href="{{ url_for('account.wishlist') }}">Yêu thích</a>
-                    <a href="{{ url_for('admin.dashboard') }}">Trang quản trị</a>
+                    <a href="{{ url_for('store.help_page', topic='instagram') }}">Instagram</a>
+                    <a href="{{ url_for('store.help_page', topic='facebook') }}">Facebook</a>
+                    <a href="{{ url_for('store.help_page', topic='tiktok') }}">TikTok</a>
+                    <a href="{{ url_for('store.help_page', topic='youtube') }}">YouTube</a>
                 </div>
             </div>
         </div>
 
-        <div class="footer-copy">© 2026 Freesion. Tự do diện, hiện cá tính.</div>
+        <div class="footer-copy">
+            <span>© 2026 Freesion. Tự do diện, hiện cá tính.</span>
+            <span class="footer-copy-links">
+                <a href="{{ url_for('store.privacy') }}">Chính sách bảo mật</a>
+                <a href="{{ url_for('store.terms') }}">Điều khoản sử dụng</a>
+                <a href="{{ url_for('admin.dashboard') }}">Trang quản trị</a>
+            </span>
+        </div>
     </div>
 </footer>

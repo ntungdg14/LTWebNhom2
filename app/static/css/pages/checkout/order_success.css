@@ -39,10 +39,93 @@
     margin-top: 1.5rem;
 }
 
+/* Các khối thông tin theo ảnh xác nhận đơn hàng */
+.page-success {
+    text-align: left;
+    max-width: 64rem;
+}
+
+.page-success > h1,
+.page-success > .success-icon,
+.page-success > p.muted,
+.page-success > .success-meta {
+    text-align: center;
+}
+
+.success-meta {
+    font-size: 0.875rem;
+    color: var(--stone-600);
+}
+
+.success-delivery {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--stone-100);
+    border: 1px solid var(--stone-200);
+    font-size: 0.875rem;
+}
+
+.success-delivery .eyebrow {
+    margin: 0;
+    color: var(--orange-600);
+}
+
+.success-delivery strong {
+    font-size: 1.125rem;
+}
+
+.success-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--stone-200);
+    border-bottom: 1px solid var(--stone-200);
+    font-size: 0.875rem;
+}
+
+.success-columns h2,
+.success-products h2,
+.success-support h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.125rem;
+}
+
+.success-products {
+    padding: 2rem 0;
+}
+
+.success-support {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--stone-100);
+    font-size: 0.875rem;
+}
+
+.success-support h2 {
+    margin-bottom: 0.35rem;
+}
+
+.success-support p {
+    margin: 0;
+    color: var(--stone-600);
+}
+
 /* Responsive ------------------------------------------------------------- */
 
 @media (min-width: 640px) {
     .success-actions {
         flex-direction: row;
+    }
+
+    .success-columns {
+        grid-template-columns: 1fr 1fr;
     }
 }

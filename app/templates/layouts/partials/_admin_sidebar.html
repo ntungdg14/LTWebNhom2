@@ -1,8 +1,27 @@
 <aside class="admin-sidebar">
     <a href="{{ url_for('admin.dashboard') }}" class="logo">FREESION</a>
+    <p class="admin-sidebar-sub">Trang quản trị</p>
+
+    <div class="admin-store-card">
+        <strong>Freesion Việt Nam</strong>
+        <span>● Cửa hàng đang hoạt động</span>
+    </div>
+
+    <p class="admin-sidebar-group">Quản lý cửa hàng</p>
     <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}is-active{% endif %}">Tổng quan</a>
-    <a href="{{ url_for('admin.products') }}" class="{% if request.endpoint == 'admin.products' %}is-active{% endif %}">Sản phẩm</a>
-    <a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint == 'admin.orders' %}is-active{% endif %}">Đơn hàng</a>
-    <a href="{{ url_for('admin.users') }}" class="{% if request.endpoint == 'admin.users' %}is-active{% endif %}">Khách hàng</a>
-    <a href="{{ url_for('store.home') }}">Về cửa hàng</a>
+    <a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint.startswith('admin.order') %}is-active{% endif %}">Đơn hàng <span class="admin-count">12</span></a>
+    <a href="{{ url_for('admin.products') }}" class="{% if request.endpoint.startswith('admin.product') %}is-active{% endif %}">Sản phẩm</a>
+    <a href="{{ url_for('admin.categories') }}" class="admin-sub-item {% if request.endpoint.startswith('admin.categor') %}is-active{% endif %}">Danh mục</a>
+    <a href="{{ url_for('admin.inventory') }}" class="{% if request.endpoint == 'admin.inventory' %}is-active{% endif %}">Kho hàng <span class="admin-count">8</span></a>
+    <a href="{{ url_for('admin.users') }}" class="{% if request.endpoint.startswith('admin.user') %}is-active{% endif %}">Khách hàng</a>
+    <a href="{{ url_for('admin.promotions') }}" class="{% if request.endpoint == 'admin.promotions' %}is-active{% endif %}">Khuyến mãi</a>
+    <a href="{{ url_for('admin.reports') }}" class="{% if request.endpoint == 'admin.reports' %}is-active{% endif %}">Báo cáo</a>
+
+    <p class="admin-sidebar-group">Nhân sự &amp; phân quyền</p>
+    <a href="{{ url_for('admin.permissions') }}" class="{% if request.endpoint == 'admin.permissions' %}is-active{% endif %}">Phân quyền tài khoản</a>
+
+    <div class="admin-sidebar-bottom">
+        <a href="{{ url_for('store.home') }}">↗ Xem cửa hàng</a>
+        <a href="{{ url_for('auth.login') }}">→ Đăng xuất</a>
+    </div>
 </aside>

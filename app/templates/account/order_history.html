@@ -8,70 +8,74 @@
 
 {% block content %}
 <div class="page">
+    <p class="account-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('account.profile') }}">Tài khoản</a> / Đơn hàng của tôi</p>
     <div class="account-layout">
         {% include "layouts/partials/_account_nav.html" %}
         <section class="grow">
-            <h1 class="page-title mb-6">Đơn hàng của tôi</h1>
+            <h1 class="page-title">Đơn hàng của tôi</h1>
+            <p class="muted">Theo dõi hành trình những món đồ bạn đã chọn.</p>
+
+            <form class="admin-filters account-order-toolbar" action="{{ url_for('account.order_history') }}" method="get">
+                <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm theo mã đơn hoặc tên sản phẩm">
+                <select class="input input-rounded" name="period"><option>6 tháng gần nhất</option><option>12 tháng gần nhất</option></select>
+                <button type="submit" class="btn btn-ghost">Lọc</button>
+            </form>
+
+            <nav class="admin-tabs" aria-label="Trạng thái đơn hàng" style="padding:0; margin-bottom:1.5rem;">
+                <a href="{{ url_for('account.order_history', status='all') }}" class="is-active">Tất cả (7)</a>
+                <a href="{{ url_for('account.order_history', status='processing') }}">Đang xử lý (1)</a>
+                <a href="{{ url_for('account.order_history', status='delivered') }}">Đã giao (4)</a>
+                <a href="{{ url_for('account.order_history', status='cancelled') }}">Đã hủy (2)</a>
+            </nav>
 
             <article class="order-card">
                 <header class="row-between">
-                    <div>
-                        <p><strong>Mã đơn hàng #FS9482</strong></p>
-                        <p class="meta">Đặt ngày 02 tháng 11, 2026</p>
-                    </div>
-                    <span class="badge badge-warn">Đang giao hàng</span>
+                    <div><p><a href="{{ url_for('account.order_detail', order_id='FR261101028') }}"><strong>#FR261101028</strong></a></p><p class="meta">Ngày đặt: 01/11/2026</p></div>
+                    <span class="badge badge-warn">Đang chuẩn bị hàng</span>
                 </header>
-                <div class="order-line">
-                    <div class="media media-sm media-beige">Ảnh sản phẩm</div>
-                    <div class="grow"><h2>Áo sơ mi Linen Basic</h2><p class="meta">Số lượng: 1 · Be tự nhiên</p></div>
-                    <span>549.000₫</span>
-                </div>
-                <div class="order-line">
-                    <div class="media media-sm media-denim">Ảnh sản phẩm</div>
-                    <div class="grow"><h2>Quần jean Straight Fit</h2><p class="meta">Số lượng: 1 · Xanh denim</p></div>
-                    <span>699.000₫</span>
-                </div>
-                <div class="order-line">
-                    <div class="media media-sm media-rose">Ảnh sản phẩm</div>
-                    <div class="grow"><h2>Áo thun Essential</h2><p class="meta">Số lượng: 2 · Hồng đất</p></div>
-                    <span>658.000₫</span>
-                </div>
+                <div class="order-line"><div class="media media-sm media-taupe">Ảnh sản phẩm</div><div class="grow"><h2>Áo thun cotton Essential</h2><p class="meta">Size M | Den vintage · 249.000₫ × 2</p></div><span>498.000₫</span></div>
+                <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><h2>Áo khoác bomber Uniform</h2><p class="meta">Size L | Nâu dừa · 899.000₫ × 1</p></div><span>899.000₫</span></div>
                 <footer class="row-between mt-4">
-                    <p class="muted">Tổng thanh toán: <strong>1.906.000₫</strong></p>
+                    <p class="muted">2 dòng sản phẩm · Tổng số lượng: 3 &nbsp;|&nbsp; <strong>1.257.300₫</strong></p>
+                    <a href="{{ url_for('account.order_detail', order_id='FR261101028') }}" class="btn">Xem chi tiết đơn hàng</a>
+                </footer>
+            </article>
+
+            <article class="order-card">
+                <header class="row-between">
+                    <div><p><a href="{{ url_for('account.order_detail', order_id='FR261015092') }}"><strong>#FR261015092</strong></a></p><p class="meta">Ngày đặt: 15/10/2026</p></div>
+                    <span class="badge badge-ok">Đã giao hàng</span>
+                </header>
+                <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><h2>Áo sơ mi Oxford dáng rộng</h2><p class="meta">Size M | Trắng kem · Số lượng: 1</p></div><span>459.000₫</span></div>
+                <footer class="row-between mt-4">
+                    <p class="muted">Tổng cộng <strong>489.000₫</strong> · Đã nhận ngày 18/10/2026</p>
                     <div class="toolbar">
-                        <a href="{{ url_for('checkout.order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
-                        <a href="{{ url_for('store.cart') }}" class="btn">Mua lại</a>
+                        <a href="{{ url_for('account.order_detail', order_id='FR261015092') }}" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="{{ url_for('store.cart', reorder='FR261015092') }}" class="btn">Đánh giá / Mua lại</a>
                     </div>
                 </footer>
             </article>
 
             <article class="order-card">
                 <header class="row-between">
-                    <div>
-                        <p><strong>Mã đơn hàng #FS9341</strong></p>
-                        <p class="meta">Đặt ngày 18 tháng 10, 2026</p>
-                    </div>
-                    <span class="badge badge-ok">Đã giao hàng</span>
+                    <div><p><a href="{{ url_for('account.order_detail', order_id='FR261002036') }}"><strong>#FR261002036</strong></a></p><p class="meta">Ngày đặt: 02/10/2026</p></div>
+                    <span class="badge badge-danger">Đã hủy</span>
                 </header>
-                <div class="order-line">
-                    <div class="media media-sm media-olive">Ảnh sản phẩm</div>
-                    <div class="grow"><h2>Áo khoác Corduroy</h2><p class="meta">Số lượng: 1 · Xanh rêu</p></div>
-                    <span>899.000₫</span>
-                </div>
+                <div class="order-line"><div class="media media-sm media-denim">Ảnh sản phẩm</div><div class="grow"><h2>Quần jean ống suông Indigo</h2><p class="meta">Size 29 | Xanh đậm · Số lượng: 1</p></div><span>649.000₫</span></div>
                 <footer class="row-between mt-4">
-                    <p class="muted">Tổng thanh toán: <strong>899.000₫</strong></p>
+                    <p class="muted">Đã hoàn tiền theo yêu cầu của bạn · Chưa thanh toán</p>
                     <div class="toolbar">
-                        <a href="{{ url_for('checkout.order_success') }}" class="btn btn-ghost">Xem chi tiết</a>
-                        <a href="{{ url_for('store.cart') }}" class="btn">Mua lại</a>
+                        <a href="{{ url_for('account.order_detail', order_id='FR261002036') }}" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="{{ url_for('store.cart', reorder='FR261002036') }}" class="btn">Mua lại</a>
                     </div>
                 </footer>
             </article>
 
             <nav class="pagination" aria-label="Phân trang đơn hàng">
-                <a href="{{ url_for('account.order_history') }}" class="page-num is-active">1</a>
-                <a href="{{ url_for('account.order_history') }}" class="page-num">2</a>
-                <a href="{{ url_for('account.order_history') }}" class="page-num">3</a>
-                <a href="{{ url_for('account.order_history') }}" class="page-num">Tiếp →</a>
+                <a href="{{ url_for('account.order_history', page=1) }}" class="page-num is-active">1</a>
+                <a href="{{ url_for('account.order_history', page=2) }}" class="page-num">2</a>
+                <a href="{{ url_for('account.order_history', page=3) }}" class="page-num">3</a>
+                <a href="{{ url_for('account.order_history', page=2) }}" class="page-num">Tiếp →</a>
             </nav>
         </section>
     </div>

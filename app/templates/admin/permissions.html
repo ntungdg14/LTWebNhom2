@@ -1,0 +1,79 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Phân quyền tài khoản - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Nhân sự</a> / Phân quyền tài khoản</p>
+            <h1 class="page-title">Phân quyền tài khoản</h1>
+            <p class="meta">Tìm kiếm, lọc theo vai trò và cập nhật quyền của từng tài khoản.</p>
+        </div>
+        <a href="{{ url_for('admin.user_new') }}" class="btn">Thêm tài khoản</a>
+    </header>
+
+    {% if request.args.get('saved') %}
+    <p class="created-banner">Đã lưu thay đổi quyền tài khoản.</p>
+    {% endif %}
+
+    {# Một form duy nhất: thanh tìm kiếm ở trên cùng, bộ lọc ngay bên dưới,
+       danh sách tài khoản và quyền hiện tại ở dưới. Nút "Áp dụng" gửi GET
+       (lọc), nút "Lưu thay đổi" gửi POST (lưu phân quyền). #}
+    <form class="form-stack" method="get" action="{{ url_for('admin.permissions') }}">
+        <section class="role-toolbar">
+            <div class="role-search">
+                <label class="sr-only" for="account-search">Tìm tài khoản</label>
+                <input class="input" id="account-search" name="q" type="search"
+                       value="{{ query }}" placeholder="Tìm theo tên hoặc email tài khoản...">
+                <button type="submit" class="btn btn-ghost">Tìm kiếm</button>
+            </div>
+
+            <fieldset class="role-filter" style="margin:0; padding:0; border:0;">
+                <legend class="sr-only">Lọc theo vai trò</legend>
+                <span>Lọc theo vai trò:</span>
+                <label class="role-option"><input type="radio" name="role" value="all" {% if role == 'all' %}checked{% endif %}> Tất cả</label>
+                <label class="role-option"><input type="radio" name="role" value="admin" {% if role == 'admin' %}checked{% endif %}> Quản trị viên</label>
+                <label class="role-option"><input type="radio" name="role" value="customer" {% if role == 'customer' %}checked{% endif %}> Khách hàng</label>
+                <button type="submit" class="btn btn-ghost">Áp dụng bộ lọc</button>
+            </fieldset>
+        </section>
+
+        <section class="admin-card form-stack">
+            <div class="row-between">
+                <h2 style="margin:0; font-size:1.125rem;">Danh sách tài khoản</h2>
+                <span class="role-summary">Hiển thị {{ accounts|length }} / {{ total }} tài khoản</span>
+            </div>
+
+            <div class="account-list">
+                {% for account in accounts %}
+                <div class="account-row">
+                    <span class="account-avatar" aria-hidden="true">{{ account.initials }}</span>
+                    <span class="account-info">
+                        <strong>{{ account.name }}</strong>
+                        <span>{{ account.email }}</span>
+                    </span>
+                    <span class="account-role {% if account.role == 'admin' %}is-admin{% endif %}">Quyền hiện tại: {{ role_labels[account.role] }}</span>
+                    <label class="sr-only" for="role-{{ loop.index }}">Quyền mới cho {{ account.name }}</label>
+                    <select class="input" id="role-{{ loop.index }}" name="role:{{ account.email }}">
+                        <option value="customer" {% if account.role == 'customer' %}selected{% endif %}>Khách hàng</option>
+                        <option value="admin" {% if account.role == 'admin' %}selected{% endif %}>Quản trị viên</option>
+                    </select>
+                </div>
+                {% else %}
+                <p class="role-empty">Không tìm thấy tài khoản nào phù hợp. Hãy đổi từ khóa hoặc bộ lọc vai trò.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a href="{{ url_for('admin.permissions') }}" class="btn btn-ghost">Đặt lại</a>
+            <button type="submit" class="btn" formmethod="post" formaction="{{ url_for('admin.permissions') }}">Lưu thay đổi</button>
+        </div>
+    </form>
+</main>
+{% endblock %}

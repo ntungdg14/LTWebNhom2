@@ -4,42 +4,69 @@
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/orders.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
 {% endblock %}
 
 {% block content %}
 <main class="admin-content stack-gap">
-    <header class="row-between">
-        <h1 class="page-title">Quản lý đơn hàng</h1>
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Quản lý cửa hàng</a> / Đơn hàng</p>
+            <h1 class="page-title">Quản lý đơn hàng</h1>
+            <p class="meta">Theo dõi, xác nhận và xử lý đơn hàng của Freesion Việt Nam.</p>
+        </div>
         <div class="toolbar">
-            <a href="{{ url_for('admin.orders') }}" class="btn">Tất cả</a>
-            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Chờ xử lý</a>
-            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Đang giao</a>
-            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Đã hoàn thành</a>
-            <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">Đã hủy</a>
+            <a href="{{ url_for('admin.reports') }}" class="btn btn-ghost">Xuất đơn hàng</a>
+            <a href="{{ url_for('admin.order_detail', order_id='FR10286') }}" class="btn">+ Tạo đơn hàng</a>
         </div>
     </header>
 
-    <section class="admin-card">
+    <section class="stat-grid">
+        <article class="stat-card"><p>Đơn hàng tuần này</p><strong>186</strong><p>↑ 12,0% so với tuần trước</p></article>
+        <article class="stat-card"><p>Chờ xác nhận</p><strong>12</strong><p>Cần xử lý trong hôm nay</p></article>
+        <article class="stat-card"><p>Đang xử lý</p><strong>26</strong><p>Đang chuẩn bị và đóng gói</p></article>
+        <article class="stat-card"><p>Đang giao</p><strong>34</strong><p>Đã bàn giao cho vận chuyển</p></article>
+    </section>
+
+    <section class="admin-card" style="padding:0;">
+        <nav class="admin-tabs" aria-label="Trạng thái đơn hàng">
+            <a href="{{ url_for('admin.orders', status='all') }}" class="is-active">Tất cả (186)</a>
+            <a href="{{ url_for('admin.orders', status='pending') }}">Chờ xác nhận (12)</a>
+            <a href="{{ url_for('admin.orders', status='processing') }}">Đang xử lý (26)</a>
+            <a href="{{ url_for('admin.orders', status='shipping') }}">Đang giao (34)</a>
+            <a href="{{ url_for('admin.orders', status='done') }}">Hoàn thành (108)</a>
+            <a href="{{ url_for('admin.orders', status='cancelled') }}">Đã hủy (6)</a>
+        </nav>
+
+        <form class="admin-filters" action="{{ url_for('admin.orders') }}" method="get" style="padding:1.5rem;">
+            <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm mã đơn, tên hoặc SĐT khách hàng...">
+            <select class="input input-rounded" name="date"><option>26/10 – 01/11/2026</option><option>Tháng 10/2026</option></select>
+            <select class="input input-rounded" name="payment"><option>Thanh toán</option><option>Đã thanh toán</option><option>Chưa thu tiền</option></select>
+            <select class="input input-rounded" name="shipping"><option>Giao hàng</option><option>Giao hàng nhanh</option><option>Tiêu chuẩn</option></select>
+            <button type="submit" class="btn btn-ghost">Lọc</button>
+        </form>
+
         <div class="table-wrap">
             <table class="admin-table">
-                <thead>
-                    <tr><th>Mã đơn hàng</th><th>Tên khách hàng</th><th>Ngày đặt</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thao tác</th></tr>
-                </thead>
+                <thead><tr><th>Mã đơn / Ngày</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thanh toán</th><th>Thao tác</th></tr></thead>
                 <tbody>
-                    <tr><td>#FS9482</td><td>Nguyễn Minh Anh</td><td>02/11/2026</td><td>1.906.000₫</td><td><span class="badge badge-warn">Chờ xử lý</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9481</td><td>Trần Hoàng Nam</td><td>01/11/2026</td><td>899.000₫</td><td><span class="badge badge-warn">Đang giao</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9480</td><td>Lê Khánh Linh</td><td>31/10/2026</td><td>1.248.000₫</td><td><span class="badge badge-ok">Đã hoàn thành</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9479</td><td>Phạm Minh Khoa</td><td>30/10/2026</td><td>649.000₫</td><td><span class="badge badge-ok">Đã hoàn thành</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td>#FS9478</td><td>Võ Ngọc Hân</td><td>29/10/2026</td><td>329.000₫</td><td><span class="badge badge-danger">Đã hủy</span></td><td><a href="{{ url_for('checkout.order_success') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10286') }}"><strong>#FR10286</strong></a><p class="meta">01/11/2026 · 10:42</p></td><td>Nguyễn Minh Anh<p class="meta">Cửa hàng trực tuyến</p></td><td>1.108.000₫</td><td><span class="badge badge-danger">Chờ xác nhận</span></td><td>Chưa thu tiền</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10286') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10285') }}"><strong>#FR10285</strong></a><p class="meta">01/11/2026 · 10:28</p></td><td>Trần Hoàng Nam<p class="meta">Cửa hàng trực tuyến</p></td><td>899.000₫</td><td><span class="badge badge-warn">Đang đóng gói</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10285') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10284') }}"><strong>#FR10284</strong></a><p class="meta">01/11/2026 · 10:15</p></td><td>Lê Thu Hà<p class="meta">Cửa hàng trực tuyến</p></td><td>1.357.000₫</td><td><span class="badge badge-warn">Đang giao</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10284') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10283') }}"><strong>#FR10283</strong></a><p class="meta">01/11/2026 · 09:56</p></td><td>Phạm Khánh Linh<p class="meta">Cửa hàng trực tuyến</p></td><td>459.000₫</td><td><span class="badge badge-ok">Hoàn thành</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10283') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10282') }}"><strong>#FR10282</strong></a><p class="meta">01/11/2026 · 09:32</p></td><td>Vũ Quốc Bảo<p class="meta">Cửa hàng trực tuyến</p></td><td>898.000₫</td><td><span class="badge badge-ok">Hoàn thành</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10282') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10281') }}"><strong>#FR10281</strong></a><p class="meta">01/11/2026 · 09:18</p></td><td>Đặng Ngọc Mại<p class="meta">Cửa hàng trực tuyến</p></td><td>589.000₫</td><td><span class="badge badge-danger">Chờ xác nhận</span></td><td>Chưa thu tiền</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10281') }}" class="link-underline">Xem chi tiết</a></td></tr>
                 </tbody>
             </table>
         </div>
-        <nav class="pagination" aria-label="Phân trang đơn hàng">
-            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm is-active">1</a>
-            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm">2</a>
-            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm">3</a>
-            <a href="{{ url_for('admin.orders') }}" class="page-num page-num-sm">Tiếp →</a>
+        <nav class="pagination" aria-label="Phân trang đơn hàng" style="padding:0 1.5rem 1.5rem;">
+            <a href="{{ url_for('admin.orders', page=1) }}" class="page-num page-num-sm is-active">1</a>
+            <a href="{{ url_for('admin.orders', page=2) }}" class="page-num page-num-sm">2</a>
+            <a href="{{ url_for('admin.orders', page=3) }}" class="page-num page-num-sm">3</a>
+            <a href="{{ url_for('admin.orders', page=2) }}" class="page-num page-num-sm">Tiếp →</a>
         </nav>
     </section>
+
+    <aside class="admin-card" style="font-size:0.875rem;">12 đơn hàng đang chờ xác nhận. Kiểm tra tồn kho và thông tin khách hàng trước khi chuyển sang đóng gói.</aside>
 </main>
 {% endblock %}

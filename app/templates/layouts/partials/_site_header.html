@@ -1,3 +1,92 @@
+{#
+  Header cửa hàng 2 hàng.
+  Menu thả xuống chạy hoàn toàn bằng CSS (:hover / :focus-within),
+  không dùng JavaScript hay thư viện bên ngoài.
+  Chỉ dùng 5 mục của Freesion; không lấy CANIFA S / LICENSE / SCHOOL /
+  ĐỒNG PHỤC và không dùng ảnh chân dung trong panel.
+#}
+{% set quick_links = ['Sản phẩm mới', 'Giá tốt', 'Mua sắm tiết kiệm', 'Sale corner'] %}
+{% set accessories = ['Túi xách', 'Mũ', 'Khăn quàng cổ', 'Thắt lưng', 'Khẩu trang', 'Khăn mặt', 'Tất / Vớ'] %}
+{% set collections = ['Thu Đông 2026', 'Freesion Essentials', 'Linen Basic', 'Denim Edit', 'Tối giản hằng ngày'] %}
+
+{% set menus = [
+    {'label': 'Nữ', 'active': true, 'categories': [
+        ('Áo khoác', true), ('Áo sơ mi & Áo kiểu', true), ('Áo len', false),
+        ('Bộ quần áo', false), ('Áo phông / Áo thun', false), ('Áo polo', false),
+        ('Váy', false), ('Đồ mặc nhà & Đồ ngủ', true), ('Áo giữ nhiệt', false),
+        ('Quần dài & Quần jeans', true), ('Quần shorts', false), ('Đồ thể thao', false),
+        ('Chống nắng', false), ('Đồ lót', false), ('Tất / Vớ', false)
+    ]},
+    {'label': 'Nam', 'categories': [
+        ('Áo khoác', true), ('Áo sơ mi', false), ('Áo len', false),
+        ('Bộ quần áo', false), ('Áo phông / Áo thun', true), ('Áo polo', false),
+        ('Đồ mặc nhà & Đồ ngủ', true), ('Quần dài & Quần jeans', true),
+        ('Quần shorts', false), ('Đồ thể thao', false), ('Chống nắng', false),
+        ('Đồ lót', false), ('Tất / Vớ', false)
+    ]},
+    {'label': 'Phụ kiện', 'categories': [
+        ('Túi xách', true), ('Mũ', false), ('Khăn quàng cổ', false),
+        ('Thắt lưng', false), ('Khẩu trang', false), ('Khăn mặt', false),
+        ('Tất / Vớ', false), ('Chăn', false)
+    ]},
+    {'label': 'Hàng mới', 'categories': [
+        ('Áo sơ mi Linen Basic', true), ('Quần jean Straight Fit', false),
+        ('Áo thun Essential', false), ('Áo khoác Corduroy', true),
+        ('Quần dài Relaxed', false), ('Áo len cổ tròn', false),
+        ('Bộ sưu tập Thu Đông', false), ('Phụ kiện mới', false)
+    ]},
+    {'label': 'Sale', 'sale': true, 'categories': [
+        ('Áo thun Essential', true), ('Quần jean Straight Fit', true),
+        ('Áo sơ mi Linen Basic', false), ('Áo len cổ tròn', false),
+        ('Quần dài Relaxed', false), ('Phụ kiện giảm giá', false),
+        ('Sale corner', true)
+    ]}
+] %}
+
+{% macro mega_panel(categories, quick_links, accessories, collections) %}
+<div class="mega-menu">
+    <div class="mega-inner">
+        <div class="mega-col mega-quick">
+            <ul class="mega-list">
+                {% for label in quick_links %}
+                <li><a href="{{ url_for('store.shop') }}">{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mega-col mega-categories">
+            <h2 class="mega-title">Danh mục sản phẩm</h2>
+            <ul class="mega-list mega-list-2">
+                {% for label, hot in categories %}
+                <li>
+                    <a href="{{ url_for('store.shop') }}">{{ label }}</a>
+                    {% if hot %}<span class="mega-hot">HOT</span>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mega-col">
+            <h2 class="mega-title">Phụ kiện</h2>
+            <ul class="mega-list">
+                {% for label in accessories %}
+                <li><a href="{{ url_for('store.shop') }}">{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mega-col">
+            <h2 class="mega-title">Bộ sưu tập</h2>
+            <ul class="mega-list">
+                {% for label in collections %}
+                <li><a href="{{ url_for('store.shop') }}">{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
 <header class="site-header">
     {# Hàng 1: logo bên trái - ô tìm kiếm - các tiện ích bên phải #}
     <div class="header-inner">
@@ -41,14 +130,18 @@
         </nav>
     </div>
 
-    {# Hàng 2: thanh danh mục ngang, mục đầu tiên được đánh dấu hoạt động #}
+    {# Hàng 2: mỗi mục có một panel mega menu hiện khi di chuột / focus #}
     <nav class="header-nav" aria-label="Danh mục chính">
         <div class="nav-inner">
-            <a href="{{ url_for('store.shop') }}" class="is-active">Nữ</a>
-            <a href="{{ url_for('store.shop') }}">Nam</a>
-            <a href="{{ url_for('store.shop') }}">Phụ kiện</a>
-            <a href="{{ url_for('store.shop') }}">Hàng mới</a>
-            <a href="{{ url_for('store.shop') }}" class="nav-sale">Sale</a>
+            {% for item in menus %}
+            <div class="nav-item">
+                <a class="nav-link{% if item.active %} is-active{% endif %}{% if item.sale %} nav-sale{% endif %}"
+                   href="{{ url_for('store.shop') }}">{{ item.label }}</a>
+                {{ mega_panel(item.categories, quick_links, accessories, collections) }}
+            </div>
+            {% endfor %}
         </div>
+        {# Thanh ngang màu đen trượt theo nút đang được di chuột (Task 4) #}
+        <span class="nav-indicator" aria-hidden="true"></span>
     </nav>
 </header>

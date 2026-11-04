@@ -1,8 +1,19 @@
 <aside class="account-nav">
-    <h2>Tài khoản</h2>
-    <a href="{{ url_for('account.profile') }}" class="{% if request.endpoint == 'account.profile' %}is-active{% endif %}">Hồ sơ của tôi</a>
-    <a href="{{ url_for('account.order_history') }}" class="{% if request.endpoint == 'account.order_history' %}is-active{% endif %}">Đơn hàng của tôi</a>
+    <p class="account-greeting">Xin chào,</p>
+    <h2>Nguyễn Minh Anh</h2>
+    <p class="account-member">Thành viên từ tháng 08/2026</p>
+
+    <p class="account-nav-group">Thông tin tài khoản</p>
+    <a href="{{ url_for('account.profile') }}" class="{% if request.endpoint == 'account.profile' %}is-active{% endif %}">Thông tin tài khoản</a>
+    <a href="{{ url_for('account.order_history') }}" class="{% if request.endpoint.startswith('account.order') %}is-active{% endif %}">Đơn hàng của tôi</a>
     <a href="{{ url_for('account.address') }}" class="{% if request.endpoint == 'account.address' %}is-active{% endif %}">Sổ địa chỉ</a>
-    <a href="{{ url_for('account.wishlist') }}" class="{% if request.endpoint == 'account.wishlist' %}is-active{% endif %}">Sản phẩm yêu thích</a>
+    <a href="{{ url_for('auth.forgot_password') }}" class="{% if request.endpoint == 'auth.forgot_password' %}is-active{% endif %}">Bảo mật tài khoản</a>
+
+    <p class="account-nav-group">Đăng xuất</p>
     <a href="{{ url_for('auth.login') }}">Đăng xuất</a>
+
+    <div class="account-support">
+        <strong>Bạn cần hỗ trợ?</strong>
+        <p>Freesion luôn sẵn sàng giúp bạn.<br>1900 636 028<br>8:30–21:00, mỗi ngày</p>
+    </div>
 </aside>

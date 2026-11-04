@@ -45,3 +45,61 @@
     background: var(--stone-50);
     padding: 2rem;
 }
+
+/* Sidebar theo ảnh quản trị: nhóm mục, thẻ cửa hàng, bộ đếm */
+.admin-sidebar-sub {
+    margin: -1.5rem 0 1.5rem 0.75rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone-500);
+}
+
+.admin-store-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    padding: 0.875rem;
+    background: var(--stone-800);
+    font-size: 0.75rem;
+    color: var(--white);
+}
+
+.admin-store-card span {
+    color: var(--green-600);
+    font-size: 0.6875rem;
+}
+
+.admin-sidebar-group {
+    margin: 1.5rem 0 0.5rem 0.75rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone-500);
+}
+
+.admin-sidebar .admin-sub-item {
+    padding-left: 1.75rem;
+    font-size: 0.8125rem;
+    color: var(--stone-400);
+}
+
+.admin-count {
+    float: right;
+    padding: 0 0.35rem;
+    background: var(--stone-800);
+    color: var(--stone-300);
+    font-size: 0.6875rem;
+}
+
+.admin-sidebar a.is-active .admin-count {
+    background: var(--stone-700);
+    color: var(--white);
+}
+
+.admin-sidebar-bottom {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--stone-800);
+}

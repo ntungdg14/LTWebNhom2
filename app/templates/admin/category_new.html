@@ -1,0 +1,73 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Thêm danh mục - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Sản phẩm</a> / <a href="{{ url_for('admin.categories') }}">Danh mục</a> / Thêm danh mục</p>
+            <h1 class="page-title">Thêm danh mục</h1>
+            <p class="meta">Tạo nhóm sản phẩm mới cho cấu trúc điều hướng của cửa hàng.</p>
+        </div>
+        <a href="{{ url_for('admin.categories') }}" class="btn btn-ghost">Hủy</a>
+    </header>
+
+    <form class="form-stack" action="{{ url_for('admin.category_new') }}" method="post">
+        <div class="form-columns">
+            <section class="admin-card form-stack form-card">
+                <h2>Thông tin danh mục</h2>
+                <div class="field">
+                    <label for="category-name">Tên danh mục *</label>
+                    <input class="input" id="category-name" name="name" type="text" placeholder="Áo khoác" required>
+                </div>
+                <div class="field">
+                    <label for="category-parent">Danh mục cha</label>
+                    <select class="input" id="category-parent" name="parent">
+                        <option value="">— Không có (danh mục gốc) —</option>
+                        <option>Nam</option>
+                        <option>Nữ</option>
+                        <option>Phụ kiện</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="category-slug">Đường dẫn *</label>
+                    <input class="input" id="category-slug" name="slug" type="text" placeholder="nam/ao-khoac" required>
+                    <p class="form-hint">Ví dụ: freesion.vn/collections/nam/ao-khoac</p>
+                </div>
+                <div class="field">
+                    <label for="category-description">Mô tả</label>
+                    <textarea class="input" id="category-description" name="description" rows="4" placeholder="Áo khoác tinh gọn cho mọi ngày..."></textarea>
+                </div>
+            </section>
+
+            <aside class="admin-card form-stack form-card">
+                <h2>Hiển thị</h2>
+                <div class="field">
+                    <label for="category-order">Thứ tự hiển thị *</label>
+                    <input class="input" id="category-order" name="order" type="number" min="0" value="0" required>
+                </div>
+                <div class="field">
+                    <label for="category-status">Trạng thái</label>
+                    <select class="input" id="category-status" name="status">
+                        <option>Hiển thị</option>
+                        <option>Đang ẩn</option>
+                    </select>
+                </div>
+                <label class="form-check"><input type="checkbox" name="visible" checked> Hiển thị trên cửa hàng</label>
+                <p class="form-hint">Danh mục ẩn vẫn giữ nguyên sản phẩm bên trong.</p>
+                <p class="form-hint">* Trường bắt buộc</p>
+            </aside>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('admin.categories') }}" class="btn btn-ghost">Hủy</a>
+            <button type="submit" class="btn">Lưu danh mục</button>
+        </div>
+    </form>
+</main>
+{% endblock %}

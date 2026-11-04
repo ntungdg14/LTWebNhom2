@@ -86,3 +86,122 @@
         grid-template-columns: 1fr 1fr; padding-top: 6rem; padding-bottom: 6rem;
     }
 }
+
+/* Các khu vực bổ sung theo ảnh trang chủ */
+.section-title {
+    margin: 0 0 2rem;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.category-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.category-tiles a {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.category-tiles a:hover {
+    color: var(--orange-600);
+}
+
+.media-tile {
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0.75rem;
+}
+
+.collection-section {
+    padding: 3.5rem 0;
+    background: var(--white);
+    border-top: 1px solid var(--stone-200);
+    border-bottom: 1px solid var(--stone-200);
+}
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.collection-card h2 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.125rem;
+}
+
+.collection-card p {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    color: var(--stone-600);
+}
+
+.testimonial-section {
+    padding: 4rem 0;
+    background: var(--white);
+}
+
+.testimonial-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.testimonial-inner blockquote {
+    margin: 1.5rem 0;
+    max-width: 32rem;
+    font-size: 1.5rem;
+    line-height: 1.5;
+}
+
+.feature-strip {
+    padding: 3.5rem 0;
+    background: var(--stone-100);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+}
+
+.feature-grid span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--stone-300);
+    font-size: 0.75rem;
+}
+
+.feature-grid strong {
+    display: block;
+    font-size: 0.875rem;
+}
+
+.feature-grid p {
+    margin: 0.5rem 0 0;
+    font-size: 0.75rem;
+    color: var(--stone-600);
+}
+
+@media (min-width: 768px) {
+    .category-tiles { grid-template-columns: repeat(3, 1fr); }
+    .collection-grid { grid-template-columns: repeat(3, 1fr); }
+    .feature-grid { grid-template-columns: repeat(3, 1fr); }
+    .testimonial-inner { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1024px) {
+    .category-tiles { grid-template-columns: repeat(6, 1fr); }
+}

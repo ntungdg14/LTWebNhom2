@@ -62,3 +62,55 @@
     flex-direction: column;
     gap: 1.5rem;
 }
+
+/* Thẻ thống kê + thanh tab trạng thái dùng chung cho các trang quản trị */
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.stat-card {
+    border: 1px solid var(--stone-200);
+    background: var(--white);
+    padding: 1.5rem;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--stone-500);
+}
+
+.stat-card strong {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1.5rem;
+    color: var(--stone-900);
+}
+
+.admin-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.admin-card-head h2 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+@media (min-width: 768px) {
+    .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .stat-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

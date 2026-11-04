@@ -46,3 +46,62 @@
         display: block;
     }
 }
+
+/* Menu tài khoản theo ảnh: lời chào, nhóm liên kết, hộp hỗ trợ */
+.account-greeting {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--stone-600);
+}
+
+.account-nav h2 {
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.account-member {
+    margin: 0.35rem 0 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--stone-200);
+    font-size: 0.75rem;
+    color: var(--stone-500);
+}
+
+.account-nav-group {
+    margin: 1.25rem 0 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--stone-700);
+}
+
+.account-support {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--stone-100);
+    font-size: 0.75rem;
+}
+
+.account-support strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.account-support p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--stone-600);
+}
+
+.account-breadcrumb {
+    margin: 0 0 1.5rem;
+    font-size: 0.75rem;
+    color: var(--stone-500);
+}
+
+.account-breadcrumb a:hover {
+    color: var(--stone-900);
+    text-decoration: underline;
+}

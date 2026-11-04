@@ -35,16 +35,17 @@ python -m unittest discover -s tests -v
 │   ├── config.py                # Development / Production / Testing config
 │   ├── blueprints/              # mỗi nhóm chức năng là một package Blueprint
 │   │   ├── __init__.py          # danh sách blueprint đăng ký vào app
-│   │   ├── store/               #    /  /shop  /product  /cart
+│   │   ├── store/               #    /  /shop  /product  /cart  /terms  /privacy  /help
 │   │   ├── auth/                #    /login  /register  /forgot-password
-│   │   ├── checkout/            #    /checkout  /order-success
-│   │   ├── account/             #    /account  /account/orders  /address  /wishlist
-│   │   └── admin/               #    /admin  /admin/products  /orders  /users
+│   │   ├── checkout/            #    /checkout/shipping  /checkout  /order-success
+│   │   ├── account/             #    /account  /account/orders/<id>  /address  /wishlist
+│   │   └── admin/               #    /admin + 17 route quản trị (xem bảng đường dẫn)
 │   │       ├── __init__.py      # khai báo Blueprint
 │   │       └── routes.py        # view + render_template
 │   ├── templates/
 │   │   ├── layouts/             # base.html + các layout kế thừa theo khu vực
-│   │   │   ├── partials/        # _site_header, _site_footer, _admin_sidebar, _account_nav
+│   │   │   ├── partials/        # _site_header, _site_footer, _admin_sidebar, _account_nav,
+│   │   │   │                    # _checkout_steps (thanh tiến trình 4 bước)
 │   │   │   ├── base.html        # khung <html>, nạp CSS nền tảng, block styles/body
 │   │   │   ├── base_store.html  # header + footer cửa hàng
 │   │   │   ├── base_auth.html   # + CSS chung cho 3 trang xác thực
@@ -53,9 +54,9 @@ python -m unittest discover -s tests -v
 │   │   ├── store/  auth/  checkout/  account/  admin/   # trang theo từng blueprint
 │   └── static/
 │       ├── css/                 # (xem sơ đồ bên dưới)
-│       ├── js/                  # dành cho JavaScript về sau
+│       ├── js/nav-indicator.js  # đo vị trí tab; hiệu ứng trượt do CSS đảm nhận
 │       └── images/              # dành cho ảnh sản phẩm về sau
-├── tests/test_routes.py         # kiểm thử route, stylesheet và bố cục header
+├── tests/test_routes.py         # 29 test: route, link, form, header, footer
 ├── .github/
 │   ├── workflows/ci.yml         # build + test trên mỗi PR (GitHub Actions)
 │   └── pull_request_template.md # mẫu mô tả PR
@@ -71,15 +72,16 @@ app/static/css/
 ├── base.css                    # :root design tokens, reset, typography, utilities
 ├── components.css              # nút, input, thẻ sản phẩm, badge, phân trang, summary…
 ├── layouts/
-│   ├── store.css               # chỉ header 2 hàng + ô tìm kiếm
+│   ├── store.css               # header 2 hàng, ô tìm kiếm, mega menu + thanh trượt hover
 │   ├── footer.css              # footer (tách riêng, không phụ thuộc store.css)
 │   └── admin.css               # sidebar / vùng nội dung admin
 └── pages/                      # mirror theo cây templates/
     ├── store/       home.css  shop.css  product_detail.css  cart.css
     ├── auth/        auth.css (dùng chung)  login.css  register.css  forgot_password.css
-    ├── checkout/    checkout.css  order_success.css
+    ├── checkout/    checkout.css  order_success.css  steps.css (dùng chung 3 trang)
     ├── account/     account.css (dùng chung)  profile.css  order_history.css  address.css  wishlist.css
-    └── admin/       admin.css (dùng chung)  dashboard.css  products.css  orders.css  users.css
+    └── admin/       admin.css (chung)  dashboard.css  products.css  orders.css  users.css
+                     forms.css (4 form mới)
 ```
 
 ## Header cửa hàng
@@ -92,14 +94,77 @@ việc chỉnh header không bao giờ làm ảnh hưởng footer:
 1. **Hàng trên**: logo `FREESION` bên trái → ô **tìm kiếm** (`<form method="get">`
    gửi `q` tới `/shop`) → 3 tiện ích có icon phía trên nhãn: Cửa hàng, Tài khoản,
    Giỏ hàng. Icon là **SVG inline** (`currentColor`), không dùng thư viện icon hay CDN.
-2. **Hàng dưới**: thanh danh mục ngang (Nữ, Nam, Phụ kiện, Hàng mới, Sale), có thể
-   cuộn ngang trên màn hình hẹp; mục đang chọn được đánh dấu bằng gạch chân.
+2. **Hàng dưới**: thanh danh mục ngang (Nữ, Nam, Phụ kiện, Hàng mới, Sale); mục
+   đang chọn được đánh dấu bằng gạch chân.
+
+### Mega menu khi di chuột
+
+Mỗi mục có một panel thả xuống hiện ra khi **di chuột** (`:hover`) hoặc khi
+**focus bằng bàn phím** (`:focus-within`) — hoàn toàn bằng CSS, không JavaScript,
+không thư viện ngoài. Panel gồm 4 cột: liên kết nhanh, **Danh mục sản phẩm**
+(chia 2 cột con, có badge `HOT`), **Phụ kiện**, **Bộ sưu tập**. Dữ liệu panel
+được khai báo bằng `{% set %}` + một Jinja macro trong `_site_header.html`.
+
+Không đưa vào menu các mục CANIFA S / LICENSE / SCHOOL / ĐỒNG PHỤC và **không dùng
+2 ảnh chân dung** của ảnh tham khảo; chỉ giữ 5 mục của Freesion. Panel thu gọn
+còn 2 cột dưới 1024px, 1 cột dưới 768px.
 
 Chỉ thay đổi **bố cục**: mọi màu vẫn lấy từ design tokens trong `base.css`
 (`--bg`, `--white`, `--stone-*`, `--orange-600`), không đưa thêm màu mới.
 Responsive: dưới 768px ô tìm kiếm xuống hàng riêng, dưới 480px các tiện ích chỉ
 giữ icon (nhãn vẫn có trong DOM để hỗ trợ trình đọc màn hình).
 
+## Đường dẫn
+
+Bảng đầy đủ các route sau khi rà soát (không còn link `#`, link trỏ nhầm trang hay route trùng lặp).
+
+| Đường dẫn | Trang / chức năng tương ứng | Ghi chú |
+| --- | --- | --- |
+| `/` | Trang chủ | Giữ nguyên; bổ sung danh mục, bộ sưu tập, đánh giá, 3 ưu điểm |
+| `/shop` | Danh sách sản phẩm | Giữ nguyên; thêm breadcrumb, bộ lọc màu/size/giá, link `?sku=` riêng |
+| `/product` | Chi tiết sản phẩm | Giữ nguyên; thêm lưới ảnh 6 ô, điểm đánh giá, review, link `?sku=` |
+| `/cart` | Giỏ hàng | Giữ nguyên; sửa nút thanh toán sang `/checkout/shipping`, thêm mã giảm giá + gợi ý |
+| `/checkout/shipping` | Thông tin giao hàng (bước 2) | MỚI — tách riêng khỏi trang thanh toán |
+| `/checkout` | Thanh toán (bước 3) | Giữ nguyên; thêm thanh tiến trình, 4 phương thức thanh toán |
+| `/order-success` | Xác nhận đơn hàng (bước 4) | Giữ nguyên; đổi liên kết sang trang chi tiết đơn |
+| `/login` | Đăng nhập | Giữ nguyên; cập nhật nhãn, icon mật khẩu, link điều khoản |
+| `/register` | Đăng ký | Giữ nguyên; sửa 2 link điều khoản (trước cùng trỏ `/`) |
+| `/forgot-password` | Quên mật khẩu | Giữ nguyên; thêm liên kết trợ giúp |
+| `/terms` | Điều khoản sử dụng | MỚI — đích riêng cho link điều khoản |
+| `/privacy` | Chính sách bảo mật | MỚI — đích riêng cho link bảo mật |
+| `/help` | Hỗ trợ kỹ thuật / liên hệ | MỚI — dùng cho footer và form xác thực |
+| `/account` | Tài khoản của bạn | Giữ nguyên; bổ sung đổi mật khẩu, địa chỉ mặc định |
+| `/account/orders` | Lịch sử đơn hàng | Giữ nguyên; thêm tab trạng thái, tìm kiếm |
+| `/account/orders/<order_id>` | Chi tiết đơn hàng (khách) | MỚI — thay link "Xem chi tiết" trỏ nhầm `/order-success` |
+| `/account/address` | Sổ địa chỉ | Giữ nguyên; mỗi thao tác có `?action=` riêng |
+| `/account/wishlist` | Sản phẩm yêu thích | Giữ nguyên; mỗi sản phẩm có `?remove=` / `?add=` riêng |
+| `/admin` | Tổng quan quản trị | Giữ nguyên; thêm thẻ thống kê, biểu đồ cột CSS, "Cần xử lý" |
+| `/admin/products` | Quản lý sản phẩm | Giữ nguyên; thêm stat/tab, nút thêm sản phẩm, link sửa |
+| `/admin/products/new` | Form thêm sản phẩm | MỚI (Nhiệm vụ 3) — POST điều hướng về danh sách |
+| `/admin/products/<sku>/edit` | Chỉnh sửa sản phẩm | MỚI — dùng lại form thêm sản phẩm ở chế độ sửa |
+| `/admin/categories` | Quản lý danh mục | MỚI — đích cho mục sidebar "Danh mục" |
+| `/admin/categories/new` | Form thêm danh mục | MỚI (Nhiệm vụ 3) |
+| `/admin/orders` | Quản lý đơn hàng | Giữ nguyên; thêm stat/tab, sửa link chi tiết |
+| `/admin/orders/<order_id>` | Chi tiết đơn hàng (admin) | MỚI — thay link trỏ nhầm `/order-success` |
+| `/admin/users` | Quản lý khách hàng | Giữ nguyên; thêm stat/tab, nút thêm khách hàng |
+| `/admin/users/new` | Form thêm khách hàng | MỚI (Nhiệm vụ 3) |
+| `/admin/users/<customer_id>` | Hồ sơ khách hàng (admin) | MỚI — thay link trỏ nhầm `/account` |
+| `/admin/permissions` | Form phân quyền tài khoản | MỚI (Nhiệm vụ 3) — tìm kiếm + lọc vai trò + quyền hiện tại |
+| `/admin/inventory` | Quản lý kho hàng | MỚI — mục sidebar theo ảnh |
+| `/admin/promotions` | Quản lý khuyến mãi | MỚI — mục sidebar theo ảnh |
+| `/admin/reports` | Báo cáo | MỚI — mục sidebar theo ảnh |
+
+Các liên kết lọc/phân trang dùng query string riêng biệt (`?page=2`, `?status=pending`, `?sku=FR-BOM-002`…), không còn nhiều link cùng trỏ một URL. `tests/test_routes.py` duyệt **toàn bộ href/action nội bộ** trên 33 trang trong bộ kiểm thử và kiểm tra từng URL trả 200.
+
+## Form quản trị mới
+
+- `/admin/products/new`, `/admin/categories/new`, `/admin/users/new`: cùng dùng `.field`, `.input`, `.btn`, `.form-stack`, `.admin-card` của `components.css` nên giữ nguyên màu, font, bo góc, khoảng cách và kiểu input/nút.
+- `/admin/permissions`: một form chứa thanh tìm kiếm (`name="q"`, bỏ dấu tiếng Việt), bộ lọc vai trò (`name="role"`: Tất cả / Quản trị viên / Khách hàng) ngay bên dưới, và danh sách tài khoản kèm **quyền hiện tại** + ô đổi quyền. Nút "Lưu thay đổi" gửi POST, hai nút lọc gửi GET.
+- Dữ liệu là mock tĩnh (không có CSDL): POST chỉ xác nhận và điều hướng về trang danh sách kèm banner.
+
+## Hiệu ứng navbar
+
+Giữ nguyên cấu trúc, vị trí và nội dung header/navbar. Các nút navbar dùng cùng hiệu ứng chuyển màu mượt (`transition: color 0.2s ease`) với Cửa hàng / Tài khoản / Giỏ hàng; thêm `.nav-indicator` — thanh ngang `var(--stone-950)` trượt theo tab đang hover nhờ `transition: transform, width` trong `store.css`. `static/js/nav-indicator.js` (JavaScript thuần, không thư viện) chỉ đo vị trí/độ rộng bằng `getBoundingClientRect()`; không có JS thì navbar vẫn hoạt động bình thường.
 ## CI
 
 `.github/workflows/ci.yml` chạy trên mỗi PR vào `master` (và khi push `master`):

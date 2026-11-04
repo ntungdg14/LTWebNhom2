@@ -88,3 +88,22 @@ body {
         grid-template-columns: repeat(4, 1fr);
     }
 }
+
+.footer-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.footer-copy-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-copy a:hover {
+    color: var(--white);
+    text-decoration: underline;
+}

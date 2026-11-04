@@ -14,6 +14,11 @@ def order_history():
     return render_template("account/order_history.html")
 
 
+@account_bp.route("/orders/<order_id>")
+def order_detail(order_id):
+    return render_template("account/order_detail.html", order_id=order_id)
+
+
 @account_bp.route("/address")
 def address():
     return render_template("account/address.html")

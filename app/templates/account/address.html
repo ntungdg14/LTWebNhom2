@@ -13,7 +13,7 @@
         <section class="grow">
             <header class="row-between mb-6">
                 <h1 class="page-title">Sổ địa chỉ của tôi</h1>
-                <a href="{{ url_for('account.address') }}" class="btn">Thêm địa chỉ mới</a>
+                <a href="{{ url_for('account.address', action='new') }}" class="btn">Thêm địa chỉ mới</a>
             </header>
             <div class="address-grid">
                 <article class="address-card">
@@ -24,9 +24,9 @@
                     <p class="muted">0901 234 567</p>
                     <p class="muted">24 Nguyễn Huệ<br>Phường Bến Nghé, Quận 1<br>TP. Hồ Chí Minh</p>
                     <div class="mt-4">
-                        <a href="{{ url_for('account.address') }}" class="link-underline">Chỉnh sửa</a>
+                        <a href="{{ url_for('account.address', action='edit-default') }}" class="link-underline">Chỉnh sửa</a>
                         &nbsp;
-                        <a href="{{ url_for('account.address') }}" class="link-underline">Xóa</a>
+                        <a href="{{ url_for('account.address', action='remove-default') }}" class="link-underline">Xóa</a>
                     </div>
                 </article>
                 <article class="address-card">
@@ -34,11 +34,11 @@
                     <p class="muted">0901 234 567</p>
                     <p class="muted">118 Lê Lợi<br>Phường Bến Thành, Quận 1<br>TP. Hồ Chí Minh</p>
                     <div class="mt-4">
-                        <a href="{{ url_for('account.address') }}" class="link-underline">Chỉnh sửa</a>
+                        <a href="{{ url_for('account.address', action='edit-second') }}" class="link-underline">Chỉnh sửa</a>
                         &nbsp;
-                        <a href="{{ url_for('account.address') }}" class="link-underline">Xóa</a>
+                        <a href="{{ url_for('account.address', action='remove-second') }}" class="link-underline">Xóa</a>
                         &nbsp;
-                        <a href="{{ url_for('account.address') }}" class="link-underline">Đặt làm mặc định</a>
+                        <a href="{{ url_for('account.address', action='set-default') }}" class="link-underline">Đặt làm mặc định</a>
                     </div>
                 </article>
             </div>

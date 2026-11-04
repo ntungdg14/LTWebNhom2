@@ -40,3 +40,70 @@
     justify-content: center;
     flex: 1;
 }
+
+/* Bố cục giỏ hàng theo ảnh: đầu bảng, tổng từng dòng, mã giảm giá, gợi ý */
+.cart-head {
+    display: grid;
+    grid-template-columns: 1fr 7rem 7rem;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--stone-900);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone-500);
+}
+
+.cart-head span:first-child {
+    width: 60%;
+}
+
+.cart-line-total {
+    flex-shrink: 0;
+    width: 7rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.cart-item .grow .link-underline {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.cart-item .price s {
+    color: var(--stone-400);
+    font-size: 0.75rem;
+}
+
+.cart-coupon {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1.25rem 0 0.5rem;
+}
+
+.cart-coupon .input {
+    flex: 1;
+    min-width: 0;
+}
+
+.cart-suggest {
+    padding: 3.5rem 0;
+    background: var(--stone-100);
+}
+
+.cart-suggest h2 {
+    margin: 0 0 2rem;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+@media (max-width: 640px) {
+    .cart-head {
+        display: none;
+    }
+
+    .cart-item {
+        flex-wrap: wrap;
+    }
+}
