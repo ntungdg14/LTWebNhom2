@@ -32,7 +32,7 @@
         <aside class="filters">
             <form action="{{ url_for('store.shop') }}" method="get">
                 <section class="filter-group">
-                    <div class="row-between"><h2>Danh mục</h2><span>−</span></div>
+                    <div class="row-between"><h2>Danh mục</h2></div>
                     <div class="filter-list">
                         <label><input type="checkbox" name="cat" value="ao-so-mi" checked> Áo sơ mi (24)</label>
                         <label><input type="checkbox" name="cat" value="ao-thun"> Áo thun (31)</label>
@@ -43,7 +43,7 @@
                     </div>
                 </section>
                 <section class="filter-group">
-                    <div class="row-between"><h2>Màu sắc</h2><span>−</span></div>
+                    <div class="row-between"><h2>Màu sắc</h2></div>
                     <div class="color-swatches">
                         <a href="{{ url_for('store.shop', color='den') }}" class="color-swatch media-stone" aria-label="Đen"></a>
                         <a href="{{ url_for('store.shop', color='trang') }}" class="color-swatch media-cream" aria-label="Trắng"></a>
@@ -55,7 +55,7 @@
                     </div>
                 </section>
                 <section class="filter-group">
-                    <div class="row-between"><h2>Kích cỡ</h2><span>−</span></div>
+                    <div class="row-between"><h2>Kích cỡ</h2></div>
                     <div class="size-chips">
                         <a href="{{ url_for('store.shop', size='S') }}" class="chip">S</a>
                         <a href="{{ url_for('store.shop', size='M') }}" class="chip is-active">M</a>
@@ -65,7 +65,7 @@
                     </div>
                 </section>
                 <section class="filter-group">
-                    <div class="row-between"><h2>Mức giá</h2><span>−</span></div>
+                    <div class="row-between"><h2>Mức giá</h2></div>
                     <div class="filter-list">
                         <label><input type="radio" name="price"> Dưới 500.000₫</label>
                         <label><input type="radio" name="price" checked> 500.000₫ – 1.000.000₫</label>

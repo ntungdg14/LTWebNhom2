@@ -10,9 +10,8 @@
 <div class="page">
     <div class="row-between" style="align-items:baseline;">
         <h1 class="page-title mb-6">Giỏ hàng của bạn</h1>
-        <span class="muted">2 sản phẩm</span>
     </div>
-
+    <br></br>
     <div class="split">
         <section class="split-main" aria-label="Danh sách sản phẩm trong giỏ hàng">
             <div class="cart-head"><span>Sản phẩm</span><span>Số lượng</span><span>Thành tiền</span></div>
@@ -67,16 +66,4 @@
         </aside>
     </div>
 </div>
-
-<section class="cart-suggest">
-    <div class="page">
-        <h2>Hoàn thiện set đồ của bạn</h2>
-        <div class="product-grid">
-            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-CHI-007') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Quần dài ống đứng Chino</h3><p class="meta">Be cát</p><p class="price">529.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h3>Áo len dệt waffle cổ tròn</h3><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-OVS-006') }}" class="product-card"><div class="media media-card media-olive">Ảnh sản phẩm</div><h3>Áo overshirt Heavyweight</h3><p class="meta">Rêu</p><p class="price">799.000₫</p></a>
-        </div>
-    </div>
-</section>
 {% endblock %}

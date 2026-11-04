@@ -12,9 +12,7 @@
         <div>
             <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Nhân sự</a> / Phân quyền tài khoản</p>
             <h1 class="page-title">Phân quyền tài khoản</h1>
-            <p class="meta">Tìm kiếm, lọc theo vai trò và cập nhật quyền của từng tài khoản.</p>
         </div>
-        <a href="{{ url_for('admin.user_new') }}" class="btn">Thêm tài khoản</a>
     </header>
 
     {% if request.args.get('saved') %}
@@ -71,7 +69,6 @@
         </section>
 
         <div class="form-actions">
-            <a href="{{ url_for('admin.permissions') }}" class="btn btn-ghost">Đặt lại</a>
             <button type="submit" class="btn" formmethod="post" formaction="{{ url_for('admin.permissions') }}">Lưu thay đổi</button>
         </div>
     </form>

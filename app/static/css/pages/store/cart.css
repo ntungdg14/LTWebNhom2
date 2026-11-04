@@ -46,7 +46,7 @@
     display: grid;
     grid-template-columns: 1fr 7rem 7rem;
     gap: 1rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--stone-900);
     font-size: 0.75rem;
     letter-spacing: 0.08em;

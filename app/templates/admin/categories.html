@@ -12,21 +12,12 @@
         <div>
             <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Sản phẩm</a> / Danh mục</p>
             <h1 class="page-title">Quản lý danh mục</h1>
-            <p class="meta">Sắp xếp cấu trúc sản phẩm và điều hướng mua sắm trên cửa hàng.</p>
         </div>
-        <a href="{{ url_for('admin.category_new') }}" class="btn">+ Thêm danh mục</a>
     </header>
 
     {% if request.args.get('created') == 'category' %}
     <p class="created-banner">Đã thêm danh mục mới.</p>
     {% endif %}
-
-    <section class="stat-grid">
-        <article class="stat-card"><p>Danh mục cha</p><strong>3</strong><p>Nam, Nữ và Phụ kiện</p></article>
-        <article class="stat-card"><p>Danh mục con</p><strong>12</strong><p>6 nhóm sản phẩm cho Nam và Nữ</p></article>
-        <article class="stat-card"><p>Sản phẩm đang bán</p><strong>128</strong><p>68 sản phẩm Nam · 60 sản phẩm Nữ</p></article>
-        <article class="stat-card"><p>Danh mục đang hiển thị</p><strong>14</strong><p>1 danh mục đang ẩn</p></article>
-    </section>
 
     <section class="admin-card">
         <div class="admin-card-head">

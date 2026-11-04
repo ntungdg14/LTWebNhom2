@@ -13,19 +13,12 @@
         {% include "layouts/partials/_account_nav.html" %}
         <section class="grow">
             <h1 class="page-title">Đơn hàng của tôi</h1>
-            <p class="muted">Theo dõi hành trình những món đồ bạn đã chọn.</p>
-
-            <form class="admin-filters account-order-toolbar" action="{{ url_for('account.order_history') }}" method="get">
-                <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm theo mã đơn hoặc tên sản phẩm">
-                <select class="input input-rounded" name="period"><option>6 tháng gần nhất</option><option>12 tháng gần nhất</option></select>
-                <button type="submit" class="btn btn-ghost">Lọc</button>
-            </form>
 
             <nav class="admin-tabs" aria-label="Trạng thái đơn hàng" style="padding:0; margin-bottom:1.5rem;">
-                <a href="{{ url_for('account.order_history', status='all') }}" class="is-active">Tất cả (7)</a>
-                <a href="{{ url_for('account.order_history', status='processing') }}">Đang xử lý (1)</a>
-                <a href="{{ url_for('account.order_history', status='delivered') }}">Đã giao (4)</a>
-                <a href="{{ url_for('account.order_history', status='cancelled') }}">Đã hủy (2)</a>
+                <a href="{{ url_for('account.order_history', status='all') }}" class="is-active">Tất cả</a>
+                <a href="{{ url_for('account.order_history', status='processing') }}">Đang xử lý</a>
+                <a href="{{ url_for('account.order_history', status='delivered') }}">Đã giao</a>
+                <a href="{{ url_for('account.order_history', status='cancelled') }}">Đã hủy</a>
             </nav>
 
             <article class="order-card">

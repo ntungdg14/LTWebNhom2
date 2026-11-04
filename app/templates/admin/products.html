@@ -35,18 +35,16 @@
 
     <section class="admin-card" style="padding:0;">
         <nav class="admin-tabs" aria-label="Trạng thái sản phẩm">
-            <a href="{{ url_for('admin.products', status='all') }}" class="is-active">Tất cả (142)</a>
-            <a href="{{ url_for('admin.products', status='selling') }}">Đang bán (128)</a>
-            <a href="{{ url_for('admin.products', status='draft') }}">Bản nháp (14)</a>
-            <a href="{{ url_for('admin.products', status='archived') }}">Đã lưu trữ (0)</a>
+            <a href="{{ url_for('admin.products', status='all') }}" class="is-ac120705tive">Tất cả</a>
+            <a href="{{ url_for('admin.products', status='selling') }}">Đang bán</a>
+            <a href="{{ url_for('admin.products', status='draft') }}">Bản nháp</a>
+            <a href="{{ url_for('admin.products', status='archived') }}">Đã lưu trữ</a>
         </nav>
 
         <form class="admin-filters" action="{{ url_for('admin.products') }}" method="get" style="padding:1.5rem;">
-            <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm tên sản phẩm, SKU...">
             <select class="input input-rounded" name="category"><option>Tất cả danh mục</option><option>Áo sơ mi</option><option>Áo khoác</option><option>Quần jean</option></select>
             <select class="input input-rounded" name="status"><option>Tất cả trạng thái</option><option>Đang bán</option><option>Bản nháp</option></select>
             <select class="input input-rounded" name="stock"><option>Tồn kho</option><option>Còn hàng</option><option>Sắp hết</option></select>
-            <button type="submit" class="btn btn-ghost">Thêm bộ lọc</button>
         </form>
 
         <div class="table-wrap">

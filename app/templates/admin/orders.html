@@ -11,9 +11,7 @@
 <main class="admin-content stack-gap">
     <header class="form-page-head">
         <div>
-            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Quản lý cửa hàng</a> / Đơn hàng</p>
             <h1 class="page-title">Quản lý đơn hàng</h1>
-            <p class="meta">Theo dõi, xác nhận và xử lý đơn hàng của Freesion Việt Nam.</p>
         </div>
         <div class="toolbar">
             <a href="{{ url_for('admin.reports') }}" class="btn btn-ghost">Xuất đơn hàng</a>
@@ -30,12 +28,12 @@
 
     <section class="admin-card" style="padding:0;">
         <nav class="admin-tabs" aria-label="Trạng thái đơn hàng">
-            <a href="{{ url_for('admin.orders', status='all') }}" class="is-active">Tất cả (186)</a>
-            <a href="{{ url_for('admin.orders', status='pending') }}">Chờ xác nhận (12)</a>
-            <a href="{{ url_for('admin.orders', status='processing') }}">Đang xử lý (26)</a>
-            <a href="{{ url_for('admin.orders', status='shipping') }}">Đang giao (34)</a>
-            <a href="{{ url_for('admin.orders', status='done') }}">Hoàn thành (108)</a>
-            <a href="{{ url_for('admin.orders', status='cancelled') }}">Đã hủy (6)</a>
+            <a href="{{ url_for('admin.orders', status='all') }}" class="is-active">Tất cả</a>
+            <a href="{{ url_for('admin.orders', status='pending') }}">Chờ xác nhận</a>
+            <a href="{{ url_for('admin.orders', status='processing') }}">Đang xử lý</a>
+            <a href="{{ url_for('admin.orders', status='shipping') }}">Đang giao</a>
+            <a href="{{ url_for('admin.orders', status='done') }}">Hoàn thành</a>
+            <a href="{{ url_for('admin.orders', status='cancelled') }}">Đã hủy</a>
         </nav>
 
         <form class="admin-filters" action="{{ url_for('admin.orders') }}" method="get" style="padding:1.5rem;">
@@ -67,6 +65,5 @@
         </nav>
     </section>
 
-    <aside class="admin-card" style="font-size:0.875rem;">12 đơn hàng đang chờ xác nhận. Kiểm tra tồn kho và thông tin khách hàng trước khi chuyển sang đóng gói.</aside>
 </main>
 {% endblock %}
