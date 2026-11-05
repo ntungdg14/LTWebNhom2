@@ -1,6 +1,8 @@
 """Khu vực tài khoản cá nhân (URL bắt đầu bằng /account)."""
 from flask import render_template
 
+from app import commerce
+
 from . import account_bp
 
 
@@ -11,12 +13,14 @@ def profile():
 
 @account_bp.route("/orders")
 def order_history():
-    return render_template("account/order_history.html")
+    return render_template("account/order_history.html", orders=commerce.get_order_history())
 
 
 @account_bp.route("/orders/<order_id>")
 def order_detail(order_id):
-    return render_template("account/order_detail.html", order_id=order_id)
+    return render_template(
+        "account/order_detail.html", order_id=order_id, order=commerce.get_order()
+    )
 
 
 @account_bp.route("/address")

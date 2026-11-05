@@ -1,8 +1,13 @@
 """Các trang cửa hàng: trang chủ, danh sách, chi tiết sản phẩm, giỏ hàng.
 
 Ngoài ra có 3 trang thông tin tĩnh dùng cho các liên kết chân trang / biểu mẫu.
+
+Mô tả sản phẩm, giỏ hàng và tóm tắt đơn hàng không viết cứng trong template:
+route lấy view-model từ app.commerce rồi truyền vào, template/macro chỉ lặp.
 """
-from flask import render_template
+from flask import render_template, request
+
+from app import commerce
 
 from . import store_bp
 
@@ -36,12 +41,23 @@ def shop():
 
 @store_bp.route("/product")
 def product_detail():
-    return render_template("store/product_detail.html")
+    product = commerce.get_product(
+        request.args.get("sku"),
+        color=request.args.get("color"),
+        size=request.args.get("size"),
+    )
+    return render_template(
+        "store/product_detail.html",
+        product=product,
+        related=commerce.get_related(product["sku"]),
+        reviews=commerce.REVIEWS,
+        rating_breakdown=commerce.RATING_BREAKDOWN,
+    )
 
 
 @store_bp.route("/cart")
 def cart():
-    return render_template("store/cart.html")
+    return render_template("store/cart.html", cart=commerce.get_cart())
 
 
 def _render_info(key):

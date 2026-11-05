@@ -1,4 +1,5 @@
 {% extends "layouts/base_account.html" %}
+{% import "layouts/macros/_commerce.html" as commerce %}
 {% block title %}Đơn hàng của tôi - FREESION{% endblock %}
 
 {% block styles %}
@@ -14,55 +15,44 @@
         <section class="grow">
             <h1 class="page-title">Đơn hàng của tôi</h1>
 
-            <nav class="admin-tabs" aria-label="Trạng thái đơn hàng" style="padding:0; margin-bottom:1.5rem;">
+            <nav class="admin-tabs account-order-toolbar" aria-label="Trạng thái đơn hàng">
                 <a href="{{ url_for('account.order_history', status='all') }}" class="is-active">Tất cả</a>
                 <a href="{{ url_for('account.order_history', status='processing') }}">Đang xử lý</a>
                 <a href="{{ url_for('account.order_history', status='delivered') }}">Đã giao</a>
                 <a href="{{ url_for('account.order_history', status='cancelled') }}">Đã hủy</a>
             </nav>
 
+            {# Mỗi đơn là 1 card ngoài; bên trong là danh sách card sản phẩm #}
+            {% for order in orders %}
             <article class="order-card">
                 <header class="row-between">
-                    <div><p><a href="{{ url_for('account.order_detail', order_id='FR261101028') }}"><strong>#FR261101028</strong></a></p><p class="meta">Ngày đặt: 01/11/2026</p></div>
-                    <span class="badge badge-warn">Đang chuẩn bị hàng</span>
+                    <div>
+                        <p><a href="{{ url_for('account.order_detail', order_id=order.code) }}"><strong>#{{ order.code }}</strong></a></p>
+                        <p class="meta">Ngày đặt: {{ order.date }}</p>
+                    </div>
+                    <span class="badge {{ order.badge }}">{{ order.status }}</span>
                 </header>
-                <div class="order-line"><div class="media media-sm media-taupe">Ảnh sản phẩm</div><div class="grow"><h2>Áo thun cotton Essential</h2><p class="meta">Size M | Den vintage · 249.000₫ × 2</p></div><span>498.000₫</span></div>
-                <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><h2>Áo khoác bomber Uniform</h2><p class="meta">Size L | Nâu dừa · 899.000₫ × 1</p></div><span>899.000₫</span></div>
-                <footer class="row-between mt-4">
-                    <p class="muted">2 dòng sản phẩm · Tổng số lượng: 3 &nbsp;|&nbsp; <strong>1.257.300₫</strong></p>
-                    <a href="{{ url_for('account.order_detail', order_id='FR261101028') }}" class="btn">Xem chi tiết đơn hàng</a>
-                </footer>
-            </article>
 
-            <article class="order-card">
-                <header class="row-between">
-                    <div><p><a href="{{ url_for('account.order_detail', order_id='FR261015092') }}"><strong>#FR261015092</strong></a></p><p class="meta">Ngày đặt: 15/10/2026</p></div>
-                    <span class="badge badge-ok">Đã giao hàng</span>
-                </header>
-                <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><h2>Áo sơ mi Oxford dáng rộng</h2><p class="meta">Size M | Trắng kem · Số lượng: 1</p></div><span>459.000₫</span></div>
+                <div class="order-summary-card__items">
+                    {% for item in order['items'] %}
+                    {{ commerce.order_item_card(item) }}
+                    {% endfor %}
+                </div>
+
                 <footer class="row-between mt-4">
-                    <p class="muted">Tổng cộng <strong>489.000₫</strong> · Đã nhận ngày 18/10/2026</p>
+                    <p class="muted">
+                        {{ order.note }}{% if order.show_total %} &nbsp;|&nbsp; <strong>{{ order.total|vnd }}</strong>{% endif %}
+                    </p>
                     <div class="toolbar">
-                        <a href="{{ url_for('account.order_detail', order_id='FR261015092') }}" class="btn btn-ghost">Xem chi tiết</a>
-                        <a href="{{ url_for('store.cart', reorder='FR261015092') }}" class="btn">Đánh giá / Mua lại</a>
+                        <a href="{{ url_for('account.order_detail', order_id=order.code) }}"
+                           class="btn{% if order.reorder_label %} btn-ghost{% endif %}">{{ order.action_label }}</a>
+                        {% if order.reorder_label %}
+                        <a href="{{ url_for('store.cart', reorder=order.code) }}" class="btn">{{ order.reorder_label }}</a>
+                        {% endif %}
                     </div>
                 </footer>
             </article>
-
-            <article class="order-card">
-                <header class="row-between">
-                    <div><p><a href="{{ url_for('account.order_detail', order_id='FR261002036') }}"><strong>#FR261002036</strong></a></p><p class="meta">Ngày đặt: 02/10/2026</p></div>
-                    <span class="badge badge-danger">Đã hủy</span>
-                </header>
-                <div class="order-line"><div class="media media-sm media-denim">Ảnh sản phẩm</div><div class="grow"><h2>Quần jean ống suông Indigo</h2><p class="meta">Size 29 | Xanh đậm · Số lượng: 1</p></div><span>649.000₫</span></div>
-                <footer class="row-between mt-4">
-                    <p class="muted">Đã hoàn tiền theo yêu cầu của bạn · Chưa thanh toán</p>
-                    <div class="toolbar">
-                        <a href="{{ url_for('account.order_detail', order_id='FR261002036') }}" class="btn btn-ghost">Xem chi tiết</a>
-                        <a href="{{ url_for('store.cart', reorder='FR261002036') }}" class="btn">Mua lại</a>
-                    </div>
-                </footer>
-            </article>
+            {% endfor %}
 
             <nav class="pagination" aria-label="Phân trang đơn hàng">
                 <a href="{{ url_for('account.order_history', page=1) }}" class="page-num is-active">1</a>

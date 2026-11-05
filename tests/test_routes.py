@@ -158,11 +158,12 @@ class HeaderLayoutTests(unittest.TestCase):
         self.assertIn("Giỏ hàng", html)
         self.assertGreaterEqual(html.count("<svg"), 4)
 
-    def test_category_row_order_and_active_item(self):
+    def test_category_row_order_without_sticky_active_item(self):
         html = self.client.get("/").get_data(as_text=True)
         links = re.findall(r'<a class="nav-link[^"]*"[^>]*>([^<]+)</a>', html)
         self.assertEqual(links, ["Nữ", "Nam", "Phụ kiện", "Hàng mới", "Sale"])
-        self.assertIn('class="nav-link is-active"', html)
+        # Không có tab active cố định: tránh vạch đen tĩnh đứng yên dưới "Nữ".
+        self.assertNotIn('class="nav-link is-active"', html)
         self.assertIn('nav-link nav-sale', html)
 
     def test_reference_only_items_are_excluded(self):

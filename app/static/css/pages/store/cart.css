@@ -1,20 +1,87 @@
 /* ==========================================================================
-   Giỏ hàng (store/cart.html): dòng sản phẩm và bộ đếm số lượng.
-   Không dùng thư viện CSS bên ngoài; mọi biến màu/kích thước nằm ở base.css.
+   Giỏ hàng (store/cart.html).
+   Mỗi sản phẩm là MỘT .cart-card: ảnh + thông tin + số lượng + thành tiền
+   + Xóa nằm trong cùng một article. .cart-shell / .cart-list là container
+   thật (grid/flex); không dùng position hay margin để ghép các phần tử rời.
+   Màu/kích thước lấy từ biến trong base.css.
    ========================================================================== */
 
-.cart-item {
+/* Biến chia sẻ cho cả hàng tiêu đề lẫn từng card -> cột luôn thẳng hàng. */
+.cart-shell {
+    --cart-columns: minmax(0, 1fr) 7rem 7rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-head,
+.cart-card {
+    display: grid;
+    grid-template-columns: var(--cart-columns);
+    gap: 1rem;
+    align-items: center;
+}
+
+.cart-head {
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--stone-900);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone-500);
+}
+
+.cart-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.cart-card {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--stone-200);
+}
+
+/* Cột 1 của card: ảnh + toàn bộ thông tin mô tả, gom trong 1 container. */
+.cart-card__product {
     display: flex;
     align-items: center;
     gap: 1rem;
-    border-bottom: 1px solid var(--stone-200);
-    padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
+    min-width: 0;
 }
 
-.cart-item h2 {
+.cart-card__info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.cart-card__info h2 {
     margin: 0;
     font-size: 0.875rem;
+}
+
+.cart-card__info p {
+    margin: 0;
+}
+
+.cart-card__remove {
+    font-size: 0.75rem;
+}
+
+.cart-card__price s {
+    color: var(--stone-400);
+    font-size: 0.75rem;
+}
+
+.cart-card__total {
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.cart-shell__continue {
+    padding-top: 1.5rem;
 }
 
 .qty {
@@ -25,14 +92,7 @@
     background: var(--white);
 }
 
-.qty a {
-    display: flex;
-    height: 2.25rem;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-}
-
+.qty a,
 .qty span {
     display: flex;
     height: 2.25rem;
@@ -41,45 +101,9 @@
     flex: 1;
 }
 
-/* Bố cục giỏ hàng theo ảnh: đầu bảng, tổng từng dòng, mã giảm giá, gợi ý */
-.cart-head {
-    display: grid;
-    grid-template-columns: 1fr 7rem 7rem;
-    gap: 1rem;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--stone-900);
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--stone-500);
-}
-
-.cart-head span:first-child {
-    width: 60%;
-}
-
-.cart-line-total {
-    flex-shrink: 0;
-    width: 7rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-.cart-item .grow .link-underline {
-    display: inline-block;
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-}
-
-.cart-item .price s {
-    color: var(--stone-400);
-    font-size: 0.75rem;
-}
-
 .cart-coupon {
     display: flex;
     gap: 0.5rem;
-    margin: 1.25rem 0 0.5rem;
 }
 
 .cart-coupon .input {
@@ -87,23 +111,23 @@
     min-width: 0;
 }
 
-.cart-suggest {
-    padding: 3.5rem 0;
-    background: var(--stone-100);
-}
-
-.cart-suggest h2 {
-    margin: 0 0 2rem;
-    font-size: 1.5rem;
-    font-weight: 400;
-}
-
+/* Responsive: tiêu đề ẩn, card vẫn là 1 khối, tự chuyển thành 2 hàng. */
 @media (max-width: 640px) {
     .cart-head {
         display: none;
     }
 
-    .cart-item {
-        flex-wrap: wrap;
+    .cart-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        row-gap: 1rem;
+    }
+
+    .cart-card__product {
+        grid-column: 1 / -1;
+    }
+
+    .cart-card__total {
+        width: auto;
+        text-align: right;
     }
 }

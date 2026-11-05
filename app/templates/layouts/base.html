@@ -9,6 +9,7 @@
        stylesheet của riêng mình thông qua block "styles" (nhớ gọi super()). #}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/commerce.css') }}">
     {% block styles %}{% endblock %}
 </head>
 <body>

@@ -1,0 +1,101 @@
+{#
+  Component thương mại dùng chung (Jinja macro).
+
+  Mỗi macro trả về ĐÚNG MỘT khung chứa (article/section) bao toàn bộ dữ liệu
+  của chính đơn vị thông tin đó. Quan hệ nhóm được thể hiện bằng cấu trúc HTML
+  (cha -> con), còn CSS chỉ chia cột bằng grid/flex trong
+  css/components/commerce.css — không dùng margin/position để "giả" nhóm.
+
+  Dữ liệu đầu vào là dict do app/commerce.py chuẩn bị, tên trường khớp
+  db/schema.sql. Mọi số tiền đi qua filter `vnd`.
+#}
+
+{% macro product_media(image, size_class, alt) -%}
+{% if image.url %}
+<img class="commerce-media {{ size_class }}" src="{{ image.url }}" alt="{{ alt }}">
+{% else %}
+<div class="media {{ size_class }} media-{{ image.tone }}" role="img" aria-label="{{ alt }}">{{ image.label }}</div>
+{% endif %}
+{%- endmacro %}
+
+
+{% macro cart_card(item) -%}
+{# Một sản phẩm trong giỏ = 1 card: ảnh, tên, giá, số lượng, xóa, thành tiền. #}
+<article class="cart-card" data-sku="{{ item.sku }}" data-variant-id="{{ item.variant_id }}">
+    <div class="cart-card__product">
+        {{ product_media(item.image, 'media-thumb', item.name) }}
+        <div class="cart-card__info">
+            <h2><a href="{{ url_for('store.product_detail', sku=item.product_sku) }}">{{ item.name }}</a></h2>
+            <p class="meta cart-card__variant">Size {{ item.size }} | {{ item.color }}</p>
+            <p class="price cart-card__price">
+                {{ item.price|vnd }}{% if item.compare_price %} <s>{{ item.compare_price|vnd }}</s>{% endif %}
+            </p>
+            <a class="link-underline cart-card__remove" href="{{ url_for('store.cart', remove=item.product_sku) }}">Xóa</a>
+        </div>
+    </div>
+    <div class="qty cart-card__qty" aria-label="Số lượng">
+        <a href="{{ url_for('store.cart', sku=item.product_sku, qty=item.quantity - 1) }}" aria-label="Giảm số lượng">−</a>
+        <span>{{ item.quantity }}</span>
+        <a href="{{ url_for('store.cart', sku=item.product_sku, qty=item.quantity + 1) }}" aria-label="Tăng số lượng">+</a>
+    </div>
+    <span class="cart-line-total cart-card__total">{{ item.line_total|vnd }}</span>
+</article>
+{%- endmacro %}
+
+
+{% macro order_item_card(item) -%}
+{# Một sản phẩm trong tóm tắt đơn hàng = 1 hàng/card riêng, đủ thông tin. #}
+<article class="order-item-card" data-sku="{{ item.sku }}">
+    {{ product_media(item.image, 'media-sm', item.name) }}
+    <div class="order-item-card__body">
+        <h3>{{ item.name }}</h3>
+        <p class="meta">Size {{ item.size }} | {{ item.color }}</p>
+        <p class="meta">{{ item.price|vnd }} × {{ item.quantity }}</p>
+    </div>
+    <span class="order-item-card__amount">{{ item.line_total|vnd }}</span>
+</article>
+{%- endmacro %}
+
+
+{% macro order_summary_card(order, title='Tóm tắt đơn hàng', rows=None, show_meta=True,
+                            coupon_form=False, action=None, note=None, extra_class='') -%}
+{# Khung BAO NGOÀI: tiêu đề + danh sách card sản phẩm + các dòng tiền + footer. #}
+<section class="order-summary-card {{ extra_class }}" aria-label="{{ title }}">
+    <header class="order-summary-card__head">
+        <h2>{{ title }}</h2>
+        {% if show_meta %}
+        <p class="muted text-xs">{{ order.item_count }} dòng sản phẩm · Tổng số lượng: {{ order.quantity_total }}</p>
+        {% endif %}
+    </header>
+
+    <div class="order-summary-card__items">
+        {% for item in order['items'] %}
+        {{ order_item_card(item) }}
+        {% endfor %}
+    </div>
+
+    <div class="order-summary-card__totals">
+        {% for row in rows or order['rows'] %}
+        <div class="summary-row"><span>{{ row.label }}</span><span>{{ row.value }}</span></div>
+        {% endfor %}
+        <div class="summary-total"><span>Tổng cộng</span><span>{{ order.total|vnd }}</span></div>
+    </div>
+
+    {% if coupon_form or action or note %}
+    <footer class="order-summary-card__footer">
+        {% if coupon_form %}
+        <form class="cart-coupon" action="{{ url_for('store.cart') }}" method="get">
+            <input class="input" type="text" name="coupon" value="{{ order.coupon_code }}" aria-label="Nhập mã giảm giá">
+            <button type="submit" class="btn btn-ghost">Áp dụng</button>
+        </form>
+        {% endif %}
+        {% if action %}
+        <a class="btn btn-block" href="{{ action.href }}">{{ action.label }}</a>
+        {% endif %}
+        {% if note %}
+        <p class="muted text-xs">{{ note }}</p>
+        {% endif %}
+    </footer>
+    {% endif %}
+</section>
+{%- endmacro %}

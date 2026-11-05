@@ -1,4 +1,5 @@
 {% extends "layouts/base_store.html" %}
+{% import "layouts/macros/_commerce.html" as commerce %}
 {% block title %}Giỏ hàng - FREESION{% endblock %}
 
 {% block styles %}
@@ -8,62 +9,35 @@
 
 {% block content %}
 <div class="page">
-    <div class="row-between" style="align-items:baseline;">
-        <h1 class="page-title mb-6">Giỏ hàng của bạn</h1>
-    </div>
-    <br></br>
+    <h1 class="page-title mb-6">Giỏ hàng của bạn</h1>
+
     <div class="split">
-        <section class="split-main" aria-label="Danh sách sản phẩm trong giỏ hàng">
-            <div class="cart-head"><span>Sản phẩm</span><span>Số lượng</span><span>Thành tiền</span></div>
+        {# Container thật: hàng tiêu đề + danh sách card + liên kết, cùng 1 grid #}
+        <section class="split-main cart-shell" aria-label="Danh sách sản phẩm trong giỏ hàng">
+            <div class="cart-head">
+                <span>Sản phẩm</span><span>Số lượng</span><span>Thành tiền</span>
+            </div>
 
-            <article class="cart-item">
-                <div class="media media-thumb media-taupe">Ảnh sản phẩm</div>
-                <div class="grow">
-                    <h2><a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}">Áo thun cotton Essential</a></h2>
-                    <p class="meta">Size M | Den vintage</p>
-                    <p class="price">249.000₫</p>
-                    <a href="{{ url_for('store.cart', remove='FR-TEE-004') }}" class="link-underline">Xóa</a>
-                </div>
-                <div class="qty">
-                    <a href="{{ url_for('store.cart', sku='FR-TEE-004', qty=1) }}" aria-label="Giảm số lượng">−</a>
-                    <span>2</span>
-                    <a href="{{ url_for('store.cart', sku='FR-TEE-004', qty=3) }}" aria-label="Tăng số lượng">+</a>
-                </div>
-                <span class="cart-line-total">498.000₫</span>
-            </article>
+            <div class="cart-list">
+                {% for item in cart['items'] %}
+                {{ commerce.cart_card(item) }}
+                {% endfor %}
+            </div>
 
-            <article class="cart-item">
-                <div class="media media-thumb media-beige">Ảnh sản phẩm</div>
-                <div class="grow">
-                    <h2><a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}">Áo khoác bomber Uniform</a></h2>
-                    <p class="meta">Size L | Nâu dừa</p>
-                    <p class="price">899.000₫ <s>1.199.000₫</s></p>
-                    <a href="{{ url_for('store.cart', remove='FR-BOM-002') }}" class="link-underline">Xóa</a>
-                </div>
-                <div class="qty">
-                    <a href="{{ url_for('store.cart', sku='FR-BOM-002', qty=0) }}" aria-label="Giảm số lượng">−</a>
-                    <span>1</span>
-                    <a href="{{ url_for('store.cart', sku='FR-BOM-002', qty=2) }}" aria-label="Tăng số lượng">+</a>
-                </div>
-                <span class="cart-line-total">899.000₫</span>
-            </article>
-
-            <a href="{{ url_for('store.shop') }}" class="link-underline">Tiếp tục mua sắm</a>
+            <div class="cart-shell__continue">
+                <a href="{{ url_for('store.shop') }}" class="link-underline">Tiếp tục mua sắm</a>
+            </div>
         </section>
 
-        <aside class="summary split-side">
-            <h2>Tóm tắt đơn hàng</h2>
-            <div class="summary-row"><span>Tạm tính (2 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <form class="cart-coupon" action="{{ url_for('store.cart') }}" method="get">
-                <input class="input" type="text" name="coupon" value="TUDO10" aria-label="Nhập mã giảm giá">
-                <button type="submit" class="btn btn-ghost">Áp dụng</button>
-            </form>
-            <div class="summary-row"><span>Giảm giá (TUDO10 · 10%)</span><span>-139.700₫</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
-            <a href="{{ url_for('checkout.shipping') }}" class="btn btn-block mt-4">Thanh toán</a>
-            <p class="muted" style="font-size:0.75rem;">Đơn hàng đã đủ điều kiện miễn phí vận chuyển. Bạn có 30 ngày để đổi trả.</p>
-        </aside>
+        {# Tóm tắt đơn hàng: 1 khung bao ngoài, bên trong có card từng sản phẩm #}
+        {{ commerce.order_summary_card(
+            cart.order,
+            show_meta=False,
+            coupon_form=True,
+            action={'href': url_for('checkout.shipping'), 'label': 'Thanh toán'},
+            note='Đơn hàng đã đủ điều kiện miễn phí vận chuyển. Bạn có 30 ngày để đổi trả.',
+            extra_class='split-side'
+        ) }}
     </div>
 </div>
 {% endblock %}

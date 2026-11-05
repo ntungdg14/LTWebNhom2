@@ -31,8 +31,9 @@ python -m unittest discover -s tests -v
 ```
 .
 ├── app/
-│   ├── __init__.py              # application factory: nạp config, đăng ký blueprint
+│   ├── __init__.py              # application factory: nạp config, đăng ký blueprint + filter `vnd`
 │   ├── config.py                # Development / Production / Testing config
+│   ├── commerce.py              # view-model: products/cart_items/order_items -> dict cho template
 │   ├── blueprints/              # mỗi nhóm chức năng là một package Blueprint
 │   │   ├── __init__.py          # danh sách blueprint đăng ký vào app
 │   │   ├── store/               #    /  /shop  /product  /cart  /terms  /privacy  /help
@@ -46,6 +47,7 @@ python -m unittest discover -s tests -v
 │   │   ├── layouts/             # base.html + các layout kế thừa theo khu vực
 │   │   │   ├── partials/        # _site_header, _site_footer, _admin_sidebar, _account_nav,
 │   │   │   │                    # _checkout_steps (thanh tiến trình 4 bước)
+│   │   │   ├── macros/          # _commerce.html: cart_card / order_item_card / order_summary_card
 │   │   │   ├── base.html        # khung <html>, nạp CSS nền tảng, block styles/body
 │   │   │   ├── base_store.html  # header + footer cửa hàng
 │   │   │   ├── base_auth.html   # + CSS chung cho 3 trang xác thực
@@ -56,7 +58,10 @@ python -m unittest discover -s tests -v
 │       ├── css/                 # (xem sơ đồ bên dưới)
 │       ├── js/nav-indicator.js  # đo vị trí tab; hiệu ứng trượt do CSS đảm nhận
 │       └── images/              # dành cho ảnh sản phẩm về sau
-├── tests/test_routes.py         # 29 test: route, link, form, header, footer
+├── db/schema.sql                # schema SQLite tham chiếu (tên cột = khóa view-model)
+├── tests/
+│   ├── test_routes.py           # 29 test: route, link, form, header, footer
+│   └── test_commerce_components.py  # 16 test: card/container, dữ liệu, tổng tiền
 ├── .github/
 │   ├── workflows/ci.yml         # build + test trên mỗi PR (GitHub Actions)
 │   └── pull_request_template.md # mẫu mô tả PR
@@ -71,6 +76,8 @@ python -m unittest discover -s tests -v
 app/static/css/
 ├── base.css                    # :root design tokens, reset, typography, utilities
 ├── components.css              # nút, input, thẻ sản phẩm, badge, phân trang, summary…
+├── components/
+│   └── commerce.css            # card giỏ hàng / card tóm tắt đơn hàng (flex + grid)
 ├── layouts/
 │   ├── store.css               # header 2 hàng, ô tìm kiếm, mega menu + thanh trượt hover
 │   ├── footer.css              # footer (tách riêng, không phụ thuộc store.css)
@@ -83,6 +90,39 @@ app/static/css/
     └── admin/       admin.css (chung)  dashboard.css  products.css  orders.css  users.css
                      forms.css (4 form mới)
 ```
+
+## Khối thông tin (component) & hợp đồng dữ liệu
+
+Mỗi **đơn vị thông tin** được gom trong đúng một khung chứa thật (HTML cha → con),
+không phải các phần tử rời rạc chỉnh margin/position cho có vẻ thành nhóm.
+
+| Component (macro trong `layouts/macros/_commerce.html`) | Khung chứa | Nội dung bên trong |
+|---|---|---|
+| `cart_card(item)` | `<article class="cart-card">` | ảnh, tên, biến thể, giá, bộ đếm số lượng, **Xóa**, thành tiền |
+| `order_item_card(item)` | `<article class="order-item-card">` | ảnh, tên, màu/size, đơn giá × số lượng, thành tiền |
+| `order_summary_card(order, …)` | `<section class="order-summary-card">` | tiêu đề → **danh sách card sản phẩm** → dòng tạm tính/giảm giá/phí vận chuyển/tổng cộng → footer (mã giảm giá, CTA, ghi chú) |
+| `product_media(image, …)` | `<img>` hoặc placeholder `<div>` | ảnh `product_images.url`, fallback theo `tone` |
+
+Trang chi tiết sản phẩm dùng thêm `.info-card` cho từng nhóm (tiêu đề, màu, size,
+mua hàng) và **một** `.product-description-card` chứa mô tả + `<dl>` thông số
+(chất liệu, người mẫu, ghi chú). CSS cho card nằm ở
+`css/components/commerce.css` (nạp từ `base.html`) và `css/pages/store/cart.css`;
+khoảng cách do `gap` của container cha quyết định, không có inline positioning.
+
+**Dữ liệu cho backend:** `app/commerce.py` chuẩn bị view-model, tên trường bám
+`db/schema.sql`. Template chỉ lặp `{% for %}` và định dạng tiền bằng filter
+`|vnd` (đăng ký trong `create_app`), không chứa tên sản phẩm/giá viết cứng.
+
+| View-model | Bảng trong `db/schema.sql` |
+|---|---|
+| `get_product()` / `get_related()` | `products` + `product_images` + `colors` + `variants` |
+| `get_cart()["items"]` | `cart_items` + `variants` + `products` + `colors` |
+| `get_order()` / `get_order_history()` | `orders` + `order_items` + `coupons` |
+
+Số tiền là `int` VND đúng kiểu cột SQL; `line_total`, `subtotal`, `discount`,
+`total` và các dòng `rows` được tính trong `commerce.py`. Để nối CSDL thật, chỉ
+cần thay thân các hàm `get_*` bằng truy vấn SQLite trả dict cùng khóa —
+macro/CSS/route giữ nguyên.
 
 ## Header cửa hàng
 

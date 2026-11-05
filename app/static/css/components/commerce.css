@@ -1,0 +1,135 @@
+/* ==========================================================================
+   Component thương mại dùng chung (layouts/macros/_commerce.html).
+
+   Nguyên tắc: khung chứa là thật (article/section chia cột bằng grid/flex).
+   Không có position/margin để "ghép" các phần tử rời rạc thành một nhóm;
+   khoảng cách giữa các card do `gap` của container cha quyết định.
+   Mọi màu/kích thước lấy biến từ base.css.
+   ========================================================================== */
+
+/* Tiện ích nhỏ thay cho inline style="font-size / text-align". */
+.text-xs {
+    font-size: 0.75rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-accent {
+    color: var(--orange-600);
+}
+
+.commerce-media {
+    object-fit: cover;
+}
+
+/* --- Khung BAO NGOÀI của "Tóm tắt đơn hàng" ------------------------------ */
+.order-summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--stone-100);
+    border: 1px solid var(--stone-200);
+}
+
+.order-summary-card__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--stone-200);
+}
+
+.order-summary-card__head h2 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.order-summary-card__head p {
+    margin: 0;
+}
+
+.order-summary-card__items {
+    display: grid;
+    gap: 0;
+}
+
+.order-summary-card__totals,
+.order-summary-card__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* .summary-row / .summary-total đã là flex justify-between; trong card này
+   khoảng cách do `gap` của container đảm nhận, bỏ margin-top cũ. */
+.order-summary-card__totals .summary-row,
+.order-summary-card__totals .summary-total {
+    margin-top: 0;
+}
+
+.order-summary-card__footer p {
+    margin: 0;
+}
+
+.order-summary-card__footer .cart-coupon {
+    margin: 0;
+}
+
+/* Biến thể: vẫn là 1 khung, nhưng không nền/viền (trang xác nhận đơn). */
+.order-summary-card--plain {
+    padding: 0;
+    background: transparent;
+    border: 0;
+}
+
+.order-summary-card--plain .order-summary-card__head {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* --- Mỗi sản phẩm trong tóm tắt = 1 hàng/card riêng --------------------- */
+.order-item-card {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--stone-200);
+}
+
+.order-item-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.order-item-card__body h3,
+.order-item-card__body p {
+    margin: 0;
+}
+
+.order-item-card__body .meta {
+    font-size: 0.75rem;
+    color: var(--stone-500);
+}
+
+.order-item-card__amount {
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 479px) {
+    .order-item-card {
+        grid-template-columns: 3rem minmax(0, 1fr);
+    }
+
+    .order-item-card__amount {
+        grid-column: 2;
+        text-align: right;
+    }
+}

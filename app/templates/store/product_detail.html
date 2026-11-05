@@ -1,5 +1,6 @@
 {% extends "layouts/base_store.html" %}
-{% block title %}Áo khoác bomber Uniform - FREESION{% endblock %}
+{% import "layouts/macros/_commerce.html" as commerce %}
+{% block title %}{{ product.name }} - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -8,79 +9,97 @@
 
 {% block content %}
 <div class="page">
-    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Áo khoác bomber Uniform</p>
+    <p class="shop-breadcrumb">
+        <a href="{{ url_for('store.home') }}">Trang chủ</a> /
+        <a href="{{ url_for('store.shop', category=product.category_slug) }}">{{ product.category }}</a> /
+        {{ product.name }}
+    </p>
 
     <div class="detail-layout">
-        <section aria-label="Hình ảnh sản phẩm">
+        {# Khung ảnh: một container chứa toàn bộ gallery #}
+        <section class="product-gallery-card" aria-label="Hình ảnh sản phẩm">
             <div class="product-gallery">
-                <div class="media media-card media-beige">Ảnh 1 · Mặt trước</div>
-                <div class="media media-card media-taupe">Ảnh 2 · Mặt sau</div>
-                <div class="media media-card media-cream">Ảnh 3 · Cổ gập</div>
-                <div class="media media-card media-taupe">Ảnh 4 · Ống tay</div>
-                <div class="media media-card media-beige">Ảnh 5 · Người mẫu</div>
-                <div class="media media-card media-cream">Ảnh 6 · Chi tiết</div>
+                {% for image in product.images %}
+                {{ commerce.product_media(image, 'media-card', image.label) }}
+                {% endfor %}
             </div>
         </section>
 
-        <section class="product-info">
-            <header>
-                <p class="eyebrow">Áo khoác · Nam</p>
-                <h1>Áo khoác bomber Uniform</h1>
-                <p class="product-rating">★★★★★ <span>4,9</span> · 128 đánh giá</p>
-                <p class="price-lg">899.000₫ <s>1.199.000₫</s></p>
+        {# Mỗi nhóm thông tin là 1 card/container riêng, dữ liệu từ backend #}
+        <div class="product-info">
+            <header class="info-card info-card--head">
+                <p class="eyebrow">{{ product.category }} · {{ product.department }}</p>
+                <h1>{{ product.name }}</h1>
+                <p class="product-rating">★★★★★ <span>{{ product.rating_display }}</span> · {{ product.review_count }} đánh giá</p>
+                <p class="price-lg">
+                    {{ product.price|vnd }}{% if product.compare_price %} <s>{{ product.compare_price|vnd }}</s>{% endif %}
+                </p>
             </header>
 
-            <div>
-                <div class="row-between"><h2>Màu sắc: Nâu dừa</h2></div>
-                <div class="swatches mt-3">
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='nau-dua') }}" class="swatch media-beige is-active" aria-label="Nâu dừa"></a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='den') }}" class="swatch media-stone" aria-label="Đen"></a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='xanh-reu') }}" class="swatch media-olive" aria-label="Xanh rêu"></a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='be') }}" class="swatch media-cream" aria-label="Be"></a>
+            <article class="info-card" aria-label="Chọn màu sắc">
+                <div class="row-between"><h2>Màu sắc: {{ product.selected_color_name }}</h2></div>
+                <div class="swatches">
+                    {% for color in product.colors %}
+                    <a href="{{ url_for('store.product_detail', sku=product.sku, color=color.slug) }}"
+                       class="swatch media-{{ color.tone }}{% if color.slug == product.selected_color %} is-active{% endif %}"
+                       aria-label="{{ color.name }}"></a>
+                    {% endfor %}
                 </div>
-            </div>
+            </article>
 
-            <div>
+            <article class="info-card" aria-label="Chọn kích cỡ">
                 <div class="row-between">
                     <h2>Kích cỡ</h2>
                     <a href="{{ url_for('store.help_page') }}" class="link-underline">Hướng dẫn chọn size</a>
                 </div>
-                <div class="size-row mt-3">
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='S') }}" class="size-btn">S</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='M') }}" class="size-btn is-active">M</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='L') }}" class="size-btn">L</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='XL') }}" class="size-btn">XL</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='XXL') }}" class="size-btn">XXL</a>
+                <div class="size-row">
+                    {% for size in product.sizes %}
+                    <a href="{{ url_for('store.product_detail', sku=product.sku, size=size) }}"
+                       class="size-btn{% if size == product.selected_size %} is-active{% endif %}">{{ size }}</a>
+                    {% endfor %}
                 </div>
-            </div>
+            </article>
 
-            <div class="form-stack">
-                <a href="{{ url_for('store.cart', add='FR-BOM-002') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
-                <a href="{{ url_for('checkout.checkout') }}" class="btn btn-accent btn-block">Mua ngay</a>
-            </div>
+            <article class="info-card product-action-card" aria-label="Mua sản phẩm">
+                <div class="form-stack">
+                    <a href="{{ url_for('store.cart', add=product.sku) }}" class="btn btn-block">Thêm vào giỏ hàng</a>
+                    <a href="{{ url_for('checkout.checkout') }}" class="btn btn-accent btn-block">Mua ngay</a>
+                </div>
+                <div class="product-perks">
+                    <p>✓ <strong>Đổi trả dễ dàng</strong><br><span>Chỉ đổi 1 lần, miễn phí trong vòng 30 ngày.</span></p>
+                    <p>✓ <strong>Giao hàng miễn phí</strong><br><span>Cho đơn từ 499.000₫ trên toàn quốc.</span></p>
+                </div>
+            </article>
 
-            <div class="product-perks">
-                <p>✓ <strong>Đổi trả dễ dàng</strong><br><span>Chỉ đổi 1 lần, miễn phí trong vòng 30 ngày.</span></p>
-                <p>✓ <strong>Giao hàng miễn phí</strong><br><span>Cho đơn từ 499.000₫ trên toàn quốc.</span></p>
-            </div>
-
-            <div class="notes">
-                <h2>Mô tả sản phẩm</h2>
-                <p>Áo khoác bomber dáng suông, cổ bo gọn với khóa kéo kim loại. Lớp lót mỏng giữ ấm vừa đủ cho những ngày se lạnh, dễ mặc ngoài áo thun hay sơ mi.</p>
-                <div class="summary-row"><span>Chất liệu</span><span>65% polyester tái chế, 35% cotton</span></div>
-                <div class="summary-row"><span>Người mẫu</span><span>Cao 1m78, mặc size M</span></div>
-                <div class="summary-row"><span>Ghi chú</span><span>Giặt máy nhẹ nhàng, không dùng chất tẩy</span></div>
-            </div>
-        </section>
+            {# Mô tả sản phẩm = 1 card duy nhất, chứa mô tả + toàn bộ thông số #}
+            <article class="info-card product-description-card" aria-labelledby="product-description-title">
+                <header>
+                    <h2 id="product-description-title">Mô tả sản phẩm</h2>
+                    <p class="product-description-card__body">{{ product.description }}</p>
+                </header>
+                <dl class="product-description-card__specs">
+                    {% for spec in product.specs %}
+                    <div class="product-description-card__spec">
+                        <dt>{{ spec.label }}</dt>
+                        <dd>{{ spec.value }}</dd>
+                    </div>
+                    {% endfor %}
+                </dl>
+            </article>
+        </div>
     </div>
 
     <section class="related">
         <h2 class="page-title mb-6">Có thể bạn cũng thích</h2>
         <div class="product-grid">
-            <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h3>Áo thun cotton Essential</h3><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h3>Áo len dệt waffle cổ tròn</h3><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
+            {% for item in related %}
+            <a href="{{ url_for('store.product_detail', sku=item.sku) }}" class="product-card">
+                {{ commerce.product_media(item.image, 'media-card', item.name) }}
+                <h3>{{ item.name }}</h3>
+                <p class="meta">{{ item.color }}</p>
+                <p class="price">{{ item.price|vnd }}</p>
+            </a>
+            {% endfor %}
         </div>
     </section>
 
@@ -88,20 +107,24 @@
         <h2 class="page-title">Đánh giá từ khách hàng</h2>
         <div class="reviews-grid">
             <div class="reviews-score">
-                <strong>4,9</strong>
+                <strong>{{ product.rating_display }}</strong>
                 <span>★★★★★</span>
-                <p class="muted">128 đánh giá</p>
+                <p class="muted">{{ product.review_count }} đánh giá</p>
                 <div class="review-bars">
-                    <div><span>5 sao</span><i style="width:82%"></i><em>104</em></div>
-                    <div><span>4 sao</span><i style="width:14%"></i><em>17</em></div>
-                    <div><span>3 sao</span><i style="width:7%"></i><em>5</em></div>
-                    <div><span>2 sao</span><i style="width:2%"></i><em>1</em></div>
-                    <div><span>1 sao</span><i style="width:1%"></i><em>1</em></div>
+                    {% for bar in rating_breakdown %}
+                    <div><span>{{ bar.label }}</span><i style="width:{{ bar.percent }}%"></i><em>{{ bar.count }}</em></div>
+                    {% endfor %}
                 </div>
             </div>
             <div class="review-list">
-                <article><p class="eyebrow">★★★★★ · 14 ngày trước</p><h3>Åm vừa đủ, dễ phối</h3><p class="muted">Mặc đi làm lẫn đi chơi đều được, form vừa phối, mặc thêm lớp áo cũng vẫn gọn. Chắc sẽ mua thêm màu khác.</p><p class="meta">Minh Anh · TP. Hồ Chí Minh · Đã mua hàng · Size M</p></article>
-                <article><p class="eyebrow">★★★★★ · 21 ngày trước</p><h3>Đúng với mô tả</h3><p class="muted">Chất dày dặn, đường may chắc chắn. Giao nhanh, đóng gói cẩn thận.</p><p class="meta">Quốc Huy · Hà Nội · Đã mua hàng · Size L</p></article>
+                {% for review in reviews %}
+                <article class="review-card">
+                    <p class="eyebrow">★★★★★ · {{ review.date }}</p>
+                    <h3>{{ review.title }}</h3>
+                    <p class="muted">{{ review.body }}</p>
+                    <p class="meta">{{ review.author }} · {{ review.city }} · Đã mua hàng · Size {{ review.size }}</p>
+                </article>
+                {% endfor %}
             </div>
         </div>
     </section>

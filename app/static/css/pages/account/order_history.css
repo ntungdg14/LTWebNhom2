@@ -12,9 +12,79 @@
 
 .account-order-toolbar {
     margin: 1.5rem 0;
+    padding: 0;
 }
 
 .order-card h2 {
     margin: 0;
     font-size: 0.875rem;
+}
+
+/* --- Chi tiết đơn: các khối được gom bằng container thật ------------------ */
+.order-detail-head {
+    align-items: flex-start;
+}
+
+.order-detail-stack {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.order-detail-stack .order-card,
+.order-detail-stack .order-summary-card {
+    margin-bottom: 0;
+}
+
+.order-detail-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.order-detail-status__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.order-detail-status__tabs {
+    padding: 0;
+}
+
+.order-detail-status p,
+.order-detail-info p,
+.order-support-card p {
+    margin: 0;
+}
+
+.order-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.order-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.order-detail-info__block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.order-support-card {
+    background: var(--stone-100);
+}
+
+.order-support-card h2 {
+    margin: 0;
+}
+
+@media (min-width: 900px) {
+    .order-detail-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }

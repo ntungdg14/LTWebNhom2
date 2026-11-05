@@ -1,4 +1,5 @@
 {% extends "layouts/base_store.html" %}
+{% import "layouts/macros/_commerce.html" as commerce %}
 {% block title %}Thanh toán - FREESION{% endblock %}
 
 {% block styles %}
@@ -34,7 +35,7 @@
 
             <section class="form-stack">
                 <h2>Phương thức thanh toán</h2>
-                <p class="muted" style="font-size:0.75rem;">Tất cả giao dịch được bảo mật. Freesion không lưu thông tin thẻ của bạn.</p>
+                <p class="muted text-xs">Tất cả giao dịch được bảo mật. Freesion không lưu thông tin thẻ của bạn.</p>
                 <label class="choice">
                     <span class="choice-left"><input type="radio" name="payment" checked> Thanh toán khi nhận hàng (COD)<br><small>Thanh toán bằng tiền mặt cho nhân viên giao hàng.</small></span>
                     <span>COD</span>
@@ -47,31 +48,17 @@
             </section>
 
             <div class="form-stack">
-                <button type="submit" class="btn btn-block">Đặt hàng · 1.257.300₫</button>
-                <p class="muted" style="text-align:center; font-size:0.75rem;">Thông tin của bạn luôn được bảo mật.</p>
+                <button type="submit" class="btn btn-block">Đặt hàng · {{ order.total|vnd }}</button>
+                <p class="muted text-xs text-center">Thông tin của bạn luôn được bảo mật.</p>
                 <a href="{{ url_for('checkout.shipping') }}" class="link-underline">← Quay lại thông tin giao hàng</a>
             </div>
         </div>
 
-        <aside class="summary split-side">
-            <h2>Tóm tắt đơn hàng</h2>
-            <p class="muted" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
-            <div class="order-line">
-                <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
-                <span>498.000₫</span>
-            </div>
-            <div class="order-line">
-                <div class="media media-sm media-beige">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
-                <span>899.000₫</span>
-            </div>
-            <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
-            <p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>
-        </aside>
+        {{ commerce.order_summary_card(
+            order,
+            extra_class='split-side',
+            note='Đã bao gồm thuế GTGT.'
+        ) }}
     </form>
 </div>
 {% endblock %}

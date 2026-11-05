@@ -39,7 +39,21 @@
     gap: 1.5rem;
 }
 
-.product-info header {
+/* Mỗi nhóm thông tin là MỘT container thật (article/header); khoảng cách
+   giữa các phần tử con do flex `gap` quyết định, không phải margin rời rạc. */
+.info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.info-card > * {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.product-info header.info-card--head {
     border-bottom: 1px solid var(--stone-200);
     padding-bottom: 1.5rem;
 }
@@ -76,15 +90,37 @@
     border-color: var(--stone-900);
 }
 
-.notes {
+/* Card "Mô tả sản phẩm": mô tả + toàn bộ thông số nằm chung 1 article. */
+.product-description-card {
     border-top: 1px solid var(--stone-200);
     padding-top: 1.5rem;
     font-size: 0.875rem;
     color: var(--stone-600);
 }
 
-.notes p {
-    margin: 0 0 1rem;
+.product-description-card__body {
+    margin: 0;
+}
+
+.product-description-card__specs {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+}
+
+.product-description-card__spec {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.product-description-card__spec dt,
+.product-description-card__spec dd {
+    margin: 0;
+}
+
+.product-description-card__spec dd {
+    text-align: right;
 }
 
 .related {
