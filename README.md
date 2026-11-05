@@ -32,16 +32,34 @@ python -m unittest discover -s tests -v
 .
 ├── app/
 │   ├── __init__.py              # application factory: nạp config, đăng ký blueprint
-│   ├── config.py                # Development / Production / Testing config
+│   ├── config.py                # Development / Production / Testing config (+ phí ship, thanh toán)
+│   ├── db.py                    # kết nối SQLite, transaction, lệnh flask init-db / seed-db
+│   ├── schema.sql               # schema CSDL (SQLite)
+│   ├── seed.py                  # dữ liệu mẫu (danh mục, màu, sản phẩm, mã giảm giá, tỉnh/phường)
 │   ├── blueprints/              # mỗi nhóm chức năng là một package Blueprint
 │   │   ├── __init__.py          # danh sách blueprint đăng ký vào app
 │   │   ├── store/               #    /  /shop  /product  /cart  /terms  /privacy  /help
+│   │   │   ├── routes.py        #    trang HTML
+│   │   │   ├── api.py           #    API sản phẩm: /api/home, /categories, /colors, /products...
+│   │   │   └── cart_api.py      #    API giỏ hàng + mã giảm giá: /api/cart...
 │   │   ├── auth/                #    /login  /register  /forgot-password
+│   │   │   ├── routes.py
+│   │   │   └── api.py           #    /api/auth/... (đăng ký, đăng nhập, quên/đặt lại mật khẩu)
 │   │   ├── checkout/            #    /checkout/shipping  /checkout  /order-success
+│   │   │   ├── routes.py
+│   │   │   ├── api.py           #    /api/checkout/options, /api/orders...
+│   │   │   └── locations_api.py #    /api/provinces, /api/provinces/<code>/wards
 │   │   ├── account/             #    /account  /account/orders/<id>  /address  /wishlist
-│   │   └── admin/               #    /admin + 17 route quản trị (xem bảng đường dẫn)
+│   │   │   ├── routes.py
+│   │   │   └── api.py           #    /api/account/... (hồ sơ, địa chỉ, yêu thích, đơn của tôi)
+│   │   └── admin/               #    /admin + 17 route quản trị (không có API)
 │   │       ├── __init__.py      # khai báo Blueprint
 │   │       └── routes.py        # view + render_template
+│   ├── common/                  # dùng chung cho các file api.py
+│   │   ├── errors.py            # lỗi JSON cho mọi URL /api/...
+│   │   ├── helpers.py           # ApiError, kiểm tra dữ liệu, đăng nhập theo session
+│   │   ├── serializers.py       # định dạng JSON trả về
+│   │   └── services.py          # giỏ hàng, giá, mã giảm giá, phí ship
 │   ├── templates/
 │   │   ├── layouts/             # base.html + các layout kế thừa theo khu vực
 │   │   │   ├── partials/        # _site_header, _site_footer, _admin_sidebar, _account_nav,
@@ -57,6 +75,7 @@ python -m unittest discover -s tests -v
 │       ├── js/nav-indicator.js  # đo vị trí tab; hiệu ứng trượt do CSS đảm nhận
 │       └── images/              # dành cho ảnh sản phẩm về sau
 ├── tests/test_routes.py         # 29 test: route, link, form, header, footer
+├── tests/test_api.py            # 33 test API (SQLite tạm + dữ liệu mẫu)
 ├── .github/
 │   ├── workflows/ci.yml         # build + test trên mỗi PR (GitHub Actions)
 │   └── pull_request_template.md # mẫu mô tả PR
@@ -83,6 +102,46 @@ app/static/css/
     └── admin/       admin.css (chung)  dashboard.css  products.css  orders.css  users.css
                      forms.css (4 form mới)
 ```
+
+## API
+
+Mỗi blueprint có file `api.py` riêng (xem cây thư mục), URL bắt đầu bằng `/api`, dùng SQLite theo `app/schema.sql`. Mỗi package khai báo thêm một blueprint `*_api_bp` (`url_prefix="/api"`) trong `__init__.py`.
+**Không có API quản trị.** Các trang HTML hiện tại vẫn là mock; giao diện gọi API bằng `fetch` khi cần.
+
+```bash
+flask --app run init-db     # tạo bảng (cũng tự chạy khi khởi động app)
+flask --app run seed-db     # nạp dữ liệu mẫu (chỉ khi chưa có sản phẩm)
+```
+
+File CSDL mặc định `instance/freesion.db`; đổi bằng biến môi trường `DATABASE`.
+
+Quy ước: body gửi lên là JSON (`Content-Type: application/json`); đăng nhập bằng cookie session.
+Lỗi luôn có dạng `{"error": {"code", "message", "fields"?}}` (400 sai tham số, 401 chưa đăng nhập,
+404 không thấy, 409 xung đột như hết hàng, 422 dữ liệu không hợp lệ).
+
+| Nhóm | Phương thức & đường dẫn | Mô tả |
+| --- | --- | --- |
+| Auth | `POST /api/auth/register` · `login` · `logout` · `GET /api/auth/me` | Đăng ký (tự đăng nhập), đăng nhập (`remember`), đăng xuất, người dùng hiện tại |
+| Auth | `POST /api/auth/forgot-password` · `reset-password` | Token lưu dạng SHA-256, hết hạn 60 phút, dùng một lần |
+| Cửa hàng | `GET /api/home` · `/api/categories` · `/api/colors` | Dữ liệu trang chủ, danh mục, nhóm màu cho bộ lọc |
+| Cửa hàng | `GET /api/products` | Lọc `department, category, color, size, price_min, price_max, q, is_new, sale, featured, exclude`; `sort`; `page, per_page`; kèm `facets` đếm theo danh mục |
+| Cửa hàng | `GET /api/products/<slug>` · `/related` | Chi tiết (ảnh, màu → size → `variant_id`/tồn kho, điểm đánh giá) và sản phẩm gợi ý |
+| Cửa hàng | `GET/POST /api/products/<slug>/reviews` | Danh sách đánh giá + thống kê sao/độ vừa vặn; gửi đánh giá (cần đăng nhập, `verified` nếu đã nhận hàng) |
+| Giỏ hàng | `GET/DELETE /api/cart` | Giỏ của khách (cookie) hoặc người dùng; `?shipping_method=standard\|express` để tính phí |
+| Giỏ hàng | `POST /api/cart/items` · `PATCH/DELETE /api/cart/items/<id>` | Thêm (cộng dồn), đổi số lượng (0 = xóa), xóa dòng; kiểm tồn kho |
+| Giỏ hàng | `POST/DELETE /api/cart/coupon` | Áp / bỏ mã giảm giá (kiểm tra hạn, đơn tối thiểu, mức giảm tối đa) |
+| Đặt hàng | `GET /api/checkout/options` | Phương thức giao hàng (phí + ngày dự kiến) và thanh toán |
+| Đặt hàng | `POST /api/orders` · `GET /api/orders/<code>` | Tạo đơn từ giỏ (trừ kho trong một transaction, server tự tính tiền); xem đơn |
+| Tài khoản | `GET/PATCH /api/account/profile` · `POST /password` · `POST /logout-all` | Hồ sơ, đổi mật khẩu, đăng xuất mọi thiết bị |
+| Tài khoản | `GET/POST /api/account/addresses` · `PATCH/DELETE /<id>` · `POST /<id>/default` | Sổ địa chỉ (địa chỉ đầu tiên tự là mặc định) |
+| Tài khoản | `GET/POST /api/account/wishlist` · `DELETE /api/account/wishlist/<product_id>` | Yêu thích |
+| Tài khoản | `GET /api/account/orders` · `POST /<code>/cancel` · `POST /<code>/reorder` | Lịch sử (`status=all\|processing\|delivered\|cancelled`, `q`), hủy đơn, mua lại |
+| Địa chỉ | `GET /api/provinces` · `/api/provinces/<code>/wards` | Tỉnh/thành và phường/xã |
+
+Ghi chú nghiệp vụ: miễn phí ship chuẩn từ 499.000₫ (nếu không: 30.000₫), giao nhanh 35.000₫ — chỉnh trong
+`config.py`. Thanh toán online (VNPAY/MoMo/thẻ) chưa tích hợp cổng nên đơn ở trạng thái `unpaid`
+(`requires_online_payment: true`). Chưa có dịch vụ email: ở Development/Testing, `forgot-password` trả kèm
+`reset_token` để thử.
 
 ## Header cửa hàng
 
