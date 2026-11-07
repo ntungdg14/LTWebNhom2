@@ -8,6 +8,7 @@
     GET  /api/products/<slug>/related       "Có thể bạn cũng thích"
     GET  /api/products/<slug>/reviews       đánh giá (phân trang)
     POST /api/products/<slug>/reviews       gửi đánh giá (cần đăng nhập)
+    PATCH/DELETE /api/reviews/<id>          sửa / xóa đánh giá của chính mình
 
 Tham số của /api/products:
     department=nu|nam|phu-kien   category=ao-so-mi,quan-jean   color=den,trang (nhóm màu)
@@ -277,3 +278,52 @@ def create_review(slug):
 def product_reviews(slug):
     """Một URL, hai phương thức (test kiểm tra mỗi đường dẫn chỉ đăng ký một lần)."""
     return create_review(slug) if request.method == "POST" else list_reviews(slug)
+
+
+def _own_review(db, review_id: int):
+    user = current_user()
+    if user is None:
+        raise ApiError("Bạn cần đăng nhập để thực hiện thao tác này.", 401, "unauthorized")
+    row = db.execute("SELECT * FROM reviews WHERE id = ? AND user_id = ?", (review_id, user["id"])).fetchone()
+    if row is None:  # không phân biệt "không tồn tại" và "của người khác"
+        raise ApiError("Không tìm thấy đánh giá.", 404, "review_not_found")
+    return row
+
+
+def update_review(review_id):
+    db = get_db()
+    row = _own_review(db, review_id)
+    incoming = json_body()
+    editable = ("rating", "fit", "title", "body", "body_info", "city")
+    if not any(k in incoming for k in editable):
+        raise ApiError("Không có thông tin nào để cập nhật.", 400, "empty_update")
+    # Trường vắng mặt giữ nguyên giá trị cũ; gửi null để xóa trường tùy chọn (fit, title, body_info, city).
+    data = {**{k: row[k] for k in editable}, **{k: incoming[k] for k in editable if k in incoming}}
+    f = Fields(data)
+    values = {
+        "rating": f.integer("rating", "Số sao", minimum=1, maximum=5),
+        "fit": f.integer("fit", "Độ vừa vặn", minimum=1, maximum=5, required=False),
+        "title": f.text("title", "Tiêu đề", required=False, max_len=120),
+        "body": f.text("body", "Nội dung đánh giá", max_len=2000),
+        "body_info": f.text("body_info", "Thông tin cơ thể", required=False, max_len=120),
+        "city": f.text("city", "Thành phố", required=False, max_len=80),
+    }
+    f.done()
+    db.execute(
+        "UPDATE reviews SET rating = ?, fit = ?, title = ?, body = ?, body_info = ?, city = ? WHERE id = ?",
+        (*values.values(), row["id"]),
+    )
+    review = db.execute("SELECT * FROM reviews WHERE id = ?", (row["id"],)).fetchone()
+    return jsonify(review=review_json(review), summary=review_summary(db, row["product_id"]))
+
+
+def delete_review(review_id):
+    db = get_db()
+    row = _own_review(db, review_id)
+    db.execute("DELETE FROM reviews WHERE id = ?", (row["id"],))
+    return jsonify(ok=True, summary=review_summary(db, row["product_id"]))
+
+
+@api_bp.route("/reviews/<int:review_id>", methods=["PATCH", "DELETE"])
+def my_review(review_id):
+    return delete_review(review_id) if request.method == "DELETE" else update_review(review_id)

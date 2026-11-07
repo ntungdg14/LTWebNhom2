@@ -3,6 +3,8 @@
     GET  /api/checkout/options      phương thức giao hàng (kèm phí/ngày dự kiến theo giỏ hiện tại) + thanh toán
     POST /api/orders                tạo đơn từ giỏ hàng hiện tại
     GET  /api/orders/<code>         xem đơn (chủ đơn, hoặc khách vừa đặt trong cùng phiên)
+    GET  /api/orders/<code>/tracking    theo dõi đơn (mô phỏng: dựng timeline từ cột orders.status)
+    POST /api/orders/<code>/simulate    "đẩy" đơn sang bước kế tiếp để demo (cần ORDER_SIMULATION hoặc admin)
 
 Tạo đơn chạy trong một transaction: kiểm tồn kho -> trừ kho -> ghi đơn/dòng hàng/mốc thời gian -> xóa giỏ.
 Giá, giảm giá, phí ship và tổng tiền luôn do server tính lại, không tin số liệu từ client.
@@ -16,8 +18,9 @@ from flask import current_app, jsonify, session
 
 from ...db import get_db, transaction
 from . import checkout_api_bp as api_bp
-from ...common.helpers import ApiError, Fields, current_user, json_body
+from ...common.helpers import ApiError, Fields, current_user, json_body, optional_json_body
 from ...common.serializers import order_json
+from ...common.tracking import advance_order, tracking_json
 from ...common.services import (
     compute_totals,
     estimated_delivery,
@@ -68,8 +71,8 @@ def _remember_order(code: str) -> None:
 
 def can_view_order(order) -> bool:
     user = current_user()
-    if user is not None and order["user_id"] == user["id"]:
-        return True
+    if user is not None and (order["user_id"] == user["id"] or user["role"] == "admin"):
+        return True  # chủ đơn hoặc shop (admin)
     return order["code"] in session.get("order_codes", [])
 
 
@@ -186,3 +189,31 @@ def get_order(code):
     if order is None or not can_view_order(order):
         raise ApiError("Không tìm thấy đơn hàng.", 404, "order_not_found")
     return jsonify(order=order_json(db, order))
+
+
+def _viewable_order(db, code: str):
+    order = db.execute("SELECT * FROM orders WHERE code = ?", (code.upper(),)).fetchone()
+    if order is None or not can_view_order(order):
+        raise ApiError("Không tìm thấy đơn hàng.", 404, "order_not_found")
+    return order
+
+
+@api_bp.get("/orders/<code>/tracking")
+def track_order(code):
+    db = get_db()
+    return jsonify(tracking=tracking_json(db, _viewable_order(db, code)))
+
+
+@api_bp.post("/orders/<code>/simulate")
+def simulate_order(code):
+    """Demo: chuyển đơn sang bước tiếp theo (body tùy chọn: {"to": "shipping"} để nhảy tới bước đó)."""
+    db = get_db()
+    user = current_user()
+    if not current_app.config.get("ORDER_SIMULATION") and not (user is not None and user["role"] == "admin"):
+        raise ApiError("Chức năng mô phỏng vận chuyển đang tắt.", 403, "simulation_disabled")
+    order = _viewable_order(db, code)
+    to = optional_json_body().get("to")
+    with transaction(db):
+        order = db.execute("SELECT * FROM orders WHERE id = ?", (order["id"],)).fetchone()
+        order = advance_order(db, order, to)
+    return jsonify(order=order_json(db, order), tracking=tracking_json(db, order))

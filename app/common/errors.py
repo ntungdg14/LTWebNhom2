@@ -22,5 +22,5 @@ def register_error_handlers(app: Flask) -> None:
         name = getattr(err, "name", "Internal Server Error")
         return error_response(getattr(err, "description", None) or name, code, name.lower().replace(" ", "_"))
 
-    for status in (400, 401, 404, 405, 413, 500):
+    for status in (400, 401, 403, 404, 405, 413, 500):
         app.register_error_handler(status, handle_http_error)

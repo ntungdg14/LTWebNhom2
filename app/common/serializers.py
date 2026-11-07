@@ -135,8 +135,10 @@ def review_summary(db, product_id: int) -> dict:
 
 
 def review_json(r) -> dict:
+    user = current_user()
     return {
         "id": r["id"],
+        "is_mine": user is not None and r["user_id"] is not None and r["user_id"] == user["id"],
         "author_name": r["author_name"],
         "city": r["city"],
         "rating": r["rating"],
@@ -237,6 +239,13 @@ def order_json(db, order, items=None, *, with_events: bool = True) -> dict:
         items = db.execute("SELECT * FROM order_items WHERE order_id = ? ORDER BY id", (order["id"],)).fetchall()
     method = order["shipping_method"]
     method_info = shipping_methods().get(method)
+    # Đơn đã giao: sản phẩm nào chủ đơn đã đánh giá rồi thì không cho đánh giá nữa.
+    reviewed: set[int] = set()
+    if order["status"] == "delivered" and order["user_id"] is not None:
+        reviewed = {
+            r["product_id"]
+            for r in db.execute("SELECT product_id FROM reviews WHERE user_id = ?", (order["user_id"],))
+        }
     payload = {
         "id": order["id"],
         "code": order["code"],
@@ -280,6 +289,13 @@ def order_json(db, order, items=None, *, with_events: bool = True) -> dict:
                 "compare_price": i["compare_price"],
                 "quantity": i["quantity"],
                 "line_total": i["price"] * i["quantity"],
+                "reviewed": i["product_id"] in reviewed,
+                "can_review": (
+                    order["status"] == "delivered"
+                    and order["user_id"] is not None
+                    and i["product_id"] is not None
+                    and i["product_id"] not in reviewed
+                ),
             }
             for i in items
         ],

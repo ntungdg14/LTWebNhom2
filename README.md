@@ -52,14 +52,18 @@ python -m unittest discover -s tests -v
 │   │   ├── account/             #    /account  /account/orders/<id>  /address  /wishlist
 │   │   │   ├── routes.py
 │   │   │   └── api.py           #    /api/account/... (hồ sơ, địa chỉ, yêu thích, đơn của tôi)
-│   │   └── admin/               #    /admin + 17 route quản trị (không có API)
+│   │   ├── chat/                #    chỉ có API (chưa có trang HTML)
+│   │   │   ├── __init__.py      #    chat_api_bp
+│   │   │   └── api.py           #    /api/chat/... (khách) và /api/shop/chat/... (shop = admin)
+│   │   └── admin/               #    /admin + 17 route quản trị (trang HTML, không có API)
 │   │       ├── __init__.py      # khai báo Blueprint
 │   │       └── routes.py        # view + render_template
 │   ├── common/                  # dùng chung cho các file api.py
 │   │   ├── errors.py            # lỗi JSON cho mọi URL /api/...
 │   │   ├── helpers.py           # ApiError, kiểm tra dữ liệu, đăng nhập theo session
 │   │   ├── serializers.py       # định dạng JSON trả về
-│   │   └── services.py          # giỏ hàng, giá, mã giảm giá, phí ship
+│   │   ├── services.py          # giỏ hàng, giá, mã giảm giá, phí ship
+│   │   └── tracking.py          # theo dõi đơn (mô phỏng): timeline từ orders.status, đẩy đơn sang bước kế
 │   ├── templates/
 │   │   ├── layouts/             # base.html + các layout kế thừa theo khu vực
 │   │   │   ├── partials/        # _site_header, _site_footer, _admin_sidebar, _account_nav,
@@ -75,7 +79,7 @@ python -m unittest discover -s tests -v
 │       ├── js/nav-indicator.js  # đo vị trí tab; hiệu ứng trượt do CSS đảm nhận
 │       └── images/              # dành cho ảnh sản phẩm về sau
 ├── tests/test_routes.py         # 29 test: route, link, form, header, footer
-├── tests/test_api.py            # 33 test API (SQLite tạm + dữ liệu mẫu)
+├── tests/test_api.py            # 46 test API (SQLite tạm + dữ liệu mẫu)
 ├── .github/
 │   ├── workflows/ci.yml         # build + test trên mỗi PR (GitHub Actions)
 │   └── pull_request_template.md # mẫu mô tả PR
@@ -106,7 +110,7 @@ app/static/css/
 ## API
 
 Mỗi blueprint có file `api.py` riêng (xem cây thư mục), URL bắt đầu bằng `/api`, dùng SQLite theo `app/schema.sql`. Mỗi package khai báo thêm một blueprint `*_api_bp` (`url_prefix="/api"`) trong `__init__.py`.
-**Không có API quản trị.** Các trang HTML hiện tại vẫn là mock; giao diện gọi API bằng `fetch` khi cần.
+**Không có API quản trị** (trang `/admin` vẫn là mock); ngoại lệ duy nhất là API trả lời tin nhắn của shop (`/api/shop/chat/...`, cần `role = admin`). Các trang HTML hiện tại vẫn là mock; giao diện gọi API bằng `fetch` khi cần.
 
 ```bash
 flask --app run init-db     # tạo bảng (cũng tự chạy khi khởi động app)
@@ -126,17 +130,25 @@ Lỗi luôn có dạng `{"error": {"code", "message", "fields"?}}` (400 sai tham
 | Cửa hàng | `GET /api/home` · `/api/categories` · `/api/colors` | Dữ liệu trang chủ, danh mục, nhóm màu cho bộ lọc |
 | Cửa hàng | `GET /api/products` | Lọc `department, category, color, size, price_min, price_max, q, is_new, sale, featured, exclude`; `sort`; `page, per_page`; kèm `facets` đếm theo danh mục |
 | Cửa hàng | `GET /api/products/<slug>` · `/related` | Chi tiết (ảnh, màu → size → `variant_id`/tồn kho, điểm đánh giá) và sản phẩm gợi ý |
-| Cửa hàng | `GET/POST /api/products/<slug>/reviews` | Danh sách đánh giá + thống kê sao/độ vừa vặn; gửi đánh giá (cần đăng nhập, `verified` nếu đã nhận hàng) |
+| Cửa hàng | `GET/POST /api/products/<slug>/reviews` | Danh sách đánh giá + thống kê sao/độ vừa vặn; gửi đánh giá (cần đăng nhập, `verified` nếu đã nhận hàng, mỗi người một đánh giá/sản phẩm). Mỗi đánh giá có `is_mine` |
+| Cửa hàng | `PATCH/DELETE /api/reviews/<id>` | Sửa (chỉ gửi trường cần đổi, `null` để xóa trường tùy chọn) / xóa đánh giá của chính mình; trả lại `summary` mới. Xóa xong được đánh giá lại |
 | Giỏ hàng | `GET/DELETE /api/cart` | Giỏ của khách (cookie) hoặc người dùng; `?shipping_method=standard\|express` để tính phí |
 | Giỏ hàng | `POST /api/cart/items` · `PATCH/DELETE /api/cart/items/<id>` | Thêm (cộng dồn), đổi số lượng (0 = xóa), xóa dòng; kiểm tồn kho |
 | Giỏ hàng | `POST/DELETE /api/cart/coupon` | Áp / bỏ mã giảm giá (kiểm tra hạn, đơn tối thiểu, mức giảm tối đa) |
 | Đặt hàng | `GET /api/checkout/options` | Phương thức giao hàng (phí + ngày dự kiến) và thanh toán |
-| Đặt hàng | `POST /api/orders` · `GET /api/orders/<code>` | Tạo đơn từ giỏ (trừ kho trong một transaction, server tự tính tiền); xem đơn |
+| Đặt hàng | `POST /api/orders` · `GET /api/orders/<code>` | Tạo đơn từ giỏ (trừ kho trong một transaction, server tự tính tiền); xem đơn (chủ đơn, khách vừa đặt trong phiên, hoặc admin). Mỗi dòng hàng có `reviewed` / `can_review` (đơn đã giao và chưa đánh giá) |
+| Đặt hàng | `GET /api/orders/<code>/tracking` | Theo dõi đơn **(mô phỏng)**: đọc cột `orders.status` rồi trả `steps` (`done`/`current`/`upcoming`, kèm mốc giờ từ `order_events`), `current_step`, `tracking_number` (từ bước đang giao), `estimated_delivery`. Đơn hủy: các bước đã qua + bước `cancelled` |
+| Đặt hàng | `POST /api/orders/<code>/simulate` | Demo: đẩy đơn sang bước kế (`pending → preparing → shipping → delivered`); body tùy chọn `{"to": "shipping"}` để nhảy tới bước đó. Khi `delivered` ghi `delivered_at`, đơn COD chuyển `paid`. Chỉ khi `ORDER_SIMULATION` bật (Development/Testing) hoặc là admin |
 | Tài khoản | `GET/PATCH /api/account/profile` · `POST /password` · `POST /logout-all` | Hồ sơ, đổi mật khẩu, đăng xuất mọi thiết bị |
 | Tài khoản | `GET/POST /api/account/addresses` · `PATCH/DELETE /<id>` · `POST /<id>/default` | Sổ địa chỉ (địa chỉ đầu tiên tự là mặc định) |
 | Tài khoản | `GET/POST /api/account/wishlist` · `DELETE /api/account/wishlist/<product_id>` | Yêu thích |
 | Tài khoản | `GET /api/account/orders` · `POST /<code>/cancel` · `POST /<code>/reorder` | Lịch sử (`status=all\|processing\|delivered\|cancelled`, `q`), hủy đơn, mua lại |
+| Tài khoản | `GET /api/account/reviews` | `items`: đánh giá của tôi (kèm sản phẩm); `pending`: sản phẩm đã nhận hàng nhưng chưa đánh giá (kèm mã đơn) |
+| Nhắn tin (khách) | `GET /api/chat/conversation` · `GET/POST /api/chat/messages` · `GET /api/chat/unread` | Mỗi khách một hội thoại với shop, tạo ở tin đầu tiên. Gửi `{body, order_code?, product_slug?}` (gắn đơn/sản phẩm đang hỏi). Lấy tin: `limit`, `before_id` (tin cũ), `after_id` (polling tin mới), `mark_read=0` để không đánh dấu đã đọc |
+| Nhắn tin (shop, admin) | `GET /api/shop/chat/conversations` · `GET/POST /api/shop/chat/conversations/<id>/messages` · `GET /api/shop/chat/unread` | Hộp thư của shop (`q` tên/email khách, `unread=1`, phân trang), đọc + trả lời từng khách. Khách thường gọi sẽ nhận 403 |
 | Địa chỉ | `GET /api/provinces` · `/api/provinces/<code>/wards` | Tỉnh/thành và phường/xã |
+
+Theo dõi đơn: chưa có đơn vị vận chuyển thật nên trạng thái hoàn toàn dựa vào cột `orders.status` (`pending`, `preparing`, `shipping`, `delivered`, `cancelled`); giao diện chỉ cần gọi `/tracking` và hiển thị theo `steps`. Chưa có websocket: chat dùng polling (`after_id`). Đặt `ORDER_SIMULATION = True` trong config để khách tự bấm "đẩy đơn" khi demo; production mặc định tắt. Bảng `conversations`/`messages` nằm trong `schema.sql` (`CREATE TABLE IF NOT EXISTS`), DB cũ tự có bảng mới khi khởi động app. Admin chưa có API đăng ký: đặt `UPDATE users SET role = 'admin' WHERE email = '...'` để có tài khoản shop.
 
 Ghi chú nghiệp vụ: miễn phí ship chuẩn từ 499.000₫ (nếu không: 30.000₫), giao nhanh 35.000₫ — chỉnh trong
 `config.py`. Thanh toán online (VNPAY/MoMo/thẻ) chưa tích hợp cổng nên đơn ở trạng thái `unpaid`

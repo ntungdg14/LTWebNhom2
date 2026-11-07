@@ -429,6 +429,234 @@ class AccountTests(ApiTestCase):
         self.assertTrue(res["review"]["verified"])
 
 
+def make_admin(case, email="shop@example.com"):
+    """Tạo client đã đăng nhập bằng tài khoản admin (admin không có API đăng ký, nên sửa role trực tiếp trong DB)."""
+    client = case.app.test_client()
+    case.register(email, client=client)
+    conn = connect(case.db_path)
+    conn.execute("UPDATE users SET role = 'admin' WHERE email = ?", (email,))
+    conn.close()
+    return client
+
+
+class TrackingTests(ApiTestCase):
+    def _order(self):
+        self.register()
+        self.add_to_cart(self.variant_id(), 1)
+        return self.call("post", "/api/orders", self.SHIPPING, expect=201)["order"]
+
+    def test_tracking_follows_status_column(self):
+        order = self._order()
+        code = order["code"]
+        t = self.call("get", f"/api/orders/{code}/tracking", expect=200)["tracking"]
+        self.assertEqual((t["status"], t["current_step"]), ("pending", 0))
+        self.assertEqual([s["state"] for s in t["steps"]], ["current", "upcoming", "upcoming", "upcoming"])
+        self.assertIsNone(t["tracking_number"])
+        self.assertIn("estimated_delivery", t)
+
+        # Đổi cột status trong DB -> tracking hiện đúng trạng thái tương ứng.
+        conn = connect(self.db_path)
+        conn.execute("UPDATE orders SET status = 'shipping' WHERE code = ?", (code,))
+        conn.close()
+        t = self.call("get", f"/api/orders/{code}/tracking")["tracking"]
+        self.assertEqual([s["state"] for s in t["steps"]], ["done", "done", "current", "upcoming"])
+        self.assertEqual(t["status_label"], "Đang giao hàng")
+        self.assertTrue(t["tracking_number"].startswith("FX"))
+
+    def test_tracking_is_private(self):
+        code = self._order()["code"]
+        self.call("get", f"/api/orders/{code}/tracking", client=self.app.test_client(), expect=404)
+        self.call("get", "/api/orders/FR000000000/tracking", expect=404)
+
+    def test_simulate_advance_to_delivered(self):
+        code = self._order()["code"]
+        res = self.call("post", f"/api/orders/{code}/simulate", {}, expect=200)
+        self.assertEqual(res["order"]["status"], "preparing")
+        res = self.call("post", f"/api/orders/{code}/simulate", {"to": "delivered"}, expect=200)
+        order, t = res["order"], res["tracking"]
+        self.assertEqual([e["status"] for e in order["events"]], ["pending", "preparing", "shipping", "delivered"])
+        self.assertTrue(t["is_delivered"])
+        self.assertEqual([s["state"] for s in t["steps"]], ["done"] * 4)
+        self.assertEqual((order["payment_status"], bool(order["delivered_at"])), ("paid", True))  # COD thu khi giao
+        self.call("post", f"/api/orders/{code}/simulate", {}, expect=409)  # đã giao xong
+        self.call("post", f"/api/orders/{code}/simulate", {"to": "pending"}, expect=409)
+
+    def test_simulate_rejects_bad_target_and_cancelled(self):
+        code = self._order()["code"]
+        bad = self.call("post", f"/api/orders/{code}/simulate", {"to": "pending"}, expect=422)
+        self.assertEqual(bad["error"]["code"], "invalid_status")
+        self.call("post", f"/api/account/orders/{code}/cancel", {}, expect=200)
+        t = self.call("get", f"/api/orders/{code}/tracking")["tracking"]
+        self.assertTrue(t["is_cancelled"])
+        self.assertEqual([s["state"] for s in t["steps"]], ["done", "cancelled"])
+        self.call("post", f"/api/orders/{code}/simulate", {}, expect=409)
+
+    def test_simulation_can_be_disabled(self):
+        code = self._order()["code"]
+        self.app.config["ORDER_SIMULATION"] = False
+        self.call("post", f"/api/orders/{code}/simulate", {}, expect=403)
+        # admin vẫn được phép dù mô phỏng đang tắt, và xem được đơn của khách
+        shop = make_admin(self)
+        res = self.call("post", f"/api/orders/{code}/simulate", {}, client=shop, expect=200)
+        self.assertEqual(res["order"]["status"], "preparing")
+        self.assertEqual(self.call("get", f"/api/orders/{code}/tracking")["tracking"]["status"], "preparing")
+
+
+class ChatTests(ApiTestCase):
+    def setUp(self):
+        super().setUp()
+        self.shop = make_admin(self)
+        self.register()  # self.client = khách
+
+    def test_requires_login_and_admin(self):
+        anon = self.app.test_client()
+        self.call("get", "/api/chat/messages", client=anon, expect=401)
+        self.call("post", "/api/chat/messages", {"body": "hi"}, client=anon, expect=401)
+        self.call("get", "/api/shop/chat/conversations", client=anon, expect=401)
+        self.call("get", "/api/shop/chat/conversations", expect=403)  # khách thường không vào được phía shop
+        self.call("post", "/api/shop/chat/conversations/1/messages", {"body": "x"}, expect=403)
+
+    def test_customer_to_shop_and_back(self):
+        self.assertIsNone(self.call("get", "/api/chat/conversation", expect=200)["conversation"])
+        self.assertEqual(self.call("get", "/api/chat/messages")["items"], [])
+        self.call("post", "/api/chat/messages", {"body": "   "}, expect=422)
+        sent = self.call("post", "/api/chat/messages", {"body": "Shop ơi còn size M không?"}, expect=201)
+        conv_id = sent["conversation_id"]
+        self.assertTrue(sent["message"]["is_mine"])
+        self.call("post", "/api/chat/messages", {"body": "Mình cần gấp ạ"}, expect=201)
+
+        # Shop thấy hội thoại với 2 tin chưa đọc
+        inbox = self.call("get", "/api/shop/chat/conversations", client=self.shop, expect=200)
+        self.assertEqual((inbox["total"], inbox["items"][0]["unread"]), (1, 2))
+        self.assertEqual(inbox["items"][0]["customer"]["email"], "minhanh@example.com")
+        self.assertEqual(self.call("get", "/api/shop/chat/unread", client=self.shop)["unread"], 2)
+        self.assertEqual(self.call("get", "/api/shop/chat/conversations?unread=1", client=self.shop)["total"], 1)
+        self.assertEqual(self.call("get", "/api/shop/chat/conversations?q=minh+anh", client=self.shop)["total"], 1)
+        self.assertEqual(self.call("get", "/api/shop/chat/conversations?q=khongco", client=self.shop)["total"], 0)
+
+        msgs = self.call("get", f"/api/shop/chat/conversations/{conv_id}/messages", client=self.shop)
+        self.assertEqual([m["body"] for m in msgs["items"]], ["Shop ơi còn size M không?", "Mình cần gấp ạ"])
+        self.assertFalse(msgs["items"][0]["is_mine"])
+        self.assertEqual(msgs["unread"], 0)  # đọc xong là hết chưa đọc
+        self.assertEqual(self.call("get", "/api/shop/chat/unread", client=self.shop)["unread"], 0)
+
+        self.call("post", f"/api/shop/chat/conversations/{conv_id}/messages", {"body": "Còn nhé bạn!"}, client=self.shop, expect=201)
+        self.call("post", "/api/shop/chat/conversations/999/messages", {"body": "x"}, client=self.shop, expect=404)
+
+        # Khách thấy 1 tin chưa đọc, đọc xong thì shop thấy tin của mình đã được đọc
+        self.assertEqual(self.call("get", "/api/chat/unread")["unread"], 1)
+        self.assertEqual(self.call("get", "/api/chat/conversation")["conversation"]["unread"], 1)
+        mine = self.call("get", "/api/chat/messages")
+        self.assertEqual([m["sender"] for m in mine["items"]], ["customer", "customer", "shop"])
+        self.assertEqual(mine["unread"], 0)
+        again = self.call("get", f"/api/shop/chat/conversations/{conv_id}/messages", client=self.shop)
+        self.assertTrue(again["items"][-1]["is_mine"])
+        self.assertTrue(again["items"][0]["read"] is True)  # tin khách gửi: shop đã đọc
+
+    def test_polling_and_paging(self):
+        for i in range(5):
+            self.call("post", "/api/chat/messages", {"body": f"tin {i}"}, expect=201)
+        newest = self.call("get", "/api/chat/messages?limit=2")
+        self.assertEqual([m["body"] for m in newest["items"]], ["tin 3", "tin 4"])
+        self.assertTrue(newest["has_more"])
+        older = self.call("get", f"/api/chat/messages?limit=2&before_id={newest['items'][0]['id']}")
+        self.assertEqual([m["body"] for m in older["items"]], ["tin 1", "tin 2"])
+        last_id = newest["items"][-1]["id"]
+        self.assertEqual(self.call("get", f"/api/chat/messages?after_id={last_id}")["items"], [])
+        self.call("post", "/api/chat/messages", {"body": "tin 5"}, expect=201)
+        fresh = self.call("get", f"/api/chat/messages?after_id={last_id}")
+        self.assertEqual([m["body"] for m in fresh["items"]], ["tin 5"])
+        self.call("get", "/api/chat/messages?after_id=1&before_id=3", expect=400)
+
+    def test_attach_order_and_product(self):
+        self.add_to_cart(self.variant_id(), 1)
+        code = self.call("post", "/api/orders", self.SHIPPING, expect=201)["order"]["code"]
+        res = self.call(
+            "post", "/api/chat/messages",
+            {"body": "Đơn này bao giờ giao?", "order_code": code.lower(), "product_slug": "ao-thun-cotton-essential"},
+            expect=201,
+        )["message"]
+        self.assertEqual(res["order_code"], code)
+        self.assertEqual(res["product"]["slug"], "ao-thun-cotton-essential")
+        self.call("post", "/api/chat/messages", {"body": "x", "order_code": "FR000000000"}, expect=404)
+        self.call("post", "/api/chat/messages", {"body": "x", "product_slug": "khong-co"}, expect=404)
+        # đơn của người khác không gắn được
+        other = self.app.test_client()
+        self.register("la@example.com", client=other)
+        self.call("post", "/api/chat/messages", {"body": "x", "order_code": code}, client=other, expect=404)
+
+    def test_each_customer_has_own_conversation(self):
+        self.call("post", "/api/chat/messages", {"body": "của khách 1"}, expect=201)
+        other = self.app.test_client()
+        self.register("la@example.com", client=other)
+        self.assertEqual(self.call("get", "/api/chat/messages", client=other)["items"], [])
+        self.call("post", "/api/chat/messages", {"body": "của khách 2"}, client=other, expect=201)
+        inbox = self.call("get", "/api/shop/chat/conversations", client=self.shop)
+        self.assertEqual(inbox["total"], 2)
+        self.assertEqual(inbox["items"][0]["last_message"]["body"], "của khách 2")  # mới nhất lên đầu
+
+
+class ReviewManagementTests(ApiTestCase):
+    SLUG = "ao-thun-cotton-essential"
+
+    def setUp(self):
+        super().setUp()
+        self.register()
+
+    def _delivered_order(self):
+        self.add_to_cart(self.variant_id(), 1)
+        code = self.call("post", "/api/orders", self.SHIPPING, expect=201)["order"]["code"]
+        self.call("post", f"/api/orders/{code}/simulate", {"to": "delivered"}, expect=200)
+        return code
+
+    def test_pending_and_can_review_flow(self):
+        code = self._delivered_order()
+        order = self.call("get", f"/api/orders/{code}")["order"]
+        self.assertEqual([(i["can_review"], i["reviewed"]) for i in order["items"]], [(True, False)])
+        mine = self.call("get", "/api/account/reviews", expect=200)
+        self.assertEqual(mine["items"], [])
+        self.assertEqual([(p["slug"], p["order_code"]) for p in mine["pending"]], [(self.SLUG, code)])
+
+        self.call("post", f"/api/products/{self.SLUG}/reviews", {"rating": 5, "body": "Rất đẹp"}, expect=201)
+        order = self.call("get", f"/api/orders/{code}")["order"]
+        self.assertEqual([(i["can_review"], i["reviewed"]) for i in order["items"]], [(False, True)])
+        mine = self.call("get", "/api/account/reviews")
+        self.assertEqual((len(mine["items"]), mine["pending"]), (1, []))
+        self.assertEqual(mine["items"][0]["product"]["slug"], self.SLUG)
+        self.assertTrue(mine["items"][0]["verified"])
+
+    def test_undelivered_order_cannot_be_reviewed_from_order(self):
+        self.add_to_cart(self.variant_id(), 1)
+        code = self.call("post", "/api/orders", self.SHIPPING, expect=201)["order"]["code"]
+        order = self.call("get", f"/api/orders/{code}")["order"]
+        self.assertFalse(order["items"][0]["can_review"])
+        self.assertEqual(self.call("get", "/api/account/reviews")["pending"], [])
+
+    def test_update_and_delete_own_review(self):
+        res = self.call("post", f"/api/products/{self.SLUG}/reviews", {"rating": 3, "fit": 2, "title": "Tạm", "body": "Hơi chật"}, expect=201)
+        rid = res["review"]["id"]
+        self.assertTrue(res["review"]["is_mine"])
+        self.call("patch", f"/api/reviews/{rid}", {}, expect=400)
+        self.call("patch", f"/api/reviews/{rid}", {"rating": 7}, expect=422)
+        edited = self.call("patch", f"/api/reviews/{rid}", {"rating": 5, "body": "Giặt xong form đẹp", "title": None}, expect=200)
+        self.assertEqual((edited["review"]["rating"], edited["review"]["fit"], edited["review"]["title"]), (5, 2, None))
+        self.assertEqual(edited["summary"]["average"], 5.0)
+
+        # người khác và khách vãng lai không sửa/xóa được; người khác xem thì is_mine = False
+        other = self.app.test_client()
+        self.register("la@example.com", client=other)
+        self.call("patch", f"/api/reviews/{rid}", {"rating": 1}, client=other, expect=404)
+        self.call("delete", f"/api/reviews/{rid}", client=other, expect=404)
+        self.assertFalse(self.call("get", f"/api/products/{self.SLUG}/reviews", client=other)["items"][0]["is_mine"])
+        self.call("delete", f"/api/reviews/{rid}", client=self.app.test_client(), expect=401)
+
+        gone = self.call("delete", f"/api/reviews/{rid}", expect=200)
+        self.assertEqual(gone["summary"]["count"], 0)
+        self.call("delete", f"/api/reviews/{rid}", expect=404)
+        # xóa xong được đánh giá lại
+        self.call("post", f"/api/products/{self.SLUG}/reviews", {"rating": 4, "body": "Đánh giá lại"}, expect=201)
+
+
 class LocationTests(ApiTestCase):
     def test_provinces_and_wards(self):
         provinces = self.call("get", "/api/provinces", expect=200)["items"]

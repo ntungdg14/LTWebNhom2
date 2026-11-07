@@ -11,6 +11,7 @@
     GET        /api/account/orders                   lịch sử đơn (?status=all|processing|delivered|cancelled&q=&page=)
     POST       /api/account/orders/<code>/cancel     hủy đơn (khi pending/preparing)
     POST       /api/account/orders/<code>/reorder    "Mua lại": thêm các món còn hàng vào giỏ
+    GET        /api/account/reviews                  đánh giá của tôi (items) + sản phẩm đã nhận nhưng chưa đánh giá (pending)
 
 Chi tiết một đơn: GET /api/orders/<code> (checkout.py).
 """
@@ -27,7 +28,15 @@ from ...db import get_db, transaction
 from . import account_api_bp as api_bp
 from ..store.cart_api import respond_cart
 from ...common.helpers import ApiError, Fields, arg_int, current_user, json_body, login_required, login_user
-from ...common.serializers import PRODUCT_CARD_SELECT, address_json, order_json, orders_json, product_cards, user_json
+from ...common.serializers import (
+    PRODUCT_CARD_SELECT,
+    address_json,
+    order_json,
+    orders_json,
+    product_cards,
+    review_json,
+    user_json,
+)
 from ...common.services import find_cart, make_default_address, placeholders, set_item_quantity
 
 STATUS_GROUPS = {
@@ -324,6 +333,44 @@ def reorder(code):
     payload = response.get_json()
     payload["skipped"] = skipped
     return jsonify(payload)
+
+
+# ------------------------------------------------------------------ đánh giá
+@api_bp.get("/account/reviews")
+@login_required
+def my_reviews():
+    db = get_db()
+    uid = current_user()["id"]
+    written = db.execute(
+        """SELECT r.*, p.slug AS product_slug, p.name AS product_name
+           FROM reviews r JOIN products p ON p.id = r.product_id
+           WHERE r.user_id = ? ORDER BY r.created_at DESC, r.id DESC""",
+        (uid,),
+    ).fetchall()
+    # Sản phẩm đã nhận hàng (đơn delivered) mà chưa đánh giá; mỗi sản phẩm chỉ liệt kê một lần (đơn mới nhất).
+    pending = db.execute(
+        """SELECT p.id AS product_id, p.slug, p.name, o.code AS order_code, o.delivered_at, MAX(o.id) AS _o
+           FROM order_items oi
+           JOIN orders o ON o.id = oi.order_id
+           JOIN products p ON p.id = oi.product_id
+           WHERE o.user_id = ? AND o.status = 'delivered' AND p.status = 'active'
+             AND NOT EXISTS (SELECT 1 FROM reviews r WHERE r.user_id = o.user_id AND r.product_id = p.id)
+           GROUP BY p.id ORDER BY _o DESC""",
+        (uid,),
+    ).fetchall()
+    return jsonify(
+        items=[{**review_json(r), "product": {"slug": r["product_slug"], "name": r["product_name"]}} for r in written],
+        pending=[
+            {
+                "product_id": r["product_id"],
+                "slug": r["slug"],
+                "name": r["name"],
+                "order_code": r["order_code"],
+                "delivered_at": r["delivered_at"],
+            }
+            for r in pending
+        ],
+    )
 
 
 api_bp.add_url_rule("/account/profile", view_func=ProfileView.as_view("account_profile"))

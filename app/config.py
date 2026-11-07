@@ -49,10 +49,15 @@ class Config:
     # Chưa có dịch vụ gửi email: khi True, API quên mật khẩu trả kèm token để thử.
     EXPOSE_RESET_TOKEN = False
 
+    # Theo dõi đơn hàng mô phỏng (chưa có đơn vị vận chuyển thật): khi True, chủ đơn có thể gọi
+    # POST /api/orders/<code>/simulate để "đẩy" đơn sang bước tiếp theo. Admin luôn được phép.
+    ORDER_SIMULATION = False
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
     EXPOSE_RESET_TOKEN = True
+    ORDER_SIMULATION = True
 
 
 class ProductionConfig(Config):
@@ -65,6 +70,7 @@ class TestingConfig(Config):
     TESTING = True
     TEMPLATES_AUTO_RELOAD = False
     EXPOSE_RESET_TOKEN = True
+    ORDER_SIMULATION = True
 
 
 config_by_name = {

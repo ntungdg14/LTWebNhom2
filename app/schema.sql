@@ -223,3 +223,24 @@ CREATE TABLE IF NOT EXISTS order_events (
     status     TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
+
+-- Nhắn tin khách <-> shop: mỗi khách có đúng một cuộc hội thoại với shop.
+CREATE TABLE IF NOT EXISTS conversations (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    last_message_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender          TEXT NOT NULL CHECK (sender IN ('customer', 'shop')),
+    sender_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,   -- nhân viên shop hoặc khách
+    body            TEXT NOT NULL,
+    order_code      TEXT,                                              -- tin nhắn gắn với một đơn hàng (tùy chọn)
+    product_id      INTEGER REFERENCES products(id) ON DELETE SET NULL, -- hoặc một sản phẩm (tùy chọn)
+    read_at         TEXT,                                              -- NULL = bên kia chưa đọc
+    created_at      TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id, id);

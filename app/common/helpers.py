@@ -227,3 +227,18 @@ def login_required(view):
         return view(*args, **kwargs)
 
     return wrapper
+
+
+def admin_required(view):
+    """Chỉ tài khoản role = 'admin' (phía shop). 401 nếu chưa đăng nhập, 403 nếu không phải admin."""
+
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        user = current_user()
+        if user is None:
+            raise ApiError("Bạn cần đăng nhập để thực hiện thao tác này.", 401, "unauthorized")
+        if user["role"] != "admin":
+            raise ApiError("Chỉ shop (quản trị viên) mới dùng được chức năng này.", 403, "forbidden")
+        return view(*args, **kwargs)
+
+    return wrapper
