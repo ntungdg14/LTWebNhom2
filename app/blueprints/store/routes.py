@@ -4,6 +4,7 @@ Ngoài ra có 3 trang thông tin tĩnh dùng cho các liên kết chân trang / 
 """
 from flask import render_template
 
+from ...common.helpers import login_required_page
 from . import store_bp
 
 INFO_PAGES = {
@@ -40,6 +41,7 @@ def product_detail():
 
 
 @store_bp.route("/cart")
+@login_required_page
 def cart():
     return render_template("store/cart.html")
 

@@ -7,7 +7,14 @@ import unicodedata
 
 from flask import redirect, render_template, request, url_for
 
+from ...common.helpers import check_role
 from . import admin_bp
+
+
+@admin_bp.before_request
+def require_admin():
+    """Toàn bộ /admin: chưa đăng nhập -> redirect login?next=...; không phải admin -> 403."""
+    return check_role("admin")
 
 # Danh sách tài khoản dùng cho form phân quyền (mock, không có CSDL).
 ACCOUNTS = (

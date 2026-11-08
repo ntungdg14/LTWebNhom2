@@ -8,8 +8,6 @@
 
 {% block content %}
 <div class="page">
-    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Áo khoác bomber Uniform</p>
-
     <div class="detail-layout">
         <section aria-label="Hình ảnh sản phẩm">
             <div class="product-gallery">
@@ -55,8 +53,15 @@
             </div>
 
             <div class="form-stack">
+                {# Khách vẫn thấy nút, bấm thì chuyển tới đăng nhập rồi quay lại trang sản phẩm #}
+                {% if current_user %}
                 <a href="{{ url_for('store.cart', add='FR-BOM-002') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
                 <a href="{{ url_for('checkout.checkout') }}" class="btn btn-accent btn-block">Mua ngay</a>
+                {% else %}
+                {% set login_url = url_for('auth.login', next=request.full_path.rstrip('?')) %}
+                <a href="{{ login_url }}" class="btn btn-block">Thêm vào giỏ hàng</a>
+                <a href="{{ login_url }}" class="btn btn-accent btn-block">Mua ngay</a>
+                {% endif %}
             </div>
 
             <div class="product-perks">

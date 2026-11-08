@@ -14,11 +14,11 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from flask import current_app, jsonify, session
+from flask import current_app, jsonify
 
 from ...db import get_db, transaction
 from . import checkout_api_bp as api_bp
-from ...common.helpers import ApiError, Fields, current_user, json_body, optional_json_body
+from ...common.helpers import ApiError, Fields, current_user, json_body, login_required, optional_json_body
 from ...common.serializers import order_json
 from ...common.tracking import advance_order, tracking_json
 from ...common.services import (
@@ -36,7 +36,7 @@ from ...common.services import (
 @api_bp.get("/checkout/options")
 def checkout_options():
     db = get_db()
-    cart = find_cart(db)
+    cart = find_cart(db) if current_user() is not None else None  # endpoint công khai: khách thấy phí chưa có giỏ
     rows = load_cart_rows(db, cart["id"]) if cart else []
     subtotal = sum(r["price"] * r["quantity"] for r in rows)
     return jsonify(
@@ -64,19 +64,13 @@ def _new_order_code(db) -> str:
     return f"{prefix}{n:03d}"
 
 
-def _remember_order(code: str) -> None:
-    codes = [c for c in session.get("order_codes", []) if c != code]
-    session["order_codes"] = (codes + [code])[-20:]
-
-
 def can_view_order(order) -> bool:
     user = current_user()
-    if user is not None and (order["user_id"] == user["id"] or user["role"] == "admin"):
-        return True  # chủ đơn hoặc shop (admin)
-    return order["code"] in session.get("order_codes", [])
+    return user is not None and (order["user_id"] == user["id"] or user["role"] == "admin")  # chủ đơn hoặc admin
 
 
 @api_bp.post("/orders")
+@login_required
 def create_order():
     db = get_db()
     user = current_user()
@@ -84,8 +78,6 @@ def create_order():
 
     # Dùng địa chỉ trong sổ địa chỉ nếu gửi address_id; các trường gửi kèm sẽ ghi đè.
     if data.get("address_id") is not None:
-        if user is None:
-            raise ApiError("Cần đăng nhập để dùng sổ địa chỉ.", 401, "unauthorized")
         saved = db.execute(
             "SELECT * FROM addresses WHERE id = ? AND user_id = ?", (data["address_id"], user["id"])
         ).fetchone()
@@ -174,7 +166,6 @@ def create_order():
                 db, user["id"], {"full_name": full_name, "phone": phone, "province": province, "ward": ward, "street": street}
             )
 
-    _remember_order(code)
     order = db.execute("SELECT * FROM orders WHERE id = ?", (order_id,)).fetchone()
     response = jsonify(order=order_json(db, order), requires_online_payment=payment != "cod")
     response.status_code = 201
@@ -182,6 +173,7 @@ def create_order():
 
 
 @api_bp.get("/orders/<code>")
+@login_required
 def get_order(code):
     db = get_db()
     order = db.execute("SELECT * FROM orders WHERE code = ?", (code.upper(),)).fetchone()
@@ -199,12 +191,14 @@ def _viewable_order(db, code: str):
 
 
 @api_bp.get("/orders/<code>/tracking")
+@login_required
 def track_order(code):
     db = get_db()
     return jsonify(tracking=tracking_json(db, _viewable_order(db, code)))
 
 
 @api_bp.post("/orders/<code>/simulate")
+@login_required
 def simulate_order(code):
     """Demo: chuyển đơn sang bước tiếp theo (body tùy chọn: {"to": "shipping"} để nhảy tới bước đó)."""
     db = get_db()

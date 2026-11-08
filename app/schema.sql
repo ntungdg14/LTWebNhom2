@@ -244,3 +244,12 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at      TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id, id);
+
+-- Giới hạn đăng nhập sai: mỗi lần sai ghi một dòng (email chuẩn hóa + IP + thời điểm, epoch giây).
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    email        TEXT NOT NULL,
+    ip           TEXT NOT NULL,
+    attempted_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_login_attempts ON login_attempts (email, ip, attempted_at);

@@ -1,8 +1,14 @@
 <aside class="account-nav">
     <p class="account-greeting">Xin chào,</p>
-    <h2>Nguyễn Minh Anh</h2>
+    <h2>{{ current_user['full_name'] }}</h2>
     <a href="{{ url_for('account.profile') }}" class="{% if request.endpoint == 'account.profile' %}is-active{% endif %}">Thông tin tài khoản</a>
     <a href="{{ url_for('account.order_history') }}" class="{% if request.endpoint.startswith('account.order') %}is-active{% endif %}">Đơn hàng của tôi</a>
     <a href="{{ url_for('account.address') }}" class="{% if request.endpoint == 'account.address' %}is-active{% endif %}">Sổ địa chỉ</a>
-    <a href="{{ url_for('auth.login') }}">Đăng xuất</a>
+    {% if current_user['role'] == 'admin' %}
+    <a href="{{ url_for('admin.dashboard') }}">Trang quản trị</a>
+    {% endif %}
+    <form action="{{ url_for('auth.logout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="account-nav-btn">Đăng xuất</button>
+    </form>
 </aside>

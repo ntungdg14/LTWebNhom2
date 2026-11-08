@@ -9,7 +9,10 @@ import re
 import unittest
 from pathlib import Path
 
-from app import create_app
+try:
+    from .support import ADMIN_EMAIL, CUSTOMER_EMAIL, add_user, csrf_token, login, make_app, remove_db
+except ImportError:  # chạy bằng: python -m unittest discover -s tests
+    from support import ADMIN_EMAIL, CUSTOMER_EMAIL, add_user, csrf_token, login, make_app, remove_db
 
 STATIC_DIR = Path(__file__).resolve().parents[1] / "app" / "static"
 
@@ -52,14 +55,45 @@ PAGES = (
 STORE_LAYOUT_PAGES = PAGES[:18]  # các trang dùng base_store.html (trừ 17 trang admin)
 ADMIN_PAGES = PAGES[18:]
 
+GUEST_ONLY_PAGES = ("/login", "/register", "/forgot-password")  # người đã đăng nhập bị chuyển về trang chủ
+FORM_ACTIONS_NOT_GET = ("/logout",)  # action của form POST, không phải liên kết GET
+
 STYLESHEET_RE = re.compile(r'<link rel="stylesheet" href="([^"]+)"')
 INTERNAL_LINK_RE = re.compile(r'(?:href|action)="([^"]*)"')
 
 
-class StructureTests(unittest.TestCase):
+class PageClient:
+    """Duyệt mọi trang như một admin đã đăng nhập (thấy được cả /cart, /account, /admin);
+    riêng trang đăng nhập / đăng ký chỉ dành cho khách nên dùng client chưa đăng nhập."""
+
+    def __init__(self, guest, admin):
+        self.guest, self.admin = guest, admin
+
+    def get(self, url, **kwargs):
+        client = self.guest if url.split("?")[0] in GUEST_ONLY_PAGES else self.admin
+        return client.get(url, **kwargs)
+
+    def post(self, url, **kwargs):
+        return self.admin.post(url, **kwargs)
+
+
+class PagesTestCase(unittest.TestCase):
+    """Nền cho các test duyệt trang: SQLite tạm, có tài khoản customer + admin."""
+
     def setUp(self):
-        self.app = create_app("testing")
-        self.client = self.app.test_client()
+        self.app, self.db_path = make_app()
+        add_user(self.db_path, CUSTOMER_EMAIL, name="Khách Hàng")
+        add_user(self.db_path, ADMIN_EMAIL, role="admin", name="Quản Trị Viên")
+        self.guest = self.app.test_client()
+        self.admin = self.app.test_client()
+        login(self.admin, ADMIN_EMAIL)
+        self.client = PageClient(self.guest, self.admin)
+
+    def tearDown(self):
+        remove_db(self.db_path)
+
+
+class StructureTests(PagesTestCase):
 
     def test_blueprints_registered(self):
         expected = {"store", "auth", "account", "checkout", "admin"}
@@ -82,7 +116,7 @@ class StructureTests(unittest.TestCase):
         for url in PAGES:
             html = self.client.get(url).get_data(as_text=True)
             for href in INTERNAL_LINK_RE.findall(html):
-                if href.startswith("/") and not href.startswith("//"):
+                if href.startswith("/") and not href.startswith("//") and href not in FORM_ACTIONS_NOT_GET:
                     links.add(href.replace("&amp;", "&"))
         self.assertGreater(len(links), 100)
         for href in sorted(links):
@@ -127,11 +161,8 @@ class StructureTests(unittest.TestCase):
         self.assertIn("is-active", self.client.get("/account/orders").get_data(as_text=True))
 
 
-class HeaderLayoutTests(unittest.TestCase):
+class HeaderLayoutTests(PagesTestCase):
     """Header 2 hàng: logo - ô tìm kiếm - tiện ích, bên dưới là thanh danh mục."""
-
-    def setUp(self):
-        self.client = create_app("testing").test_client()
 
     def test_header_has_two_rows_on_every_store_page(self):
         for url in STORE_LAYOUT_PAGES:
@@ -173,11 +204,11 @@ class HeaderLayoutTests(unittest.TestCase):
         self.assertNotIn("<img", header)
 
 
-class NavIndicatorTests(unittest.TestCase):
+class NavIndicatorTests(PagesTestCase):
     """Task 4: thanh ngang đen trượt theo nút navbar đang hover."""
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        super().setUp()
         self.html = self.client.get("/").get_data(as_text=True)
 
     def test_indicator_markup_and_assets(self):
@@ -201,11 +232,11 @@ class NavIndicatorTests(unittest.TestCase):
         self.assertNotIn("<script src=\"http", self.html)
 
 
-class MegaMenuTests(unittest.TestCase):
+class MegaMenuTests(PagesTestCase):
     """Menu thả xuống khi di chuột: thuần CSS, một panel cho mỗi mục."""
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        super().setUp()
         self.html = self.client.get("/").get_data(as_text=True)
 
     def test_each_tab_has_one_panel(self):
@@ -232,7 +263,7 @@ class MegaMenuTests(unittest.TestCase):
                 )
 
 
-class AdminFormTests(unittest.TestCase):
+class AdminFormTests(PagesTestCase):
     """Task 3: 4 form mới, dùng chung .input/.btn/.field của dự án."""
 
     FORMS = {
@@ -241,9 +272,6 @@ class AdminFormTests(unittest.TestCase):
         "/admin/users/new": ("Thêm khách hàng", "customer-name"),
         "/admin/permissions": ("Phân quyền tài khoản", "account-search"),
     }
-
-    def setUp(self):
-        self.client = create_app("testing").test_client()
 
     def test_forms_render_with_existing_input_and_button_styles(self):
         for url, (title, field_id) in self.FORMS.items():
@@ -254,6 +282,8 @@ class AdminFormTests(unittest.TestCase):
                 self.assertIn('class="input', html)
                 self.assertIn('class="btn', html)
                 self.assertIn('method="get"', html) if url.endswith("permissions") else self.assertIn('method="post"', html)
+                if not url.endswith("permissions"):
+                    self.assertIn('name="csrf_token"', html)
                 self.assertIn("/static/css/pages/admin/forms.css", html)
 
     def test_permissions_form_requirements(self):
@@ -285,26 +315,25 @@ class AdminFormTests(unittest.TestCase):
             ("/admin/users/new", "/admin/users?created=user"),
         ):
             with self.subTest(url=url):
-                response = self.client.post(url, data={"name": "Mẫu thử"})
+                token = csrf_token(self.admin, "/")
+                response = self.client.post(url, data={"name": "Mẫu thử", "csrf_token": token})
                 self.assertEqual(response.status_code, 302)
                 self.assertIn(response.headers["Location"], target)
 
     def test_permissions_post_preserves_filters(self):
         response = self.client.post(
-            "/admin/permissions", data={"q": "Minh Anh", "role": "admin"}
+            "/admin/permissions",
+            data={"q": "Minh Anh", "role": "admin", "csrf_token": csrf_token(self.admin, "/")},
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("q=Minh+Anh", response.headers["Location"])
         self.assertIn("role=admin", response.headers["Location"])
 
 
-class CheckoutFlowTests(unittest.TestCase):
+class CheckoutFlowTests(PagesTestCase):
     """Luồng 4 bước: giỏ hàng -> giao hàng -> thanh toán -> xác nhận."""
 
     STEPS = ("/cart", "/checkout/shipping", "/checkout", "/order-success")
-
-    def setUp(self):
-        self.client = create_app("testing").test_client()
 
     def test_step_bar_on_checkout_pages(self):
         for step, url in enumerate(("/checkout/shipping", "/checkout", "/order-success"), start=2):
@@ -317,13 +346,10 @@ class CheckoutFlowTests(unittest.TestCase):
                 self.assertIn('href="/checkout/shipping"', html)
 
 
-class FooterLayoutTests(unittest.TestCase):
+class FooterLayoutTests(PagesTestCase):
     """Footer tách riêng khỏi store.css, luôn được nạp trên các trang cửa hàng."""
 
     CSS_DIR = STATIC_DIR / "css"
-
-    def setUp(self):
-        self.client = create_app("testing").test_client()
 
     def test_footer_stylesheet_is_loaded(self):
         for url in STORE_LAYOUT_PAGES:

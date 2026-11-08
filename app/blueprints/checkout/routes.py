@@ -1,7 +1,14 @@
 """Luồng đặt hàng 4 bước: giỏ hàng -> giao hàng -> thanh toán -> xác nhận."""
 from flask import render_template
 
+from ...common.helpers import check_role
 from . import checkout_bp
+
+
+@checkout_bp.before_request
+def require_login():
+    """Giao hàng, thanh toán, xác nhận đơn: cần đăng nhập."""
+    return check_role()
 
 
 @checkout_bp.route("/checkout/shipping")

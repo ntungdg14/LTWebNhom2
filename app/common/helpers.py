@@ -7,9 +7,11 @@ Quy ước phản hồi lỗi::
 from __future__ import annotations
 
 import re
+import secrets
 from functools import wraps
+from urllib.parse import urlsplit
 
-from flask import g, jsonify, request, session
+from flask import abort, flash, g, jsonify, redirect, request, session, url_for
 
 from ..db import get_db
 
@@ -191,6 +193,7 @@ class Fields:
 
 # ------------------------------------------------------------ đăng nhập
 def login_user(user, remember: bool = False) -> None:
+    session.pop("csrf_token", None)  # đổi CSRF token sau khi đăng nhập
     session["uid"] = user["id"]
     session["sv"] = user["session_version"]
     session.permanent = bool(remember)
@@ -242,3 +245,96 @@ def admin_required(view):
         return view(*args, **kwargs)
 
     return wrapper
+
+
+# ------------------------------------------------------------------ CSRF
+def csrf_token() -> str:
+    """Token CSRF của phiên hiện tại (tạo mới nếu chưa có). Dùng trong template: {{ csrf_token() }}."""
+    token = session.get("csrf_token")
+    if not token:
+        token = session["csrf_token"] = secrets.token_urlsafe(32)
+    return token
+
+
+def validate_csrf() -> None:
+    """So sánh token gửi lên (field `csrf_token` hoặc header X-CSRF-Token) với token trong session."""
+    expected = session.get("csrf_token")
+    sent = request.form.get("csrf_token") or request.headers.get("X-CSRF-Token")
+    if not expected or not sent or not secrets.compare_digest(sent.encode(), expected.encode()):
+        abort(400, description="CSRF token thiếu hoặc không hợp lệ. Hãy tải lại trang rồi thử lại.")
+
+
+# ------------------------------------------------------- điều hướng / next
+def safe_next_url(target) -> str | None:
+    """Chỉ chấp nhận đường dẫn nội bộ: bắt đầu bằng '/', không '//', không '\\', không scheme/host."""
+    if not isinstance(target, str) or not target.startswith("/") or target.startswith("//"):
+        return None
+    if "\\" in target or any(ord(ch) < 32 or ord(ch) == 127 for ch in target):
+        return None
+    parts = urlsplit(target)
+    if parts.scheme or parts.netloc:
+        return None
+    return target
+
+
+def wants_json() -> bool:
+    """True với /api/*, fetch/AJAX (X-Requested-With), body JSON hoặc client ưu tiên JSON."""
+    if request.path == "/api" or request.path.startswith("/api/"):
+        return True
+    if request.headers.get("X-Requested-With", "").lower() == "xmlhttprequest" or request.is_json:
+        return True
+    best = request.accept_mimetypes.best_match(["text/html", "application/json"])
+    return best == "application/json" and request.accept_mimetypes[best] > request.accept_mimetypes["text/html"]
+
+
+def _current_path_with_query() -> str:
+    path = request.full_path if request.query_string else request.path
+    return path.rstrip("?")
+
+
+def redirect_to_login():
+    flash("Vui lòng đăng nhập để tiếp tục", "error")
+    return redirect(url_for("auth.login", next=_current_path_with_query()))
+
+
+def check_role(*roles: str):
+    """Kiểm tra đăng nhập (+ vai trò nếu có). Trả về response nếu bị chặn, None nếu hợp lệ.
+
+    - Chưa đăng nhập: JSON 401 (API/AJAX) hoặc redirect tới auth.login?next=...
+    - Sai vai trò: 403 (JSON hoặc trang lỗi).
+    """
+    user = current_user()
+    if user is None:
+        if wants_json():
+            raise ApiError("Bạn cần đăng nhập để thực hiện thao tác này.", 401, "unauthorized")
+        return redirect_to_login()
+    if roles and user["role"] not in roles:
+        if wants_json():
+            raise ApiError("Bạn không có quyền thực hiện thao tác này.", 403, "forbidden")
+        abort(403)
+    return None
+
+
+def login_required_page(view):
+    """Decorator cho trang HTML: chưa đăng nhập thì chuyển tới đăng nhập (kèm next)."""
+
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        blocked = check_role()
+        return blocked if blocked is not None else view(*args, **kwargs)
+
+    return wrapper
+
+
+def role_required(*roles: str):
+    """Decorator dùng được cho cả HTML lẫn API: @role_required('admin')."""
+
+    def decorator(view):
+        @wraps(view)
+        def wrapper(*args, **kwargs):
+            blocked = check_role(*roles)
+            return blocked if blocked is not None else view(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

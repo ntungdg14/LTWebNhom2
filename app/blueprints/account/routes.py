@@ -1,7 +1,14 @@
 """Khu vực tài khoản cá nhân (URL bắt đầu bằng /account)."""
 from flask import render_template
 
+from ...common.helpers import check_role
 from . import account_bp
+
+
+@account_bp.before_request
+def require_login():
+    """Mọi trang /account cần đăng nhập."""
+    return check_role()
 
 
 @account_bp.route("")

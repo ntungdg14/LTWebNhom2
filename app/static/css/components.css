@@ -447,3 +447,40 @@ select.input {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* Thông báo flash + lỗi biểu mẫu (đăng nhập / đăng ký) ----------------------- */
+.flash-stack {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 1rem 1.5rem 0;
+}
+
+.alert {
+    margin: 0 0 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid transparent;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.alert-success {
+    background: var(--green-100);
+    border-color: var(--green-600);
+    color: var(--green-700);
+}
+
+.alert-error {
+    background: var(--red-100);
+    border-color: var(--red-600);
+    color: var(--red-600);
+}
+
+.field-error {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--red-600);
+}
+
+.input.is-invalid {
+    border-color: var(--red-600);
+}

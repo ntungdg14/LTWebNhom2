@@ -1,10 +1,9 @@
 """Logic nghiệp vụ dùng chung: giỏ hàng, mã giảm giá, phí vận chuyển, ngày giao dự kiến."""
 from __future__ import annotations
 
-import secrets
 from datetime import date, datetime, timedelta, timezone
 
-from flask import current_app, session
+from flask import current_app
 
 from .helpers import ApiError, current_user
 
@@ -89,21 +88,14 @@ def evaluate_coupon(db, code: str, subtotal: int):
 
 # ------------------------------------------------------------------ giỏ hàng
 def find_cart(db, create: bool = False):
-    """Giỏ của người dùng đang đăng nhập, hoặc giỏ khách (token lưu trong session)."""
+    """Giỏ hàng của người dùng đang đăng nhập (luôn thuộc user_id; không còn giỏ khách)."""
     user = current_user()
-    if user is not None:
-        row = db.execute("SELECT * FROM carts WHERE user_id = ?", (user["id"],)).fetchone()
-        if row is not None or not create:
-            return row
-        cur = db.execute("INSERT INTO carts (user_id) VALUES (?)", (user["id"],))
-    else:
-        token = session.get("cart_token")
-        row = db.execute("SELECT * FROM carts WHERE guest_token = ?", (token,)).fetchone() if token else None
-        if row is not None or not create:
-            return row
-        token = secrets.token_urlsafe(24)
-        session["cart_token"] = token
-        cur = db.execute("INSERT INTO carts (guest_token) VALUES (?)", (token,))
+    if user is None:
+        raise ApiError("Bạn cần đăng nhập để thực hiện thao tác này.", 401, "unauthorized")
+    row = db.execute("SELECT * FROM carts WHERE user_id = ?", (user["id"],)).fetchone()
+    if row is not None or not create:
+        return row
+    cur = db.execute("INSERT INTO carts (user_id) VALUES (?)", (user["id"],))
     return db.execute("SELECT * FROM carts WHERE id = ?", (cur.lastrowid,)).fetchone()
 
 
@@ -189,42 +181,6 @@ def set_item_quantity(db, cart_id: int, variant_id: int, quantity: int, *, add: 
             "INSERT INTO cart_items (cart_id, variant_id, quantity) VALUES (?, ?, ?)", (cart_id, variant_id, target)
         )
     touch_cart(db, cart_id)
-
-
-def merge_guest_cart(db, user_id: int) -> None:
-    """Gộp giỏ khách (session) vào giỏ của người dùng sau khi đăng nhập/đăng ký."""
-    token = session.pop("cart_token", None)
-    if not token:
-        return
-    guest = db.execute("SELECT * FROM carts WHERE guest_token = ?", (token,)).fetchone()
-    if guest is None:
-        return
-    mine = db.execute("SELECT * FROM carts WHERE user_id = ?", (user_id,)).fetchone()
-    if mine is None:
-        db.execute(
-            "UPDATE carts SET user_id = ?, guest_token = NULL, updated_at = datetime('now') WHERE id = ?",
-            (user_id, guest["id"]),
-        )
-        return
-    for item in db.execute("SELECT variant_id, quantity FROM cart_items WHERE cart_id = ?", (guest["id"],)):
-        stock = db.execute("SELECT stock FROM variants WHERE id = ?", (item["variant_id"],)).fetchone()["stock"]
-        have = db.execute(
-            "SELECT id, quantity FROM cart_items WHERE cart_id = ? AND variant_id = ?", (mine["id"], item["variant_id"])
-        ).fetchone()
-        qty = min(item["quantity"] + (have["quantity"] if have else 0), stock)
-        if qty <= 0:
-            continue
-        if have:
-            db.execute("UPDATE cart_items SET quantity = ? WHERE id = ?", (qty, have["id"]))
-        else:
-            db.execute(
-                "INSERT INTO cart_items (cart_id, variant_id, quantity) VALUES (?, ?, ?)",
-                (mine["id"], item["variant_id"], qty),
-            )
-    if not mine["coupon_code"] and guest["coupon_code"]:
-        db.execute("UPDATE carts SET coupon_code = ? WHERE id = ?", (guest["coupon_code"], mine["id"]))
-    db.execute("DELETE FROM carts WHERE id = ?", (guest["id"],))  # cart_items xóa theo ON DELETE CASCADE
-    touch_cart(db, mine["id"])
 
 
 # --------------------------------------------------------------- địa chỉ

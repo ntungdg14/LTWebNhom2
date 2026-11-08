@@ -17,6 +17,7 @@
     </header>
 
     <form class="form-stack" action="{{ url_for('admin.user_new') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-columns">
             <section class="admin-card form-stack form-card">
                 <h2>Thông tin cá nhân</h2>

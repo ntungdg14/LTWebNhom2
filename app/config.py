@@ -1,18 +1,20 @@
 """Cấu hình ứng dụng theo môi trường.
 
 Chọn cấu hình bằng biến môi trường FLASK_CONFIG: development (mặc định),
-production hoặc testing. Khi deploy, đặt SECRET_KEY qua biến môi trường;
-giá trị mặc định bên dưới chỉ dành cho môi trường phát triển.
+production hoặc testing. Khi deploy (production), BẮT BUỘC đặt biến môi trường SECRET_KEY, thiếu thì app báo lỗi khi khởi động;
+giá trị mặc định bên dưới chỉ dành cho môi trường phát triển / kiểm thử.
 """
 from __future__ import annotations
 
 import os
 
+DEV_SECRET_KEY = "dev-only-change-me"
+
 
 class Config:
     """Cấu hình dùng chung."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
+    SECRET_KEY = os.environ.get("SECRET_KEY", DEV_SECRET_KEY)
     TEMPLATES_AUTO_RELOAD = True
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
 
@@ -61,6 +63,8 @@ class DevelopmentConfig(Config):
 
 
 class ProductionConfig(Config):
+    # Production bắt buộc đặt SECRET_KEY qua biến môi trường (kiểm tra trong create_app, không có giá trị mặc định).
+    SECRET_KEY = None
     DEBUG = False
     TEMPLATES_AUTO_RELOAD = False
     SESSION_COOKIE_SECURE = True
