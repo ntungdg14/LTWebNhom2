@@ -205,3 +205,8 @@
 @media (min-width: 1024px) {
     .category-tiles { grid-template-columns: repeat(6, 1fr); }
 }
+
+/* Ảnh trang chủ: khi ảnh tải được thì ẩn chữ giữ chỗ, ảnh phủ kín khối ---------- */
+.media { position: relative; overflow: hidden; }
+.media > img { position: absolute; inset: 0; }
+.media.has-img .media-label { visibility: hidden; }

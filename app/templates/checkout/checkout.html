@@ -11,18 +11,19 @@
 {% set active_step = 3 %}
 {% include "layouts/partials/_checkout_steps.html" %}
 
-<div class="page">
+<div class="page" data-checkout-page="payment">
     <h1 class="page-title mb-6">Thanh toán</h1>
     <p class="muted">Kiểm tra thông tin và chọn cách thanh toán phù hợp với bạn.</p>
 
-    <form class="split mt-8" action="{{ url_for('checkout.order_success') }}" method="get">
+    <form class="split mt-8" id="payment-form" action="{{ url_for('checkout.order_success') }}" method="get" novalidate>
         <div class="split-main form-stack">
+            <p class="form-alert" id="checkout-notice" role="alert" hidden></p>
             <section class="form-stack">
                 <div class="row-between">
                     <h2>Giao đến</h2>
                     <a href="{{ url_for('checkout.shipping') }}" class="link-underline">Chỉnh sửa</a>
                 </div>
-                <div class="choice">
+                <div class="choice" id="pay-ship-to">
                     <span>
                         <strong>Nguyễn Minh Anh</strong> · 090 123 4567<br>
                         28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh<br>
@@ -35,43 +36,33 @@
             <section class="form-stack">
                 <h2>Phương thức thanh toán</h2>
                 <p class="muted" style="font-size:0.75rem;">Tất cả giao dịch được bảo mật. Freesion không lưu thông tin thẻ của bạn.</p>
+                <div class="form-stack" id="pay-methods">
                 <label class="choice">
-                    <span class="choice-left"><input type="radio" name="payment" checked> Thanh toán khi nhận hàng (COD)<br><small>Thanh toán bằng tiền mặt cho nhân viên giao hàng.</small></span>
+                    <span class="choice-left"><input type="radio" name="payment" value="cod" checked> Thanh toán khi nhận hàng (COD)<br><small>Thanh toán bằng tiền mặt cho nhân viên giao hàng.</small></span>
                     <span>COD</span>
                 </label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> VNPAY / Thẻ ATM nội địa<br><small>Quét mã QR hoặc thanh toán qua ứng dụng ngân hàng.</small></span><span>VNPAY</span></label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Ví điện tử MoMo<br><small>Chuyển đến ứng dụng MoMo để xác nhận thanh toán.</small></span><span>MoMo</span></label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Thẻ quốc tế<br><small>Visa, Mastercard, JCB · Xác thực an toàn qua 3D Secure.</small></span><span>THẺ</span></label>
-                <label class="form-check"><input type="checkbox" name="vat"> Tôi cần xuất hóa đơn GTGT cho đơn hàng này</label>
-                <label class="form-check"><input type="checkbox" name="terms" checked> Tôi đồng ý với Điều khoản mua hàng và Chính sách bảo mật của Freesion.</label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment" value="vnpay"> VNPAY / Thẻ ATM nội địa<br><small>Quét mã QR hoặc thanh toán qua ứng dụng ngân hàng.</small></span><span>VNPAY</span></label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment" value="momo"> Ví điện tử MoMo<br><small>Chuyển đến ứng dụng MoMo để xác nhận thanh toán.</small></span><span>MoMo</span></label>
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment" value="card"> Thẻ quốc tế<br><small>Visa, Mastercard, JCB · Xác thực an toàn qua 3D Secure.</small></span><span>THẺ</span></label>
+                </div>
+                <label class="form-check"><input type="checkbox" id="pay-vat" name="vat"> Tôi cần xuất hóa đơn GTGT cho đơn hàng này</label>
+                <label class="form-check"><input type="checkbox" id="pay-terms" name="terms" checked> Tôi đồng ý với Điều khoản mua hàng và Chính sách bảo mật của Freesion.</label>
             </section>
 
             <div class="form-stack">
-                <button type="submit" class="btn btn-block">Đặt hàng · 1.257.300₫</button>
+                <button type="submit" class="btn btn-block" id="pay-submit">Đặt hàng · 1.257.300₫</button>
                 <p class="muted" style="text-align:center; font-size:0.75rem;">Thông tin của bạn luôn được bảo mật.</p>
                 <a href="{{ url_for('checkout.shipping') }}" class="link-underline">← Quay lại thông tin giao hàng</a>
             </div>
         </div>
 
-        <aside class="summary split-side">
-            <h2>Tóm tắt đơn hàng</h2>
-            <p class="muted" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
-            <div class="order-line">
-                <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
-                <span>498.000₫</span>
-            </div>
-            <div class="order-line">
-                <div class="media media-sm media-beige">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
-                <span>899.000₫</span>
-            </div>
-            <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
-            <p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>
-        </aside>
+        {% set vat_note = true %}
+        {% include "layouts/partials/_checkout_summary.html" %}
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/checkout.js') }}" defer></script>
 {% endblock %}

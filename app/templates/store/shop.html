@@ -1,5 +1,12 @@
 {% extends "layouts/base_store.html" %}
-{% block title %}Hàng mới về - FREESION{% endblock %}
+{% set dept_names = {'nu': 'Nữ', 'nam': 'Nam', 'phu-kien': 'Phụ kiện'} %}
+{% if request.args.get('q') %}{% set shop_title = 'Kết quả cho "' ~ request.args.get('q') ~ '"' %}{% set shop_crumb = 'Tất cả sản phẩm' %}
+{% elif request.args.get('sale') == '1' %}{% set shop_title = 'Ưu đãi' %}{% set shop_crumb = shop_title %}
+{% elif request.args.get('is_new') == '1' %}{% set shop_title = 'Hàng mới về' %}{% set shop_crumb = shop_title %}
+{% elif request.args.get('department') in dept_names %}{% set shop_title = dept_names[request.args.get('department')] %}{% set shop_crumb = shop_title %}
+{% else %}{% set shop_title = 'Tất cả sản phẩm' %}{% set shop_crumb = shop_title %}
+{% endif %}
+{% block title %}{{ shop_title }} - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -8,89 +15,72 @@
 
 {% block content %}
 <div class="page">
-    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Hàng mới về</p>
+    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <span id="shop-current">{{ shop_crumb }}</span></p>
 
     <header class="shop-head">
         <div>
-            <h1 class="page-title">Hàng mới về cho nữ</h1>
+            <h1 class="page-title" id="shop-title">{{ shop_title }}</h1>
             <p class="muted">Chất liệu bền, phom gọn, dễ phối. Mỗi tuần có thêm mẫu mới.</p>
-            <p class="muted" style="font-size:0.75rem;">128 sản phẩm</p>
+            <p class="muted" style="font-size:0.75rem;" id="shop-count">&nbsp;</p>
         </div>
-        <form class="sort-form" action="{{ url_for('store.shop') }}" method="get">
+        <form class="sort-form" id="sort-form" action="{{ url_for('store.shop') }}" method="get">
             <label for="sort">Sắp xếp:</label>
             <select id="sort" class="input" name="sort">
-                <option>Nổi bật</option>
-                <option>Mới nhất</option>
-                <option>Giá tăng dần</option>
-                <option>Giá giảm dần</option>
+                <option value="featured">Nổi bật</option>
+                <option value="newest">Mới nhất</option>
+                <option value="price_asc">Giá tăng dần</option>
+                <option value="price_desc">Giá giảm dần</option>
+                <option value="bestseller">Bán chạy</option>
             </select>
             <button type="submit" class="btn btn-ghost">Áp dụng</button>
         </form>
     </header>
 
     <div class="shop-layout">
+        {# Bộ lọc được shop.js vẽ lại từ /api/products (danh mục + số lượng), /api/colors; thay đổi là lọc ngay, không tải lại trang. #}
         <aside class="filters">
-            <form action="{{ url_for('store.shop') }}" method="get">
+            <form id="filter-form" action="{{ url_for('store.shop') }}" method="get">
                 <section class="filter-group">
                     <div class="row-between"><h2>Danh mục</h2></div>
-                    <div class="filter-list">
-                        <label><input type="checkbox" name="cat" value="ao-so-mi" checked> Áo sơ mi (24)</label>
-                        <label><input type="checkbox" name="cat" value="ao-thun"> Áo thun (31)</label>
-                        <label><input type="checkbox" name="cat" value="quan-dai"> Quần dài (18)</label>
-                        <label><input type="checkbox" name="cat" value="quan-jean"> Quần jean (22)</label>
-                        <label><input type="checkbox" name="cat" value="ao-len"> Áo len (15)</label>
-                        <label><input type="checkbox" name="cat" value="ao-khoac"> Áo khoác (18)</label>
+                    <div class="filter-list" id="filter-categories">
                     </div>
                 </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Màu sắc</h2></div>
-                    <div class="color-swatches">
-                        <a href="{{ url_for('store.shop', color='den') }}" class="color-swatch media-stone" aria-label="Đen"></a>
-                        <a href="{{ url_for('store.shop', color='trang') }}" class="color-swatch media-cream" aria-label="Trắng"></a>
-                        <a href="{{ url_for('store.shop', color='be') }}" class="color-swatch media-beige" aria-label="Be"></a>
-                        <a href="{{ url_for('store.shop', color='xanh-dam') }}" class="color-swatch media-denim" aria-label="Xanh đậm"></a>
-                        <a href="{{ url_for('store.shop', color='xanh-reu') }}" class="color-swatch media-olive" aria-label="Xanh rêu"></a>
-                        <a href="{{ url_for('store.shop', color='hong-dat') }}" class="color-swatch media-rose" aria-label="Hồng đất"></a>
-                        <a href="{{ url_for('store.shop', color='nau') }}" class="color-swatch media-taupe" aria-label="Nâu"></a>
+                    <div class="color-swatches" id="filter-colors">
                     </div>
                 </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Kích cỡ</h2></div>
-                    <div class="size-chips">
-                        <a href="{{ url_for('store.shop', size='S') }}" class="chip">S</a>
-                        <a href="{{ url_for('store.shop', size='M') }}" class="chip is-active">M</a>
-                        <a href="{{ url_for('store.shop', size='L') }}" class="chip">L</a>
-                        <a href="{{ url_for('store.shop', size='XL') }}" class="chip">XL</a>
-                        <a href="{{ url_for('store.shop', size='XXL') }}" class="chip">XXL</a>
+                    <div class="size-chips" id="filter-sizes">
                     </div>
                 </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Mức giá</h2></div>
-                    <div class="filter-list">
-                        <label><input type="radio" name="price"> Dưới 500.000₫</label>
-                        <label><input type="radio" name="price" checked> 500.000₫ – 1.000.000₫</label>
-                        <label><input type="radio" name="price"> Trên 1.000.000₫</label>
+                    <div class="filter-list" id="filter-price">
                     </div>
                 </section>
                 <button type="submit" class="btn btn-ghost btn-block">Áp dụng bộ lọc</button>
             </form>
         </aside>
 
-        <section class="product-grid-3">
-            <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h2>Áo sơ mi Oxford dáng rộng</h2><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h2>Áo khoác bomber Uniform</h2><p class="meta">Nâu dừa</p><p class="price">899.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h2>Quần jean ống suông Indigo</h2><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h2>Áo thun cotton Essential</h2><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h2>Áo len dệt waffle cổ tròn</h2><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-OVS-006') }}" class="product-card"><div class="media media-card media-olive">Ảnh sản phẩm</div><h2>Áo overshirt Heavyweight</h2><p class="meta">Rêu</p><p class="price">799.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-CHI-007') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h2>Quần dài ống đứng Chino</h2><p class="meta">Be cát</p><p class="price">529.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-BOX-008') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h2>Áo thun Boxy dày dặn</h2><p class="meta">Trắng</p><p class="price">289.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-SKI-009') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h2>Quần jean slim co giãn</h2><p class="meta">Indigo đậm</p><p class="price">699.000₫</p></a>
-        </section>
+        <div class="grow">
+            <p id="shop-notice" class="fs-notice" hidden></p>
+            {# Khung chờ (skeleton), không phải dữ liệu mẫu: shop.js thay bằng sản phẩm thật từ /api/products. #}
+            <section class="product-grid-3 is-loading" id="shop-grid" aria-busy="true">
+                {% for _ in range(9) %}<div class="product-card skeleton-card" aria-hidden="true"><div class="media media-card"></div><h2>&nbsp;</h2><p class="meta">&nbsp;</p></div>{% endfor %}
+            </section>
+            <noscript><p class="muted">Cần bật JavaScript để xem danh sách sản phẩm.</p></noscript>
+        </div>
     </div>
 
     <div class="shop-more">
-        <a href="{{ url_for('store.shop', page=2) }}" class="btn btn-outline">Xem thêm sản phẩm</a>
+        <button type="button" id="shop-more" class="btn btn-outline" hidden>Xem thêm sản phẩm</button>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/shop.js') }}" defer></script>
 {% endblock %}

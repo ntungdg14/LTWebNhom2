@@ -4,13 +4,15 @@
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/store/product_detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/store/reviews.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="page">
+<div class="page" data-product-slug="ao-khoac-bomber-uniform">
+    <p class="shop-breadcrumb" id="pd-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / Cửa hàng</p>
     <div class="detail-layout">
         <section aria-label="Hình ảnh sản phẩm">
-            <div class="product-gallery">
+            <div class="product-gallery" id="pd-gallery">
                 <div class="media media-card media-beige">Ảnh 1 · Mặt trước</div>
                 <div class="media media-card media-taupe">Ảnh 2 · Mặt sau</div>
                 <div class="media media-card media-cream">Ảnh 3 · Cổ gập</div>
@@ -22,15 +24,15 @@
 
         <section class="product-info">
             <header>
-                <p class="eyebrow">Áo khoác · Nam</p>
-                <h1>Áo khoác bomber Uniform</h1>
-                <p class="product-rating">★★★★★ <span>4,9</span> · 128 đánh giá</p>
-                <p class="price-lg">899.000₫ <s>1.199.000₫</s></p>
+                <p class="eyebrow" id="pd-eyebrow">Áo khoác · Nam</p>
+                <h1 id="pd-title">Áo khoác bomber Uniform</h1>
+                <p class="product-rating" id="product-rating">★★★★★ <span>4,9</span> · 128 đánh giá</p>
+                <p class="price-lg" id="pd-price">899.000₫ <s>1.199.000₫</s></p>
             </header>
 
             <div>
-                <div class="row-between"><h2>Màu sắc: Nâu dừa</h2></div>
-                <div class="swatches mt-3">
+                <div class="row-between"><h2 id="pd-color-name">Màu sắc: Nâu dừa</h2></div>
+                <div class="swatches mt-3" id="pd-swatches">
                     <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='nau-dua') }}" class="swatch media-beige is-active" aria-label="Nâu dừa"></a>
                     <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='den') }}" class="swatch media-stone" aria-label="Đen"></a>
                     <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='xanh-reu') }}" class="swatch media-olive" aria-label="Xanh rêu"></a>
@@ -43,7 +45,7 @@
                     <h2>Kích cỡ</h2>
                     <a href="{{ url_for('store.help_page') }}" class="link-underline">Hướng dẫn chọn size</a>
                 </div>
-                <div class="size-row mt-3">
+                <div class="size-row mt-3" id="pd-sizes">
                     <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='S') }}" class="size-btn">S</a>
                     <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='M') }}" class="size-btn is-active">M</a>
                     <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='L') }}" class="size-btn">L</a>
@@ -53,15 +55,10 @@
             </div>
 
             <div class="form-stack">
-                {# Khách vẫn thấy nút, bấm thì chuyển tới đăng nhập rồi quay lại trang sản phẩm #}
-                {% if current_user %}
-                <a href="{{ url_for('store.cart', add='FR-BOM-002') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
-                <a href="{{ url_for('checkout.checkout') }}" class="btn btn-accent btn-block">Mua ngay</a>
-                {% else %}
-                {% set login_url = url_for('auth.login', next=request.full_path.rstrip('?')) %}
-                <a href="{{ login_url }}" class="btn btn-block">Thêm vào giỏ hàng</a>
-                <a href="{{ login_url }}" class="btn btn-accent btn-block">Mua ngay</a>
-                {% endif %}
+                <p class="pd-stock" id="pd-stock" hidden></p>
+                <p class="pd-msg" id="pd-msg" hidden></p>
+                <button type="button" class="btn btn-block" id="pd-add">Thêm vào giỏ hàng</button>
+                <button type="button" class="btn btn-accent btn-block" id="pd-buy">Mua ngay</button>
             </div>
 
             <div class="product-perks">
@@ -69,19 +66,18 @@
                 <p>✓ <strong>Giao hàng miễn phí</strong><br><span>Cho đơn từ 499.000₫ trên toàn quốc.</span></p>
             </div>
 
-            <div class="notes">
+            <div class="notes" id="pd-notes">
                 <h2>Mô tả sản phẩm</h2>
                 <p>Áo khoác bomber dáng suông, cổ bo gọn với khóa kéo kim loại. Lớp lót mỏng giữ ấm vừa đủ cho những ngày se lạnh, dễ mặc ngoài áo thun hay sơ mi.</p>
                 <div class="summary-row"><span>Chất liệu</span><span>65% polyester tái chế, 35% cotton</span></div>
-                <div class="summary-row"><span>Người mẫu</span><span>Cao 1m78, mặc size M</span></div>
                 <div class="summary-row"><span>Ghi chú</span><span>Giặt máy nhẹ nhàng, không dùng chất tẩy</span></div>
             </div>
         </section>
     </div>
 
-    <section class="related">
+    <section class="related" id="pd-related-box">
         <h2 class="page-title mb-6">Có thể bạn cũng thích</h2>
-        <div class="product-grid">
+        <div class="product-grid" id="pd-related">
             <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
             <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
             <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h3>Áo thun cotton Essential</h3><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
@@ -89,10 +85,10 @@
         </div>
     </section>
 
-    <section class="reviews">
+    <section class="reviews" id="reviews">
         <h2 class="page-title">Đánh giá từ khách hàng</h2>
         <div class="reviews-grid">
-            <div class="reviews-score">
+            <div class="reviews-score" id="review-summary">
                 <strong>4,9</strong>
                 <span>★★★★★</span>
                 <p class="muted">128 đánh giá</p>
@@ -104,11 +100,21 @@
                     <div><span>1 sao</span><i style="width:1%"></i><em>1</em></div>
                 </div>
             </div>
-            <div class="review-list">
-                <article><p class="eyebrow">★★★★★ · 14 ngày trước</p><h3>Åm vừa đủ, dễ phối</h3><p class="muted">Mặc đi làm lẫn đi chơi đều được, form vừa phối, mặc thêm lớp áo cũng vẫn gọn. Chắc sẽ mua thêm màu khác.</p><p class="meta">Minh Anh · TP. Hồ Chí Minh · Đã mua hàng · Size M</p></article>
-                <article><p class="eyebrow">★★★★★ · 21 ngày trước</p><h3>Đúng với mô tả</h3><p class="muted">Chất dày dặn, đường may chắc chắn. Giao nhanh, đóng gói cẩn thận.</p><p class="meta">Quốc Huy · Hà Nội · Đã mua hàng · Size L</p></article>
+            <div>
+                <div id="review-form-box"></div>
+                <div class="review-list" id="review-list">
+                    <article><p class="eyebrow">★★★★★ · 14 ngày trước</p><h3>Åm vừa đủ, dễ phối</h3><p class="muted">Mặc đi làm lẫn đi chơi đều được, form vừa phối, mặc thêm lớp áo cũng vẫn gọn. Chắc sẽ mua thêm màu khác.</p><p class="meta">Minh Anh · TP. Hồ Chí Minh · Đã mua hàng · Size M</p></article>
+                    <article><p class="eyebrow">★★★★★ · 21 ngày trước</p><h3>Đúng với mô tả</h3><p class="muted">Chất dày dặn, đường may chắc chắn. Giao nhanh, đóng gói cẩn thận.</p><p class="meta">Quốc Huy · Hà Nội · Đã mua hàng · Size L</p></article>
+                </div>
+                <button type="button" class="btn btn-ghost" id="review-more" hidden>Xem thêm đánh giá</button>
             </div>
         </div>
     </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/product-detail.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/reviews.js') }}" defer></script>
 {% endblock %}

@@ -13,7 +13,9 @@
         <section class="grow">
             <h1 class="page-title">Tài khoản của bạn</h1>
 
-            <form class="form-stack mt-8" action="{{ url_for('account.profile') }}" method="get">
+            {# profile.js thay dữ liệu mẫu bằng hồ sơ thật từ /api/account/profile và gửi PATCH / POST khi bấm nút. #}
+            <p id="profile-notice" class="fs-notice mt-8" hidden></p>
+            <form class="form-stack mt-8" id="profile-form" action="{{ url_for('account.profile') }}" method="get">
                 <section class="profile-section">
                     <h2>Thông tin cá nhân</h2>
                     <div class="field"><label for="full-name">Họ và tên *</label><input id="full-name" class="input" type="text"></div>
@@ -32,15 +34,19 @@
 
                 <div class="toolbar">
                     <button type="submit" class="btn">Lưu thay đổi</button>
-                    <a href="{{ url_for('account.profile', reset=1) }}" class="btn btn-ghost">Hủy thay đổi</a>
+                    <a href="{{ url_for('account.profile', reset=1) }}" id="profile-reset" class="btn btn-ghost">Hủy thay đổi</a>
                 </div>
+            </form>
 
+            <p id="password-notice" class="fs-notice mt-8" hidden></p>
+            <form class="form-stack mt-8" id="password-form" action="{{ url_for('account.profile') }}" method="get">
                 <section class="profile-section">
+                    <h2>Đổi mật khẩu</h2>
                     <div class="form-grid-2">
-                        <div class="field"><label for="current-password">Mật khẩu hiện tại *</label><input id="current-password" class="input" type="password"></div><br>
-                        <div class="field"><label for="new-password">Mật khẩu mới *</label><input id="new-password" class="input" type="password" placeholder="Nhập mật khẩu mới"></div>
+                        <div class="field"><label for="current-password">Mật khẩu hiện tại *</label><input id="current-password" class="input" type="password" autocomplete="current-password"></div><br>
+                        <div class="field"><label for="new-password">Mật khẩu mới *</label><input id="new-password" class="input" type="password" placeholder="Nhập mật khẩu mới" autocomplete="new-password"></div>
                     </div>
-                    <div class="field" style="max-width:20rem;"><label for="confirm-password">Xác nhận mật khẩu mới *</label><input id="confirm-password" class="input" type="password" placeholder="Nhập lại mật khẩu mới"></div>
+                    <div class="field" style="max-width:20rem;"><label for="confirm-password">Xác nhận mật khẩu mới *</label><input id="confirm-password" class="input" type="password" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password"></div>
                     <p class="form-hint">Mật khẩu mới cần ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.</p>
                     <br></br>
                     <button type="submit" class="btn">Cập nhật mật khẩu</button>
@@ -51,4 +57,9 @@
         </section>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/profile.js') }}" defer></script>
 {% endblock %}

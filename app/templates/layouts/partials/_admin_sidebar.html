@@ -9,6 +9,7 @@
     <a href="{{ url_for('admin.inventory') }}" class="{% if request.endpoint == 'admin.inventory' %}is-active{% endif %}">Kho hàng</a>
     <a href="{{ url_for('admin.users') }}" class="{% if request.endpoint.startswith('admin.user') %}is-active{% endif %}">Khách hàng</a>
     <a href="{{ url_for('admin.promotions') }}" class="{% if request.endpoint == 'admin.promotions' %}is-active{% endif %}">Khuyến mãi</a>
+    <a href="{{ url_for('admin.messages') }}" class="{% if request.endpoint == 'admin.messages' %}is-active{% endif %}">Tin nhắn khách</a>
     <a href="{{ url_for('admin.reports') }}" class="{% if request.endpoint == 'admin.reports' %}is-active{% endif %}">Báo cáo</a>
 
     <a href="{{ url_for('admin.permissions') }}" class="{% if request.endpoint == 'admin.permissions' %}is-active{% endif %}">Phân quyền tài khoản</a>

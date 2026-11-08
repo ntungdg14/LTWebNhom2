@@ -92,10 +92,11 @@ def build_filters(skip: tuple[str, ...] = ()):
 
     q = (args.get("q") or "").strip()
     if q:
-        where.append("(unaccent(p.name) LIKE ? ESCAPE '\\' OR unaccent(p.sku) LIKE ? ESCAPE '\\' "
-                     "OR unaccent(p.description) LIKE ? ESCAPE '\\')")
+        # Chỉ tìm theo tên và mã SKU. Không tìm trong mô tả vì mô tả của sản phẩm này có thể nhắc tới
+        # sản phẩm khác (vd. khăn "dễ phối với áo khoác") làm kết quả sai.
+        where.append("(unaccent(p.name) LIKE ? ESCAPE '\\' OR unaccent(p.sku) LIKE ? ESCAPE '\\')")
         pattern = _like_pattern(q)
-        params += [pattern, pattern, pattern]
+        params += [pattern, pattern]
 
     excluded = arg_list("exclude")
     if excluded:

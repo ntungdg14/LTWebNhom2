@@ -1,0 +1,44 @@
+{% extends "layouts/base_admin.html" %}
+{% block title %}Tin nhắn khách - Freesion Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin/messages.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-content stack-gap">
+    <header class="form-page-head">
+        <div>
+            <h1 class="page-title">Tin nhắn khách hàng</h1>
+            <p class="muted" id="msg-total">Trả lời khách hỏi về sản phẩm và đơn hàng.</p>
+        </div>
+    </header>
+
+    <p class="msg-notice" id="msg-notice" hidden></p>
+
+    <section class="msg-layout">
+        <aside class="admin-card msg-sidebar">
+            <input type="search" class="input" id="msg-search" placeholder="Tìm tên hoặc email khách" aria-label="Tìm khách">
+            <label class="form-check"><input type="checkbox" id="msg-unread-only"> Chỉ hiện tin chưa đọc</label>
+            <div class="msg-conversations" id="msg-conversations"><p class="muted">Đang tải...</p></div>
+        </aside>
+
+        <section class="admin-card msg-thread">
+            <header class="msg-thread-head" id="msg-thread-head"><span class="muted">Chọn một cuộc trò chuyện ở bên trái.</span></header>
+            <div class="msg-thread-body" id="msg-thread-body"></div>
+            <form class="msg-reply" id="msg-reply" hidden>
+                <textarea class="input" id="msg-input" rows="2" maxlength="2000" placeholder="Nhập câu trả lời... (Enter để gửi, Shift+Enter xuống dòng)" aria-label="Nội dung trả lời"></textarea>
+                <button type="submit" class="btn" id="msg-send">Gửi</button>
+            </form>
+        </section>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-chat.js') }}" defer></script>
+{% endblock %}

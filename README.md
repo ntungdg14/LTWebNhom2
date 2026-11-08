@@ -76,6 +76,17 @@ python -m unittest discover -s tests -v
 │   │   ├── store/  auth/  checkout/  account/  admin/   # trang theo từng blueprint
 │   └── static/
 │       ├── css/                 # (xem sơ đồ bên dưới)
+│       ├── js/api.js            # tiện ích dùng chung: FS.api (gọi /api), FS.el (tạo DOM an toàn), định dạng tiền/ngày
+│       ├── js/order-history.js  # /account/orders: danh sách đơn thật + lọc trạng thái + phân trang
+│       ├── js/order-tracking.js # /account/orders/<mã>: theo dõi đơn (timeline), nút mô phỏng, hủy đơn, nút đánh giá
+│       ├── js/reviews.js        # /product: thống kê sao, danh sách, viết/sửa/xóa đánh giá
+│       ├── js/home.js           # /: danh mục + sản phẩm nổi bật từ /api/home
+│       ├── js/shop.js           # /shop: lọc, sắp xếp, xem thêm từ /api/products
+│       ├── js/wishlist.js       # /account/wishlist: danh sách yêu thích thật
+│       ├── js/profile.js        # /account: hồ sơ + đổi mật khẩu
+│       ├── js/address.js        # /account/address: sổ địa chỉ (thêm/sửa/xóa/mặc định)
+│       ├── js/chat.js           # khung chat nổi của khách (polling), có mặt trên mọi trang cửa hàng
+│       ├── js/admin-chat.js     # /admin/messages: hộp thư của shop (chỉ role admin)
 │       ├── js/nav-indicator.js  # đo vị trí tab; hiệu ứng trượt do CSS đảm nhận
 │       └── images/              # dành cho ảnh sản phẩm về sau
 ├── tests/test_routes.py         # 29 test: route, link, form, header, footer
@@ -149,6 +160,26 @@ Lỗi luôn có dạng `{"error": {"code", "message", "fields"?}}` (400 sai tham
 | Địa chỉ | `GET /api/provinces` · `/api/provinces/<code>/wards` | Tỉnh/thành và phường/xã |
 
 Theo dõi đơn: chưa có đơn vị vận chuyển thật nên trạng thái hoàn toàn dựa vào cột `orders.status` (`pending`, `preparing`, `shipping`, `delivered`, `cancelled`); giao diện chỉ cần gọi `/tracking` và hiển thị theo `steps`. Chưa có websocket: chat dùng polling (`after_id`). Đặt `ORDER_SIMULATION = True` trong config để khách tự bấm "đẩy đơn" khi demo; production mặc định tắt. Bảng `conversations`/`messages` nằm trong `schema.sql` (`CREATE TABLE IF NOT EXISTS`), DB cũ tự có bảng mới khi khởi động app. Admin chưa có API đăng ký: đặt `UPDATE users SET role = 'admin' WHERE email = '...'` để có tài khoản shop.
+
+### Giao diện nối API (JavaScript thuần)
+
+Các trang vẫn là template tĩnh; JavaScript gọi API bằng `fetch` (cùng origin, dùng cookie phiên) rồi thay nội dung mẫu bằng dữ liệu thật. Nếu API trả lỗi (chưa đăng nhập, sai mã đơn) thì giữ dữ liệu mẫu và hiện thông báo.
+
+| Trang | JS | API dùng |
+|---|---|---|
+| `/account/orders` | `order-history.js` | `GET /api/account/orders` |
+| `/account/orders/<mã đơn>` | `order-tracking.js` | `GET /api/orders/<mã>`, `/tracking`, `POST /simulate`, `POST /api/account/orders/<mã>/cancel` |
+| `/product?slug=<slug>` (mặc định `ao-khoac-bomber-uniform`) | `reviews.js` | `GET/POST /api/products/<slug>/reviews`, `PATCH/DELETE /api/reviews/<id>`, `GET /api/account/reviews` |
+| `/` | `home.js` | `GET /api/home` (danh mục + sản phẩm yêu thích) |
+| `/shop` | `shop.js` | `GET /api/products` (lọc danh mục/màu/size/giá, sắp xếp, "Xem thêm"), `GET /api/colors`; bộ lọc lưu trên URL |
+| `/account/wishlist` | `wishlist.js` | `GET /api/account/wishlist`, `DELETE /api/account/wishlist/<id>` |
+| `/account` | `profile.js` | `GET/PATCH /api/account/profile`, `POST /api/account/password` |
+| `/account/address` | `address.js` | `GET/POST /api/account/addresses`, `PATCH/DELETE /<id>`, `POST /<id>/default`, `GET /api/provinces`, `/api/provinces/<mã>/wards` |
+| Trang chủ, Shop (nút ♥ trên thẻ sản phẩm) | `api.js` (`FS.productCard`) | `POST /api/account/wishlist`, `DELETE /api/account/wishlist/<id>`; chưa đăng nhập thì chuyển tới `/login` |
+| Mọi trang cửa hàng (trừ đăng nhập/đăng ký) | `chat.js` | `/api/chat/...` |
+| `/admin/messages` | `admin-chat.js` | `/api/shop/chat/...` (cần đăng nhập tài khoản `role = admin`; trang `/admin` khác vẫn là mock, chưa kiểm tra đăng nhập) |
+
+Trang đặt `data-chat-order="<mã đơn>"` hoặc `data-chat-product="<slug>"` thì tin nhắn đầu tiên tự gắn đơn/sản phẩm đó; nút nào có `data-chat-open` sẽ mở khung chat.
 
 Ghi chú nghiệp vụ: miễn phí ship chuẩn từ 499.000₫ (nếu không: 30.000₫), giao nhanh 35.000₫ — chỉnh trong
 `config.py`. Thanh toán online (VNPAY/MoMo/thẻ) chưa tích hợp cổng nên đơn ở trạng thái `unpaid`

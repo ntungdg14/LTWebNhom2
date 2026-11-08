@@ -122,6 +122,12 @@ def promotions():
     return _render_section("promotions")
 
 
+@admin_bp.route("/messages")
+def messages():
+    """Hộp thư chat với khách. Dữ liệu thật: trang gọi /api/shop/chat/... (cần đăng nhập bằng tài khoản role=admin)."""
+    return render_template("admin/messages.html")
+
+
 @admin_bp.route("/reports")
 def reports():
     return _render_section("reports")

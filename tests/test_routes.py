@@ -5,9 +5,14 @@ Chạy: python -m unittest discover -s tests -v
 """
 from __future__ import annotations
 
+import atexit
+import os
 import re
+import tempfile
 import unittest
 from pathlib import Path
+
+from app import create_app
 
 try:
     from .support import ADMIN_EMAIL, CUSTOMER_EMAIL, add_user, csrf_token, login, make_app, remove_db
@@ -183,7 +188,8 @@ class HeaderLayoutTests(PagesTestCase):
 
     def test_actions_have_inline_svg_icons_and_labels(self):
         html = self.client.get("/").get_data(as_text=True)
-        self.assertEqual(html.count('class="nav-action"'), 3)
+        self.assertEqual(html.count('class="nav-action"'), 4)
+        self.assertIn("Yêu thích", html)
         self.assertIn("Cửa hàng", html)
         self.assertIn("Tài khoản", html)
         self.assertIn("Giỏ hàng", html)
@@ -380,3 +386,27 @@ class FooterLayoutTests(PagesTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AccountGuardTests(unittest.TestCase):
+    """Chưa đăng nhập mà vào /account thì được chuyển tới trang đăng nhập."""
+
+    def test_anonymous_is_redirected_to_login(self):
+        client = create_app("testing").test_client()
+        for url in ("/account", "/account/orders", "/account/address", "/account/wishlist"):
+            with self.subTest(url=url):
+                res = client.get(url)
+                self.assertEqual(res.status_code, 302)
+                self.assertTrue(res.headers["Location"].startswith("/login?next="), res.headers["Location"])
+
+    def test_logged_in_user_can_open_account(self):
+        self.assertEqual(logged_in_client().get("/account").status_code, 200)
+
+    def test_logout_link_really_logs_out(self):
+        client = logged_in_client()
+        self.assertEqual(client.get("/account").status_code, 200)
+        self.assertIn('href="/logout"', client.get("/account").get_data(as_text=True))
+        res = client.get("/logout")
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res.headers["Location"], "/login")
+        self.assertEqual(client.get("/account").status_code, 302)  # đã đăng xuất nên bị chuyển về /login

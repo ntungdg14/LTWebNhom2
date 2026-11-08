@@ -1,14 +1,21 @@
 """Khu vực tài khoản cá nhân (URL bắt đầu bằng /account)."""
-from flask import render_template
+from flask import redirect, render_template, request, url_for
 
-from ...common.helpers import check_role
+from ...common.helpers import current_user
 from . import account_bp
 
 
 @account_bp.before_request
 def require_login():
-    """Mọi trang /account cần đăng nhập."""
-    return check_role()
+    """Chưa đăng nhập thì chuyển sang trang đăng nhập (đăng nhập xong quay lại đúng trang đang mở)."""
+    if current_user() is None:
+        return redirect(url_for("auth.login", next=request.full_path.rstrip("?")))
+
+
+@account_bp.context_processor
+def inject_account_user():
+    user = current_user()
+    return {"account_user_name": user["full_name"] if user else ""}
 
 
 @account_bp.route("")

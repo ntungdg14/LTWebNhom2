@@ -5,3 +5,11 @@
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/auth/auth.css') }}">
 {% endblock %}
+
+{# Trang đăng nhập / đăng ký không hiện khung chat. #}
+{% block chat_widget %}{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+{% endblock %}

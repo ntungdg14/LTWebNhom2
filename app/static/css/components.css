@@ -98,6 +98,10 @@
     font-size: 0.875rem;
 }
 
+/* Ảnh sản phẩm: phủ kín khung chữ nhật, không để lộ nền màu ở trên/dưới */
+.media { position: relative; overflow: hidden; }
+.media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
 .media-hero {
     aspect-ratio: 4 / 5;
 }

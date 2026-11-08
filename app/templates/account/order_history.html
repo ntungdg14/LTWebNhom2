@@ -4,6 +4,7 @@
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/account/order_history.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/account/order_tracking.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -13,13 +14,16 @@
         <section class="grow">
             <h1 class="page-title">Đơn hàng của tôi</h1>
 
-            <nav class="admin-tabs" aria-label="Trạng thái đơn hàng" style="padding:0; margin-bottom:1.5rem;">
-                <a href="{{ url_for('account.order_history', status='all') }}" class="is-active">Tất cả</a>
-                <a href="{{ url_for('account.order_history', status='processing') }}">Đang xử lý</a>
-                <a href="{{ url_for('account.order_history', status='delivered') }}">Đã giao</a>
-                <a href="{{ url_for('account.order_history', status='cancelled') }}">Đã hủy</a>
+            <nav class="admin-tabs" id="order-tabs" aria-label="Trạng thái đơn hàng" style="padding:0; margin-bottom:1.5rem;">
+                <a data-status="all" href="{{ url_for('account.order_history', status='all') }}" class="is-active">Tất cả</a>
+                <a data-status="processing" href="{{ url_for('account.order_history', status='processing') }}">Đang xử lý</a>
+                <a data-status="delivered" href="{{ url_for('account.order_history', status='delivered') }}">Đã giao</a>
+                <a data-status="cancelled" href="{{ url_for('account.order_history', status='cancelled') }}">Đã hủy</a>
             </nav>
 
+            <p id="order-list-notice" class="order-notice" hidden></p>
+            <div id="order-list">
+            {# Dữ liệu mẫu dự phòng; order-history.js thay bằng đơn thật từ /api/account/orders khi đã đăng nhập. #}
             <article class="order-card">
                 <header class="row-between">
                     <div><p><a href="{{ url_for('account.order_detail', order_id='FR261101028') }}"><strong>#FR261101028</strong></a></p><p class="meta">Ngày đặt: 01/11/2026</p></div>
@@ -62,8 +66,9 @@
                     </div>
                 </footer>
             </article>
+            </div>
 
-            <nav class="pagination" aria-label="Phân trang đơn hàng">
+            <nav class="pagination" id="order-pagination" aria-label="Phân trang đơn hàng">
                 <a href="{{ url_for('account.order_history', page=1) }}" class="page-num is-active">1</a>
                 <a href="{{ url_for('account.order_history', page=2) }}" class="page-num">2</a>
                 <a href="{{ url_for('account.order_history', page=3) }}" class="page-num">3</a>
@@ -72,4 +77,9 @@
         </section>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/order-history.js') }}" defer></script>
 {% endblock %}

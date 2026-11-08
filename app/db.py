@@ -72,6 +72,39 @@ def init_db() -> None:
     db.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+def _seed_if_empty() -> None:
+    """Lần chạy đầu (chưa có sản phẩm nào) tự nạp dữ liệu mẫu để shop không trống.
+
+    Chỉ chạy khi bảng products rỗng nên không ghi đè dữ liệu đã chỉnh sửa trong admin.
+    """
+    db = get_db()
+    if db.execute("SELECT 1 FROM products LIMIT 1").fetchone():
+        return
+    from .seed import seed
+    from .seed_extra import seed_extra
+
+    seed(db)
+    seed_extra(db)
+
+
+ADMIN_EMAIL = "admin@freesion.vn"
+ADMIN_PASSWORD = "Admin@123"  # chỉ để demo/thử nghiệm, hãy đổi khi triển khai thật
+
+
+def _ensure_admin() -> None:
+    """Tạo sẵn tài khoản quản trị mẫu nếu chưa có (không ghi đè nếu đã tồn tại)."""
+    from werkzeug.security import generate_password_hash
+
+    db = get_db()
+    if db.execute("SELECT 1 FROM users WHERE email = ?", (ADMIN_EMAIL,)).fetchone():
+        return
+    db.execute(
+        "INSERT INTO users (full_name, email, password_hash, role, password_updated_at) "
+        "VALUES (?, ?, ?, 'admin', datetime('now'))",
+        ("Quản trị viên", ADMIN_EMAIL, generate_password_hash(ADMIN_PASSWORD)),
+    )
+
+
 def init_app(app: Flask) -> None:
     default_path = os.environ.get("DATABASE") or str(Path(app.instance_path) / "freesion.db")
     app.config.setdefault("DATABASE", default_path)
@@ -87,11 +120,17 @@ def init_app(app: Flask) -> None:
     def seed_db_command():
         """Nạp dữ liệu mẫu (chỉ chạy khi chưa có sản phẩm)."""
         from .seed import seed
+        from .seed_extra import seed_extra
 
         init_db()
-        click.echo("Đã nạp dữ liệu mẫu." if seed(get_db()) else "Đã có dữ liệu, bỏ qua.")
+        db = get_db()
+        click.echo("Đã nạp dữ liệu mẫu." if seed(db) else "Đã có dữ liệu gốc, bỏ qua.")
+        stats = seed_extra(db)
+        click.echo(f"Sản phẩm bổ sung: thêm {stats['added']}, sản phẩm theo ảnh thật {stats['catalog']}, cập nhật thông tin {stats['info']}, gắn {stats['images']} ảnh.")
 
     if not app.config.get("TESTING"):
         with app.app_context():
             init_db()
+            _seed_if_empty()
+            _ensure_admin()
             close_db()

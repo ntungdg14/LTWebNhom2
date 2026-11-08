@@ -22,3 +22,18 @@
         grid-template-columns: 1fr 1fr;
     }
 }
+
+/* Form thêm / sửa địa chỉ do address.js mở */
+.address-form-panel {
+    border: 1px solid var(--stone-900);
+    background: var(--white);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.address-form-panel[hidden] { display: none; }
+
+.address-form-panel h2 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+}

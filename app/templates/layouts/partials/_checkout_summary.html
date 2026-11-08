@@ -1,0 +1,23 @@
+{# Tóm tắt đơn hàng dùng chung cho 2 bước giao hàng / thanh toán. checkout.js thay phần mẫu bằng giỏ hàng thật
+   (GET /api/cart?shipping_method=...). Đặt {% set vat_note = true %} trước khi include để hiện dòng "Đã bao gồm thuế GTGT". #}
+<aside class="summary split-side">
+    <h2>Tóm tắt đơn hàng</h2>
+    <p class="muted" id="sum-count" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
+    <div id="sum-lines">
+        <div class="order-line">
+            <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
+            <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
+            <span>498.000₫</span>
+        </div>
+        <div class="order-line">
+            <div class="media media-sm media-beige">Ảnh sản phẩm</div>
+            <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
+            <span>899.000₫</span>
+        </div>
+    </div>
+    <div class="summary-row"><span id="sum-subtotal-label">Tạm tính (3 sản phẩm)</span><span id="sum-subtotal">1.397.000₫</span></div>
+    <div class="summary-row" id="sum-discount-row"><span id="sum-discount-label">Giảm giá · TUDO10 (10%)</span><span id="sum-discount">-139.700₫</span></div>
+    <div class="summary-row"><span>Phí vận chuyển</span><span id="sum-shipping">Miễn phí</span></div>
+    <div class="summary-total"><span>Tổng cộng</span><span id="sum-total">1.257.300₫</span></div>
+    {% if vat_note %}<p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>{% endif %}
+</aside>

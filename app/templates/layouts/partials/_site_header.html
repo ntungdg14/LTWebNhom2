@@ -2,67 +2,43 @@
   Header cửa hàng 2 hàng.
   Menu thả xuống chạy hoàn toàn bằng CSS (:hover / :focus-within),
   không dùng JavaScript hay thư viện bên ngoài.
-  Chỉ dùng 5 mục của Freesion; không lấy CANIFA S / LICENSE / SCHOOL /
+  Danh sách sản phẩm trong panel lấy thật từ DB (mega_products). Chỉ dùng 5 mục của Freesion; không lấy CANIFA S / LICENSE / SCHOOL /
   ĐỒNG PHỤC và không dùng ảnh chân dung trong panel.
 #}
-{% set quick_links = ['Sản phẩm mới', 'Giá tốt', 'Mua sắm tiết kiệm', 'Sale corner'] %}
+{% set quick_links = [('Sản phẩm mới', 'is_new=1'), ('Giá tốt', 'sort=price_asc'), ('Mua sắm tiết kiệm', 'price=lt500'), ('Sale corner', 'sale=1')] %}
 {% set accessories = ['Túi xách', 'Mũ', 'Khăn quàng cổ', 'Thắt lưng', 'Khẩu trang', 'Khăn mặt', 'Tất / Vớ'] %}
 {% set collections = ['Thu Đông 2026', 'Freesion Essentials', 'Linen Basic', 'Denim Edit', 'Tối giản hằng ngày'] %}
 
 {% set menus = [
-    {'label': 'Nữ', 'categories': [
-        ('Áo khoác', true), ('Áo sơ mi & Áo kiểu', true), ('Áo len', false),
-        ('Bộ quần áo', false), ('Áo phông / Áo thun', false), ('Áo polo', false),
-        ('Váy', false), ('Đồ mặc nhà & Đồ ngủ', true), ('Áo giữ nhiệt', false),
-        ('Quần dài & Quần jeans', true), ('Quần shorts', false), ('Đồ thể thao', false),
-        ('Chống nắng', false), ('Đồ lót', false), ('Tất / Vớ', false)
-    ]},
-    {'label': 'Nam', 'categories': [
-        ('Áo khoác', true), ('Áo sơ mi', false), ('Áo len', false),
-        ('Bộ quần áo', false), ('Áo phông / Áo thun', true), ('Áo polo', false),
-        ('Đồ mặc nhà & Đồ ngủ', true), ('Quần dài & Quần jeans', true),
-        ('Quần shorts', false), ('Đồ thể thao', false), ('Chống nắng', false),
-        ('Đồ lót', false), ('Tất / Vớ', false)
-    ]},
-    {'label': 'Phụ kiện', 'categories': [
-        ('Túi xách', true), ('Mũ', false), ('Khăn quàng cổ', false),
-        ('Thắt lưng', false), ('Khẩu trang', false), ('Khăn mặt', false),
-        ('Tất / Vớ', false), ('Chăn', false)
-    ]},
-    {'label': 'Hàng mới', 'categories': [
-        ('Áo sơ mi Linen Basic', true), ('Quần jean Straight Fit', false),
-        ('Áo thun Essential', false), ('Áo khoác Corduroy', true),
-        ('Quần dài Relaxed', false), ('Áo len cổ tròn', false),
-        ('Bộ sưu tập Thu Đông', false), ('Phụ kiện mới', false)
-    ]},
-    {'label': 'Sale', 'sale': true, 'categories': [
-        ('Áo thun Essential', true), ('Quần jean Straight Fit', true),
-        ('Áo sơ mi Linen Basic', false), ('Áo len cổ tròn', false),
-        ('Quần dài Relaxed', false), ('Phụ kiện giảm giá', false),
-        ('Sale corner', true)
-    ]}
+    {'label': 'Nữ', 'key': 'nu', 'query': 'department=nu'},
+    {'label': 'Nam', 'key': 'nam', 'query': 'department=nam'},
+    {'label': 'Phụ kiện', 'key': 'phu-kien', 'query': 'department=phu-kien'},
+    {'label': 'Hàng mới', 'key': 'hang-moi', 'query': 'is_new=1'},
+    {'label': 'Sale', 'key': 'sale', 'sale': true, 'query': 'sale=1'}
 ] %}
 
-{% macro mega_panel(categories, quick_links, accessories, collections) %}
+{% macro mega_panel(products, query, quick_links, accessories, collections) %}
 <div class="mega-menu">
     <div class="mega-inner">
         <div class="mega-col mega-quick">
             <ul class="mega-list">
-                {% for label in quick_links %}
-                <li><a href="{{ url_for('store.shop') }}">{{ label }}</a></li>
+                {% for label, link_query in quick_links %}
+                <li><a href="{{ url_for('store.shop') }}?{{ link_query }}">{{ label }}</a></li>
                 {% endfor %}
             </ul>
         </div>
 
         <div class="mega-col mega-categories">
-            <h2 class="mega-title">Danh mục sản phẩm</h2>
+            <h2 class="mega-title">Sản phẩm nổi bật</h2>
+            {# Sản phẩm thật do context processor `mega_products` (store/routes.py) render sẵn từ server #}
             <ul class="mega-list mega-list-2">
-                {% for label, hot in categories %}
+                {% for p in products %}
                 <li>
-                    <a href="{{ url_for('store.shop') }}">{{ label }}</a>
-                    {% if hot %}<span class="mega-hot">HOT</span>{% endif %}
+                    <a href="{{ url_for('store.product_detail', slug=p['slug']) }}">{{ p['name'] }}</a>
+                    {% if p['is_featured'] %}<span class="mega-hot">HOT</span>{% endif %}
                 </li>
                 {% endfor %}
+                <li class="mega-all"><a href="{{ url_for('store.shop') }}?{{ query }}">Xem tất cả</a></li>
             </ul>
         </div>
 
@@ -70,7 +46,7 @@
             <h2 class="mega-title">Phụ kiện</h2>
             <ul class="mega-list">
                 {% for label in accessories %}
-                <li><a href="{{ url_for('store.shop') }}">{{ label }}</a></li>
+                <li><a href="{{ url_for('store.shop') }}?department=phu-kien&amp;q={{ label|urlencode }}">{{ label }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -79,7 +55,7 @@
             <h2 class="mega-title">Bộ sưu tập</h2>
             <ul class="mega-list">
                 {% for label in collections %}
-                <li><a href="{{ url_for('store.shop') }}">{{ label }}</a></li>
+                <li><a href="{{ url_for('store.shop') }}?q={{ label|urlencode }}">{{ label }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -120,6 +96,12 @@
                 </svg>
                 <span class="nav-action-label">Tài khoản</span>
             </a>
+            <a class="nav-action" href="{{ url_for('account.wishlist') }}">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.9a4.3 4.3 0 0 1 7.5 2.6c0 5.4-7.5 10-7.5 10z"></path>
+                </svg>
+                <span class="nav-action-label">Yêu thích</span>
+            </a>
             <a class="nav-action" href="{{ url_for('store.cart') }}">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d="M5 8h14l-1 12H6L5 8z"></path>
@@ -150,8 +132,8 @@
             {% for item in menus %}
             <div class="nav-item">
                 <a class="nav-link{% if item.active %} is-active{% endif %}{% if item.sale %} nav-sale{% endif %}"
-                   href="{{ url_for('store.shop') }}">{{ item.label }}</a>
-                {{ mega_panel(item.categories, quick_links, accessories, collections) }}
+                   href="{{ url_for('store.shop') }}?{{ item.query }}">{{ item.label }}</a>
+                {{ mega_panel(mega_products(item.key), item.query, quick_links, accessories, collections) }}
             </div>
             {% endfor %}
         </div>

@@ -297,6 +297,13 @@
     text-underline-offset: 3px;
 }
 
+.mega-all a {
+    font-weight: 500;
+    color: var(--stone-900);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .mega-hot {
     display: inline-block;
     margin-left: 0.35rem;
