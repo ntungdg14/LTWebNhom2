@@ -11,59 +11,58 @@
     <div class="row-between" style="align-items:baseline;">
         <h1 class="page-title mb-6">Giỏ hàng của bạn</h1>
     </div>
-    <br></br>
+    <br>
+    {% if items %}
     <div class="split">
         <section class="split-main" aria-label="Danh sách sản phẩm trong giỏ hàng">
             <div class="cart-head"><span>Sản phẩm</span><span>Số lượng</span><span>Thành tiền</span></div>
 
+            {% for i in items %}
             <article class="cart-item">
-                <div class="media media-thumb media-taupe">Ảnh sản phẩm</div>
+                {% if i['image_url'] %}<img class="media media-thumb" src="{{ i['image_url'] }}" alt="{{ i['name'] }}" style="object-fit:cover;">{% else %}<div class="media media-thumb media-{{ i['image_tone'] or i['tone'] }}">Ảnh sản phẩm</div>{% endif %}
                 <div class="grow">
-                    <h2><a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}">Áo thun cotton Essential</a></h2>
-                    <p class="meta">Size M | Den vintage</p>
-                    <p class="price">249.000₫</p>
-                    <a href="{{ url_for('store.cart', remove='FR-TEE-004') }}" class="link-underline">Xóa</a>
+                    <h2><a href="{{ url_for('store.product_detail', slug=i['slug']) }}">{{ i['name'] }}</a></h2>
+                    <p class="meta">Size {{ i['size'] }} | {{ i['color_name'] }}</p>
+                    <p class="price">{{ i['price']|vnd }}{% if i['compare_price'] %} <s>{{ i['compare_price']|vnd }}</s>{% endif %}</p>
+                    {% if i['issue'] %}<p class="warn" role="alert">{{ i['issue'] }}</p>{% endif %}
+                    <form action="{{ url_for('store.cart_update') }}" method="post" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="item_id" value="{{ i['item_id'] }}">
+                        <input type="hidden" name="quantity" value="0">
+                        <button type="submit" class="link-underline" style="background:none;border:0;padding:0;cursor:pointer;">Xóa</button>
+                    </form>
                 </div>
-                <div class="qty">
-                    <a href="{{ url_for('store.cart', sku='FR-TEE-004', qty=1) }}" aria-label="Giảm số lượng">−</a>
-                    <span>2</span>
-                    <a href="{{ url_for('store.cart', sku='FR-TEE-004', qty=3) }}" aria-label="Tăng số lượng">+</a>
-                </div>
-                <span class="cart-line-total">498.000₫</span>
+                <form class="qty" action="{{ url_for('store.cart_update') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="item_id" value="{{ i['item_id'] }}">
+                    <button type="submit" name="quantity" value="{{ i['quantity'] - 1 }}" aria-label="Giảm số lượng" style="flex:1;height:2.25rem;border:0;background:none;cursor:pointer;">−</button>
+                    <span>{{ i['quantity'] }}</span>
+                    <button type="submit" name="quantity" value="{{ i['quantity'] + 1 }}" aria-label="Tăng số lượng" style="flex:1;height:2.25rem;border:0;background:none;cursor:pointer;"{% if i['quantity'] >= i['stock'] %} disabled{% endif %}>+</button>
+                </form>
+                <span class="cart-line-total">{{ i['line_total']|vnd }}</span>
             </article>
-
-            <article class="cart-item">
-                <div class="media media-thumb media-beige">Ảnh sản phẩm</div>
-                <div class="grow">
-                    <h2><a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}">Áo khoác bomber Uniform</a></h2>
-                    <p class="meta">Size L | Nâu dừa</p>
-                    <p class="price">899.000₫ <s>1.199.000₫</s></p>
-                    <a href="{{ url_for('store.cart', remove='FR-BOM-002') }}" class="link-underline">Xóa</a>
-                </div>
-                <div class="qty">
-                    <a href="{{ url_for('store.cart', sku='FR-BOM-002', qty=0) }}" aria-label="Giảm số lượng">−</a>
-                    <span>1</span>
-                    <a href="{{ url_for('store.cart', sku='FR-BOM-002', qty=2) }}" aria-label="Tăng số lượng">+</a>
-                </div>
-                <span class="cart-line-total">899.000₫</span>
-            </article>
+            {% endfor %}
 
             <a href="{{ url_for('store.shop') }}" class="link-underline">Tiếp tục mua sắm</a>
         </section>
 
         <aside class="summary split-side">
             <h2>Tóm tắt đơn hàng</h2>
-            <div class="summary-row"><span>Tạm tính (2 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <form class="cart-coupon" action="{{ url_for('store.cart') }}" method="get">
-                <input class="input" type="text" name="coupon" value="TUDO10" aria-label="Nhập mã giảm giá">
-                <button type="submit" class="btn btn-ghost">Áp dụng</button>
-            </form>
-            <div class="summary-row"><span>Giảm giá (TUDO10 · 10%)</span><span>-139.700₫</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+            <div class="summary-row"><span>Tạm tính ({{ totals['item_count'] }} sản phẩm)</span><span>{{ totals['subtotal']|vnd }}</span></div>
+            <div class="summary-row"><span>Phí vận chuyển</span><span>{{ 'Miễn phí' if totals['shipping_fee'] == 0 else totals['shipping_fee']|vnd }}</span></div>
+            <div class="summary-total"><span>Tổng cộng</span><span>{{ totals['total']|vnd }}</span></div>
+            {% if has_issues %}
+            <button type="button" class="btn btn-block mt-4" disabled>Thanh toán</button>
+            <p class="warn" style="font-size:0.75rem;">Vui lòng xử lý các sản phẩm có cảnh báo trước khi thanh toán.</p>
+            {% else %}
             <a href="{{ url_for('checkout.shipping') }}" class="btn btn-block mt-4">Thanh toán</a>
-            <p class="muted" style="font-size:0.75rem;">Đơn hàng đã đủ điều kiện miễn phí vận chuyển. Bạn có 30 ngày để đổi trả.</p>
+            {% endif %}
+            <p class="muted" style="font-size:0.75rem;">{% if totals['free_shipping_remaining'] > 0 %}Mua thêm {{ totals['free_shipping_remaining']|vnd }} để được miễn phí vận chuyển. {% else %}Đơn hàng đã đủ điều kiện miễn phí vận chuyển. {% endif %}Bạn có 30 ngày để đổi trả.</p>
         </aside>
     </div>
+    {% else %}
+    <p class="muted">Giỏ hàng của bạn đang trống.</p>
+    <a href="{{ url_for('store.shop') }}" class="btn">Tiếp tục mua sắm</a>
+    {% endif %}
 </div>
 {% endblock %}

@@ -12,10 +12,8 @@
 {% include "layouts/partials/_checkout_steps.html" %}
 
 <div class="page">
-    <h1 class="page-title mb-6">Thanh toán</h1>
-    <p class="muted">Kiểm tra thông tin và chọn cách thanh toán phù hợp với bạn.</p>
-
-    <form class="split mt-8" action="{{ url_for('checkout.order_success') }}" method="get">
+    <form class="split mt-8" action="{{ url_for('checkout.checkout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="split-main form-stack">
             <section class="form-stack">
                 <div class="row-between">
@@ -24,30 +22,28 @@
                 </div>
                 <div class="choice">
                     <span>
-                        <strong>Nguyễn Minh Anh</strong> · 090 123 4567<br>
-                        28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh<br>
-                        minhanh.nguyen@gmail.com<br>
-                        <small>Giao hàng tiêu chuẩn · Dự kiến 04–06/11/2026 · Miễn phí</small>
+                        <strong>{{ s['full_name'] }}</strong> · {{ s['phone'] }}<br>
+                        {% if s['street'] %}{{ s['street'] }}, {{ s['ward'] }}, {{ s['province'] }}{% else %}<em>Chưa có địa chỉ giao hàng</em>{% endif %}<br>
+                        {{ s['email'] }}<br>
+                        <small>{{ method_name }} · Dự kiến {{ eta['from'][8:10] }}–{{ eta['to'][8:10] }}/{{ eta['to'][5:7] }}/{{ eta['to'][:4] }} · {{ 'Miễn phí' if totals['shipping_fee'] == 0 else totals['shipping_fee']|vnd }}</small>
+                        {% if s['note'] %}<br><small>Ghi chú: {{ s['note'] }}</small>{% endif %}
                     </span>
                 </div>
             </section>
 
             <section class="form-stack">
                 <h2>Phương thức thanh toán</h2>
-                <p class="muted" style="font-size:0.75rem;">Tất cả giao dịch được bảo mật. Freesion không lưu thông tin thẻ của bạn.</p>
-                <label class="choice">
-                    <span class="choice-left"><input type="radio" name="payment" checked> Thanh toán khi nhận hàng (COD)<br><small>Thanh toán bằng tiền mặt cho nhân viên giao hàng.</small></span>
-                    <span>COD</span>
-                </label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> VNPAY / Thẻ ATM nội địa<br><small>Quét mã QR hoặc thanh toán qua ứng dụng ngân hàng.</small></span><span>VNPAY</span></label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Ví điện tử MoMo<br><small>Chuyển đến ứng dụng MoMo để xác nhận thanh toán.</small></span><span>MoMo</span></label>
-                <label class="choice"><span class="choice-left"><input type="radio" name="payment"> Thẻ quốc tế<br><small>Visa, Mastercard, JCB · Xác thực an toàn qua 3D Secure.</small></span><span>THẺ</span></label>
+                {% set hints = {'cod': 'Thanh toán bằng tiền mặt cho nhân viên giao hàng.', 'vnpay': 'Quét mã QR hoặc thanh toán qua ứng dụng ngân hàng.', 'momo': 'Chuyển đến ứng dụng MoMo để xác nhận thanh toán.', 'card': 'Visa, Mastercard, JCB · Xác thực an toàn qua 3D Secure.'} %}
+                {% set tags = {'cod': 'COD', 'vnpay': 'VNPAY', 'momo': 'MoMo', 'card': 'THẺ'} %}
+                {% for key, name in payments.items() %}
+                <label class="choice"><span class="choice-left"><input type="radio" name="payment" value="{{ key }}"{% if key == selected_payment %} checked{% endif %}> {{ name }}<br><small>{{ hints.get(key, '') }}</small></span><span>{{ tags.get(key, key) }}</span></label>
+                {% endfor %}
                 <label class="form-check"><input type="checkbox" name="vat"> Tôi cần xuất hóa đơn GTGT cho đơn hàng này</label>
                 <label class="form-check"><input type="checkbox" name="terms" checked> Tôi đồng ý với Điều khoản mua hàng và Chính sách bảo mật của Freesion.</label>
             </section>
 
             <div class="form-stack">
-                <button type="submit" class="btn btn-block">Đặt hàng · 1.257.300₫</button>
+                <button type="submit" class="btn btn-block"{% if not items %} disabled{% endif %}>Đặt hàng · {{ totals['total']|vnd }}</button>
                 <p class="muted" style="text-align:center; font-size:0.75rem;">Thông tin của bạn luôn được bảo mật.</p>
                 <a href="{{ url_for('checkout.shipping') }}" class="link-underline">← Quay lại thông tin giao hàng</a>
             </div>
@@ -55,21 +51,18 @@
 
         <aside class="summary split-side">
             <h2>Tóm tắt đơn hàng</h2>
-            <p class="muted" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
+            <p class="muted" style="font-size:0.75rem;">{{ totals['line_count'] }} dòng sản phẩm · Tổng số lượng: {{ totals['item_count'] }}</p>
+            {% if not items %}<p class="muted">Giỏ hàng đang trống. <a href="{{ url_for('store.shop') }}" class="link-underline">Tiếp tục mua sắm</a></p>{% endif %}
+            {% for i in items %}
             <div class="order-line">
-                <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
-                <span>498.000₫</span>
+                {% if i['image_url'] %}<img class="media media-sm" src="{{ i['image_url'] }}" alt="{{ i['name'] }}" style="object-fit:cover;">{% else %}<div class="media media-sm media-{{ i['image_tone'] or i['tone'] }}">Ảnh sản phẩm</div>{% endif %}
+                <div class="grow"><h3>{{ i['name'] }}</h3><p class="meta">Size {{ i['size'] }} | {{ i['color_name'] }}<br>{{ i['price']|vnd }} × {{ i['quantity'] }}</p></div>
+                <span>{{ i['line_total']|vnd }}</span>
             </div>
-            <div class="order-line">
-                <div class="media media-sm media-beige">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
-                <span>899.000₫</span>
-            </div>
-            <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+            {% endfor %}
+            <div class="summary-row"><span>Tạm tính ({{ totals['item_count'] }} sản phẩm)</span><span>{{ totals['subtotal']|vnd }}</span></div>
+            <div class="summary-row"><span>Phí vận chuyển</span><span>{{ 'Miễn phí' if totals['shipping_fee'] == 0 else totals['shipping_fee']|vnd }}</span></div>
+            <div class="summary-total"><span>Tổng cộng</span><span>{{ totals['total']|vnd }}</span></div>
             <p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>
         </aside>
     </form>

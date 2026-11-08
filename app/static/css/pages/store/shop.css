@@ -117,3 +117,38 @@
     justify-content: center;
     padding: 3rem 0;
 }
+
+/* Bộ lọc dạng checkbox ẩn: ô màu và nút size ----------------------------- */
+.color-swatch-pick,
+.chip-pick {
+    position: relative;
+    cursor: pointer;
+}
+
+.color-swatch-pick input,
+.chip-pick input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.color-swatch-pick input:checked + .color-swatch,
+.chip-pick input:checked + .chip {
+    border-color: var(--stone-900);
+    box-shadow: 0 0 0 2px var(--stone-900);
+}
+
+.color-swatch-pick input:focus-visible + .color-swatch,
+.chip-pick input:focus-visible + .chip {
+    outline: 2px solid var(--stone-900);
+    outline-offset: 2px;
+}
+
+.shop-more {
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.shop-head h1 {
+    margin: 0;
+}

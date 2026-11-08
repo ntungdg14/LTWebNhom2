@@ -11,27 +11,31 @@
 {% set active_step = 2 %}
 {% include "layouts/partials/_checkout_steps.html" %}
 
+{% macro err(name) %}{% if errors.get(name) %}<p class="form-hint" style="color:#b91c1c;" role="alert">{{ errors[name] }}</p>{% endif %}{% endmacro %}
+
 <div class="page">
     <h1 class="page-title mb-6">Thông tin giao hàng</h1>
-    <p class="muted">Thêm địa chỉ để Freesion giao những món đồ bạn yêu thích đến tận nơi.</p>
-
-    <form class="split mt-8" action="{{ url_for('checkout.checkout') }}" method="get">
+    <form class="split mt-8" action="{{ url_for('checkout.shipping') }}" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="split-main form-stack">
             <section class="form-stack">
                 <h2>Thông tin liên hệ</h2>
                 <div class="grid-2">
                     <div class="field">
                         <label for="ship-name">Họ và tên *</label>
-                        <input class="input" id="ship-name" name="name" value="Nguyễn Minh Anh" required>
+                        <input class="input" id="ship-name" name="name" value="{{ v.full_name }}" maxlength="100" required>
+                        {{ err('name') }}
                     </div>
                     <div class="field">
                         <label for="ship-phone">Số điện thoại *</label>
-                        <input class="input" id="ship-phone" name="phone" type="tel" value="090 123 4567" required>
+                        <input class="input" id="ship-phone" name="phone" type="tel" value="{{ v.phone }}" required>
+                        {{ err('phone') }}
                     </div>
                 </div>
                 <div class="field">
                     <label for="ship-email">Email *</label>
-                    <input class="input" id="ship-email" name="email" type="email" value="minhanh.nguyen@gmail.com" required>
+                    <input class="input" id="ship-email" name="email" type="email" value="{{ v.email }}" required>
+                    {{ err('email') }}
                     <p class="form-hint">Thông tin xác nhận và cập nhật đơn hàng sẽ được gửi đến email này.</p>
                 </div>
             </section>
@@ -44,68 +48,71 @@
                 <div class="grid-2">
                     <div class="field">
                         <label for="ship-city">Tỉnh / Thành phố *</label>
-                        <select class="input" id="ship-city" name="city">
-                            <option>TP. Hồ Chí Minh</option>
-                            <option>Hà Nội</option>
-                            <option>Đà Nẵng</option>
+                        <select class="input" id="ship-city" name="city" required>
+                            <option value="">Chọn tỉnh / thành phố</option>
+                            {% for p in provinces %}<option value="{{ p['code'] }}"{% if p['code'] == province_code %} selected{% endif %}>{{ p['name'] }}</option>{% endfor %}
                         </select>
+                        {{ err('city') }}
                     </div>
                     <div class="field">
                         <label for="ship-ward">Phường / Xã *</label>
-                        <select class="input" id="ship-ward" name="ward">
-                            <option>Phường Sài Gòn</option>
-                            <option>Phường Bến Thành</option>
+                        <select class="input" id="ship-ward" name="ward" required>
+                            <option value="">Chọn phường / xã</option>
+                            {% for w in wards %}<option value="{{ w['name'] }}"{% if w['name'] == v.ward %} selected{% endif %}>{{ w['name'] }}</option>{% endfor %}
                         </select>
+                        {{ err('ward') }}
                     </div>
                 </div>
                 <div class="field">
                     <label for="ship-address">Địa chỉ cụ thể *</label>
-                    <input class="input" id="ship-address" name="address" value="28 Nguyễn Thị Minh Khai" required>
+                    <input class="input" id="ship-address" name="address" value="{{ v.street }}" maxlength="200" required>
+                    {{ err('address') }}
                     <p class="form-hint">Nhập số nhà, tên đường, tòa nhà hoặc số căn hộ (nếu có).</p>
                 </div>
-                <label class="form-check"><input type="checkbox" name="default" checked> Lưu làm địa chỉ giao hàng mặc định</label>
+                <label class="form-check"><input type="checkbox" name="default"{% if v.save_default %} checked{% endif %}> Lưu làm địa chỉ giao hàng mặc định</label>
             </section>
 
             <section class="form-stack">
                 <h2>Phương thức giao hàng</h2>
+                {{ err('shipping') }}
+                {% for m in methods %}
                 <label class="choice">
-                    <span class="choice-left"><input type="radio" name="shipping" checked> Giao hàng tiêu chuẩn<br><small>Dự kiến nhận hàng: 04–06/11/2026 · 3–5 ngày làm việc</small></span>
-                    <span>Miễn phí</span>
+                    <span class="choice-left"><input type="radio" name="shipping" value="{{ m['id'] }}" data-fee="{{ m['fee'] }}"{% if m['id'] == method %} checked{% endif %}> {{ m['name'] }}<br><small>Dự kiến nhận hàng: {{ m['eta']['from'][8:10] }}–{{ m['eta']['to'][8:10] }}/{{ m['eta']['to'][5:7] }}/{{ m['eta']['to'][:4] }} · {{ m['days'][0] }}–{{ m['days'][1] }} ngày làm việc</small></span>
+                    <span>{{ 'Miễn phí' if m['fee'] == 0 else m['fee']|vnd }}</span>
                 </label>
-                <label class="choice">
-                    <span class="choice-left"><input type="radio" name="shipping"> Giao hàng nhanh nội thành<br><small>Dự kiến nhận hàng: 02–03/11/2026 · 1–2 ngày làm việc</small></span>
-                    <span>35.000₫</span>
-                </label>
+                {% endfor %}
                 <div class="field">
                     <label for="ship-note">Ghi chú đơn hàng (không bắt buộc)</label>
-                    <textarea class="input" id="ship-note" name="note" rows="3" placeholder="Vui lòng gọi trước khi giao khoảng 15 phút."></textarea>
+                    <textarea class="input" id="ship-note" name="note" rows="3" maxlength="500" placeholder="Vui lòng gọi trước khi giao khoảng 15 phút.">{{ v.note }}</textarea>
                 </div>
             </section>
 
             <div class="row-between">
                 <a href="{{ url_for('store.cart') }}" class="link-underline">← Quay lại giỏ hàng</a>
-                <button type="submit" class="btn">Tiếp tục đến thanh toán →</button>
+                <button type="submit" class="btn"{% if not items %} disabled{% endif %}>Tiếp tục đến thanh toán →</button>
             </div>
         </div>
 
         <aside class="summary split-side">
             <h2>Tóm tắt đơn hàng</h2>
-            <p class="muted" style="font-size:0.75rem;">2 dòng sản phẩm · Tổng số lượng: 3</p>
+            <p class="muted" style="font-size:0.75rem;">{{ totals['line_count'] }} dòng sản phẩm · Tổng số lượng: {{ totals['item_count'] }}</p>
+            {% if not items %}<p class="muted">Giỏ hàng đang trống. <a href="{{ url_for('store.shop') }}" class="link-underline">Tiếp tục mua sắm</a></p>{% endif %}
+            {% for i in items %}
             <div class="order-line">
-                <div class="media media-sm media-taupe">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div>
-                <span>498.000₫</span>
+                {% if i['image_url'] %}<img class="media media-sm" src="{{ i['image_url'] }}" alt="{{ i['name'] }}" style="object-fit:cover;">{% else %}<div class="media media-sm media-{{ i['image_tone'] or i['tone'] }}">Ảnh sản phẩm</div>{% endif %}
+                <div class="grow"><h3>{{ i['name'] }}</h3><p class="meta">Size {{ i['size'] }} | {{ i['color_name'] }}<br>{{ i['price']|vnd }} × {{ i['quantity'] }}</p></div>
+                <span>{{ i['line_total']|vnd }}</span>
             </div>
-            <div class="order-line">
-                <div class="media media-sm media-beige">Ảnh sản phẩm</div>
-                <div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div>
-                <span>899.000₫</span>
-            </div>
-            <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+            {% endfor %}
+            <div class="summary-row"><span>Tạm tính ({{ totals['item_count'] }} sản phẩm)</span><span>{{ totals['subtotal']|vnd }}</span></div>
+            <div class="summary-row"><span>Phí vận chuyển</span><span id="sum-fee">{{ 'Miễn phí' if totals['shipping_fee'] == 0 else totals['shipping_fee']|vnd }}</span></div>
+            <div class="summary-total"><span>Tổng cộng</span><span id="sum-total" data-subtotal="{{ totals['subtotal'] }}">{{ totals['total']|vnd }}</span></div>
         </aside>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/shipping.js') }}"></script>
 {% endblock %}

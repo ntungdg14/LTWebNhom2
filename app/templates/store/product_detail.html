@@ -1,5 +1,5 @@
 {% extends "layouts/base_store.html" %}
-{% block title %}Áo khoác bomber Uniform - FREESION{% endblock %}
+{% block title %}{{ product['name'] }} - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -7,34 +7,33 @@
 {% endblock %}
 
 {% block content %}
+{% set stars = rating['average'] | round(0, 'floor') | int if rating['average'] else 0 %}
 <div class="page">
     <div class="detail-layout">
         <section aria-label="Hình ảnh sản phẩm">
-            <div class="product-gallery">
-                <div class="media media-card media-beige">Ảnh 1 · Mặt trước</div>
-                <div class="media media-card media-taupe">Ảnh 2 · Mặt sau</div>
-                <div class="media media-card media-cream">Ảnh 3 · Cổ gập</div>
-                <div class="media media-card media-taupe">Ảnh 4 · Ống tay</div>
-                <div class="media media-card media-beige">Ảnh 5 · Người mẫu</div>
-                <div class="media media-card media-cream">Ảnh 6 · Chi tiết</div>
-            </div>
+            {% if image and image['url'] %}
+            <img class="detail-image" src="{{ image['url'] }}" alt="{{ product['name'] }}">
+            {% else %}
+            <div class="media detail-image media-{{ (image['tone'] if image else None) or product['tone'] }}">Ảnh sản phẩm</div>
+            {% endif %}
         </section>
 
         <section class="product-info">
             <header>
-                <p class="eyebrow">Áo khoác · Nam</p>
-                <h1>Áo khoác bomber Uniform</h1>
-                <p class="product-rating">★★★★★ <span>4,9</span> · 128 đánh giá</p>
-                <p class="price-lg">899.000₫ <s>1.199.000₫</s></p>
+                <p class="eyebrow">{{ product['category']['name'] }} · {{ departments[product['department']] }}{% if product['is_new'] %} · Mới{% endif %}</p>
+                <h1>{{ product['name'] }}</h1>
+                <p class="product-rating">{% if rating['count'] %}{{ '★' * stars }}{{ '☆' * (5 - stars) }} <span>{{ rating['average'] }}</span> · {{ rating['count'] }} đánh giá{% else %}Chưa có đánh giá{% endif %}</p>
+                <p class="price-lg">{{ product['price']|vnd }}{% if product['compare_price'] %} <s>{{ product['compare_price']|vnd }}</s> <span class="badge badge-danger">-{{ product['discount_percent'] }}%</span>{% endif %}</p>
+                <p class="meta">Mã sản phẩm: {{ product['sku'] }}</p>
             </header>
 
+            {% if color %}
             <div>
-                <div class="row-between"><h2>Màu sắc: Nâu dừa</h2></div>
+                <div class="row-between"><h2>Màu sắc: {{ color['name'] }}</h2></div>
                 <div class="swatches mt-3">
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='nau-dua') }}" class="swatch media-beige is-active" aria-label="Nâu dừa"></a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='den') }}" class="swatch media-stone" aria-label="Đen"></a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='xanh-reu') }}" class="swatch media-olive" aria-label="Xanh rêu"></a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', color='be') }}" class="swatch media-cream" aria-label="Be"></a>
+                    {% for c in product['colors'] %}
+                    <a href="{{ pick(color=c['slug'], size=None) }}" class="swatch{% if c['slug'] == color['slug'] %} is-active{% endif %}" style="background:{{ c['hex'] }}" aria-label="{{ c['name'] }}" title="{{ c['name'] }}{% if not c['in_stock'] %} (hết hàng){% endif %}"></a>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -44,19 +43,28 @@
                     <a href="{{ url_for('store.help_page') }}" class="link-underline">Hướng dẫn chọn size</a>
                 </div>
                 <div class="size-row mt-3">
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='S') }}" class="size-btn">S</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='M') }}" class="size-btn is-active">M</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='L') }}" class="size-btn">L</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='XL') }}" class="size-btn">XL</a>
-                    <a href="{{ url_for('store.product_detail', sku='FR-BOM-002', size='XXL') }}" class="size-btn">XXL</a>
+                    {% for s in color['sizes'] %}
+                    <a href="{{ pick(size=s['size']) }}" class="size-btn{% if s['size'] == variant['size'] %} is-active{% endif %}{% if s['stock'] == 0 %} is-out{% endif %}" title="{{ 'Hết hàng' if s['stock'] == 0 else 'Còn ' ~ s['stock'] }}">{{ s['size'] }}</a>
+                    {% endfor %}
                 </div>
+                <p class="meta mt-3">{% if variant['stock'] == 0 %}Phiên bản này đã hết hàng{% elif variant['stock'] <= 5 %}Chỉ còn {{ variant['stock'] }} sản phẩm{% else %}Còn hàng{% endif %} · SKU {{ variant['sku'] }}</p>
             </div>
+            {% endif %}
 
             <div class="form-stack">
-                {# Khách vẫn thấy nút, bấm thì chuyển tới đăng nhập rồi quay lại trang sản phẩm #}
-                {% if current_user %}
-                <a href="{{ url_for('store.cart', add='FR-BOM-002') }}" class="btn btn-block">Thêm vào giỏ hàng</a>
-                <a href="{{ url_for('checkout.checkout') }}" class="btn btn-accent btn-block">Mua ngay</a>
+                {% if not variant or variant['stock'] == 0 %}
+                <button type="button" class="btn btn-block" disabled>Hết hàng</button>
+                {% elif current_user %}
+                <form action="{{ url_for('store.cart_add') }}" method="post" class="form-stack">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="variant_id" value="{{ variant['variant_id'] }}">
+                    <input type="hidden" name="back" value="{{ request.full_path.rstrip('?') }}">
+                    <label class="meta">Số lượng
+                        <input class="input" type="number" name="quantity" value="1" min="1" max="{{ [variant['stock'], 99]|min }}" style="width:5rem;">
+                    </label>
+                    <button type="submit" class="btn btn-block">Thêm vào giỏ hàng</button>
+                    <button type="submit" name="buy_now" value="1" class="btn btn-accent btn-block">Mua ngay</button>
+                </form>
                 {% else %}
                 {% set login_url = url_for('auth.login', next=request.full_path.rstrip('?')) %}
                 <a href="{{ login_url }}" class="btn btn-block">Thêm vào giỏ hàng</a>
@@ -71,44 +79,58 @@
 
             <div class="notes">
                 <h2>Mô tả sản phẩm</h2>
-                <p>Áo khoác bomber dáng suông, cổ bo gọn với khóa kéo kim loại. Lớp lót mỏng giữ ấm vừa đủ cho những ngày se lạnh, dễ mặc ngoài áo thun hay sơ mi.</p>
-                <div class="summary-row"><span>Chất liệu</span><span>65% polyester tái chế, 35% cotton</span></div>
-                <div class="summary-row"><span>Người mẫu</span><span>Cao 1m78, mặc size M</span></div>
-                <div class="summary-row"><span>Ghi chú</span><span>Giặt máy nhẹ nhàng, không dùng chất tẩy</span></div>
+                <p>{{ product['description'] or 'Chưa có mô tả cho sản phẩm này.' }}</p>
+                {% if product['material'] %}<div class="summary-row"><span>Chất liệu</span><span>{{ product['material'] }}</span></div>{% endif %}
+                {% if product['model_info'] %}<div class="summary-row"><span>Người mẫu</span><span>{{ product['model_info'] }}</span></div>{% endif %}
+                {% if product['care'] %}<div class="summary-row"><span>Bảo quản</span><span>{{ product['care'] }}</span></div>{% endif %}
             </div>
         </section>
     </div>
 
+    {% if related %}
     <section class="related">
         <h2 class="page-title mb-6">Có thể bạn cũng thích</h2>
         <div class="product-grid">
-            <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h3>Áo thun cotton Essential</h3><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h3>Áo len dệt waffle cổ tròn</h3><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
+            {% for p in related %}
+            <a href="{{ url_for('store.product_detail', sku=p['sku']) }}" class="product-card">
+                {% if p['image']['url'] %}<img class="media media-card" src="{{ p['image']['url'] }}" alt="{{ p['name'] }}" loading="lazy" style="object-fit:cover;">{% else %}<div class="media media-card media-{{ p['image']['tone'] or p['tone'] }}">Ảnh sản phẩm</div>{% endif %}
+                <h3>{{ p['name'] }}</h3>
+                <p class="meta">{{ p['colors']|map(attribute='name')|join(', ') }}</p>
+                <p class="price">{{ p['price']|vnd }}</p>
+            </a>
+            {% endfor %}
         </div>
     </section>
+    {% endif %}
 
     <section class="reviews">
         <h2 class="page-title">Đánh giá từ khách hàng</h2>
+        {% if rating['count'] %}
         <div class="reviews-grid">
             <div class="reviews-score">
-                <strong>4,9</strong>
-                <span>★★★★★</span>
-                <p class="muted">128 đánh giá</p>
+                <strong>{{ rating['average'] }}</strong>
+                <span>{{ '★' * stars }}{{ '☆' * (5 - stars) }}</span>
+                <p class="muted">{{ rating['count'] }} đánh giá</p>
                 <div class="review-bars">
-                    <div><span>5 sao</span><i style="width:82%"></i><em>104</em></div>
-                    <div><span>4 sao</span><i style="width:14%"></i><em>17</em></div>
-                    <div><span>3 sao</span><i style="width:7%"></i><em>5</em></div>
-                    <div><span>2 sao</span><i style="width:2%"></i><em>1</em></div>
-                    <div><span>1 sao</span><i style="width:1%"></i><em>1</em></div>
+                    {% for star in ['5', '4', '3', '2', '1'] %}
+                    <div><span>{{ star }} sao</span><i style="width:{{ (rating['distribution'][star] * 100 / rating['count'])|round|int }}%"></i><em>{{ rating['distribution'][star] }}</em></div>
+                    {% endfor %}
                 </div>
             </div>
             <div class="review-list">
-                <article><p class="eyebrow">★★★★★ · 14 ngày trước</p><h3>Åm vừa đủ, dễ phối</h3><p class="muted">Mặc đi làm lẫn đi chơi đều được, form vừa phối, mặc thêm lớp áo cũng vẫn gọn. Chắc sẽ mua thêm màu khác.</p><p class="meta">Minh Anh · TP. Hồ Chí Minh · Đã mua hàng · Size M</p></article>
-                <article><p class="eyebrow">★★★★★ · 21 ngày trước</p><h3>Đúng với mô tả</h3><p class="muted">Chất dày dặn, đường may chắc chắn. Giao nhanh, đóng gói cẩn thận.</p><p class="meta">Quốc Huy · Hà Nội · Đã mua hàng · Size L</p></article>
+                {% for r in reviews %}
+                <article>
+                    <p class="eyebrow">{{ '★' * r['rating'] }}{{ '☆' * (5 - r['rating']) }} · {{ r['created_at']|vn_datetime(false) }}</p>
+                    {% if r['title'] %}<h3>{{ r['title'] }}</h3>{% endif %}
+                    <p class="muted">{{ r['body'] }}</p>
+                    <p class="meta">{{ r['author_name'] }}{% if r['city'] %} · {{ r['city'] }}{% endif %}{% if r['verified'] %} · Đã mua hàng{% endif %}{% if r['body_info'] %} · {{ r['body_info'] }}{% endif %}</p>
+                </article>
+                {% endfor %}
             </div>
         </div>
+        {% else %}
+        <p class="muted">Sản phẩm này chưa có đánh giá nào.</p>
+        {% endif %}
     </section>
 </div>
 {% endblock %}

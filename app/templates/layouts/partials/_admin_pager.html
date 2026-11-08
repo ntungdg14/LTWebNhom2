@@ -1,0 +1,6 @@
+{% if pager.show %}
+<nav class="pagination" aria-label="Phân trang" style="padding:0 1.5rem 1.5rem;">
+    {% for n, url, active in pager['items'] %}<a href="{{ url }}" class="page-num page-num-sm{% if active %} is-active{% endif %}">{{ n }}</a>{% endfor %}
+    {% if pager.next %}<a href="{{ pager.next }}" class="page-num page-num-sm">Tiếp →</a>{% endif %}
+</nav>
+{% endif %}

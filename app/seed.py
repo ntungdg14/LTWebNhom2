@@ -70,6 +70,21 @@ PROVINCES = {
 }
 
 
+def seed_reference(db) -> None:
+    """Nạp danh mục + màu nếu còn trống (form thêm sản phẩm cần). Không đụng dữ liệu đã có."""
+    for pos, (slug, name, tone) in enumerate(CATEGORIES):
+        db.execute("INSERT OR IGNORE INTO categories (slug, name, tone, position) VALUES (?, ?, ?, ?)", (slug, name, tone, pos))
+    for pos, (slug, name, hex_) in enumerate(COLOR_FAMILIES):
+        db.execute("INSERT OR IGNORE INTO color_families (slug, name, hex, position) VALUES (?, ?, ?, ?)", (slug, name, hex_, pos))
+    for slug, name, hex_, family in COLORS:
+        db.execute("INSERT OR IGNORE INTO colors (slug, name, hex, family) VALUES (?, ?, ?, ?)", (slug, name, hex_, family))
+    if db.execute("SELECT 1 FROM provinces LIMIT 1").fetchone() is None:  # địa giới cho form giao hàng
+        for code, (name, wards) in PROVINCES.items():
+            db.execute("INSERT INTO provinces (code, name) VALUES (?, ?)", (code, name))
+            for ward in wards:
+                db.execute("INSERT INTO wards (province_code, name) VALUES (?, ?)", (code, ward))
+
+
 def seed(db) -> bool:
     """Nạp dữ liệu mẫu. Trả về False nếu đã có sản phẩm."""
     if db.execute("SELECT 1 FROM products LIMIT 1").fetchone():
@@ -77,11 +92,11 @@ def seed(db) -> bool:
     db.execute("BEGIN IMMEDIATE")
     try:
         for pos, (slug, name, tone) in enumerate(CATEGORIES):
-            db.execute("INSERT INTO categories (slug, name, tone, position) VALUES (?, ?, ?, ?)", (slug, name, tone, pos))
+            db.execute("INSERT OR IGNORE INTO categories (slug, name, tone, position) VALUES (?, ?, ?, ?)", (slug, name, tone, pos))
         for pos, (slug, name, hex_) in enumerate(COLOR_FAMILIES):
-            db.execute("INSERT INTO color_families (slug, name, hex, position) VALUES (?, ?, ?, ?)", (slug, name, hex_, pos))
+            db.execute("INSERT OR IGNORE INTO color_families (slug, name, hex, position) VALUES (?, ?, ?, ?)", (slug, name, hex_, pos))
         for slug, name, hex_, family in COLORS:
-            db.execute("INSERT INTO colors (slug, name, hex, family) VALUES (?, ?, ?, ?)", (slug, name, hex_, family))
+            db.execute("INSERT OR IGNORE INTO colors (slug, name, hex, family) VALUES (?, ?, ?, ?)", (slug, name, hex_, family))
         color_id = {r["slug"]: r["id"] for r in db.execute("SELECT id, slug FROM colors")}
         category_id = {r["slug"]: r["id"] for r in db.execute("SELECT id, slug FROM categories")}
 

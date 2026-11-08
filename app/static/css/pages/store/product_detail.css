@@ -230,3 +230,21 @@
     .product-perks { grid-template-columns: 1fr 1fr; }
     .reviews-grid { grid-template-columns: 14rem 1fr; }
 }
+
+/* Một ảnh lớn duy nhất */
+.detail-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+}
+
+.size-btn.is-active {
+    border-color: var(--stone-900);
+    box-shadow: 0 0 0 1px var(--stone-900);
+}
+
+.size-btn.is-out {
+    color: var(--stone-400, #a8a29e);
+    text-decoration: line-through;
+}

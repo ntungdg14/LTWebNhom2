@@ -25,27 +25,20 @@
             <a href="{{ url_for('admin.category_new') }}" class="link-underline">+ Thêm danh mục</a>
         </div>
         <form class="admin-filters" action="{{ url_for('admin.categories') }}" method="get">
-            <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm tên danh mục...">
-            <select class="input input-rounded" name="status">
-                <option>Tất cả trạng thái</option>
-                <option>Hiển thị</option>
-                <option>Đang ẩn</option>
-            </select>
+            <input class="input input-rounded grow" type="search" name="q" value="{{ q }}" placeholder="Tìm tên danh mục...">
             <button type="submit" class="btn btn-ghost">Lọc</button>
         </form>
         <div class="table-wrap" style="margin-top:1.5rem;">
             <table class="admin-table">
                 <thead>
-                    <tr><th>Tên danh mục</th><th>Đường dẫn</th><th>Sản phẩm</th><th>Thứ tự</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                    <tr><th>Tên danh mục</th><th>Đường dẫn</th><th>Sản phẩm</th><th>Thứ tự</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td><strong>Nam</strong></td><td>/collections/nam</td><td>68</td><td>1</td><td><span class="badge badge-ok">Hiển thị</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
-                    <tr><td>↳ Áo sơ mi</td><td>/collections/nam/ao-so-mi</td><td>12</td><td>1</td><td><span class="badge badge-ok">Hiển thị</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
-                    <tr><td>↳ Áo thun</td><td>/collections/nam/ao-thun</td><td>16</td><td>2</td><td><span class="badge badge-ok">Hiển thị</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
-                    <tr><td>↳ Áo khoác</td><td>/collections/nam/ao-khoac</td><td>10</td><td>3</td><td><span class="badge badge-ok">Hiển thị</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
-                    <tr><td><strong>Nữ</strong></td><td>/collections/nu</td><td>60</td><td>2</td><td><span class="badge badge-ok">Hiển thị</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
-                    <tr><td>↳ Áo sơ mi</td><td>/collections/nu/ao-so-mi</td><td>12</td><td>1</td><td><span class="badge badge-ok">Hiển thị</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
-                    <tr><td><strong>Phụ kiện</strong></td><td>/collections/phu-kien</td><td>0</td><td>3</td><td><span class="badge badge-warn">Đang ẩn</span></td><td><a href="{{ url_for('admin.category_new') }}" class="link-underline">Sửa</a></td></tr>
+                    {% for c in categories %}
+                    <tr><td><strong>{{ c['name'] }}</strong></td><td><a href="{{ url_for('store.shop', category=c['slug']) }}">/shop?category={{ c['slug'] }}</a></td><td>{{ c['product_count'] }}</td><td>{{ c['position'] + 1 }}</td></tr>
+                    {% else %}
+                    <tr><td colspan="4" class="muted">Không có danh mục nào.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

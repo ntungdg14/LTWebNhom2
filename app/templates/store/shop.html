@@ -8,38 +8,18 @@
 
 {% block content %}
 <div class="page">
-    <p class="shop-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Hàng mới về</p>
-
-    <header class="shop-head">
-        <div>
-            <h1 class="page-title">Hàng mới về cho nữ</h1>
-            <p class="muted">Chất liệu bền, phom gọn, dễ phối. Mỗi tuần có thêm mẫu mới.</p>
-            <p class="muted" style="font-size:0.75rem;">128 sản phẩm</p>
-        </div>
-        <form class="sort-form" action="{{ url_for('store.shop') }}" method="get">
-            <label for="sort">Sắp xếp:</label>
-            <select id="sort" class="input" name="sort">
-                <option>Nổi bật</option>
-                <option>Mới nhất</option>
-                <option>Giá tăng dần</option>
-                <option>Giá giảm dần</option>
-            </select>
-            <button type="submit" class="btn btn-ghost">Áp dụng</button>
-        </form>
-    </header>
-
     <div class="shop-layout">
         <aside class="filters">
             <form action="{{ url_for('store.shop') }}" method="get">
                 <section class="filter-group">
                     <div class="row-between"><h2>Danh mục</h2></div>
                     <div class="filter-list">
-                        <label><input type="checkbox" name="cat" value="ao-so-mi" checked> Áo sơ mi (24)</label>
-                        <label><input type="checkbox" name="cat" value="ao-thun"> Áo thun (31)</label>
-                        <label><input type="checkbox" name="cat" value="quan-dai"> Quần dài (18)</label>
-                        <label><input type="checkbox" name="cat" value="quan-jean"> Quần jean (22)</label>
-                        <label><input type="checkbox" name="cat" value="ao-len"> Áo len (15)</label>
-                        <label><input type="checkbox" name="cat" value="ao-khoac"> Áo khoác (18)</label>
+                        <label><input type="checkbox" name="cat" value="ao-so-mi" checked> Áo sơ mi</label>
+                        <label><input type="checkbox" name="cat" value="ao-thun"> Áo thun</label>
+                        <label><input type="checkbox" name="cat" value="quan-dai"> Quần dài</label>
+                        <label><input type="checkbox" name="cat" value="quan-jean"> Quần jean</label>
+                        <label><input type="checkbox" name="cat" value="ao-len"> Áo len</label>
+                        <label><input type="checkbox" name="cat" value="ao-khoac"> Áo khoác</label>
                     </div>
                 </section>
                 <section class="filter-group">

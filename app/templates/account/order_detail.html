@@ -1,5 +1,5 @@
 {% extends "layouts/base_account.html" %}
-{% block title %}Chi tiết đơn hàng #{{ order_id }} - FREESION{% endblock %}
+{% block title %}Chi tiết đơn hàng #{{ order['code'] }} - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -7,10 +7,11 @@
 {% endblock %}
 
 {% block content %}
+{% macro eta(e) %}{{ e['from'][8:10] }}–{{ e['to'][8:10] }}/{{ e['to'][5:7] }}/{{ e['to'][:4] }}{% endmacro %}
 <div class="page">
     <p class="form-breadcrumb" style="font-size:0.75rem; color:var(--stone-500);">
         <a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('account.profile') }}">Tài khoản</a> /
-        <a href="{{ url_for('account.order_history') }}">Đơn hàng của tôi</a> / #{{ order_id }}
+        <a href="{{ url_for('account.order_history') }}">Đơn hàng của tôi</a> / #{{ order['code'] }}
     </p>
 
     <div class="account-layout">
@@ -20,45 +21,64 @@
             <a href="{{ url_for('account.order_history') }}" class="link-underline">← Quay lại đơn hàng của tôi</a>
             <div class="row-between mt-4" style="align-items:flex-start;">
                 <div>
-                    <h1 class="page-title">#{{ order_id }}</h1>
-                    <p class="muted">Đặt lúc 10:32, 01/11/2026 · 2 dòng sản phẩm · Số lượng: 3</p>
+                    <h1 class="page-title">#{{ order['code'] }}</h1>
+                    <p class="muted">Đặt lúc {{ order['created_at']|vn_datetime }} · {{ order['line_count'] }} dòng sản phẩm · Số lượng: {{ order['item_count'] }}</p>
                 </div>
-                <span class="badge badge-warn">Đang chuẩn bị hàng</span>
+                <span class="badge {{ badges[order['status']] }}">{{ order['status_label'] }}</span>
             </div>
 
             <section class="order-card">
-                <strong>Dự kiến nhận: 04–06/11/2026</strong>
-                <p class="muted">Đơn hàng được xác nhận. Freesion đang đóng gói sản phẩm cho bạn.</p>
+                {% if order['estimated_delivery'] %}<strong>Dự kiến nhận: {{ eta(order['estimated_delivery']) }}</strong>{% elif order['status'] == 'delivered' %}<strong>Đã giao{% if order['delivered_at'] %} lúc {{ order['delivered_at']|vn_datetime }}{% endif %}</strong>{% else %}<strong>Đơn hàng đã hủy</strong>{% endif %}
+                <p class="muted">{{ tracking['steps'][tracking['current_step']]['description'] }}</p>
                 <div class="admin-tabs" style="padding:0; margin:1.5rem 0 0.5rem;">
-                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='placed') }}" class="is-active">✓ Đã đặt hàng<br><small>01/11 · 10:32</small></a>
-                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='preparing') }}" style="color:var(--orange-600);">Đang chuẩn bị<br><small>01/11 · 11:05</small></a>
-                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='shipping') }}">Đang giao hàng<br><small>Chưa bàn giao</small></a>
-                    <a href="{{ url_for('account.order_detail', order_id=order_id, step='delivered') }}">Đã giao hàng<br><small>Dự kiến 04–06/11</small></a>
+                    {% for s in tracking['steps'] %}
+                    <span class="{% if s['state'] == 'current' %}is-active{% endif %}" style="padding:0.75rem 1rem;{% if s['state'] == 'upcoming' %} color:var(--stone-400);{% elif s['state'] == 'cancelled' %} color:#b91c1c;{% elif s['state'] == 'current' %} color:var(--orange-600);{% endif %}">{% if s['state'] == 'done' %}✓ {% endif %}{{ s['label'] }}<br><small>{{ s['at']|vn_datetime if s['at'] else ('Dự kiến ' ~ eta(order['estimated_delivery']) if s['key'] == 'delivered' and order['estimated_delivery'] else 'Chưa thực hiện') }}</small></span>
+                    {% endfor %}
                 </div>
-                <p class="muted">Đơn vị vận chuyển và mã vận đơn sẽ hiện thị khi đơn hàng được bàn giao.</p>
+                {% if tracking['tracking_number'] %}<p class="muted">Đơn vị vận chuyển: {{ tracking['carrier'] }} · Mã vận đơn: {{ tracking['tracking_number'] }}</p>
+                {% elif order['status'] in ('pending', 'preparing') %}<p class="muted">Đơn vị vận chuyển và mã vận đơn sẽ hiện thị khi đơn hàng được bàn giao.</p>{% endif %}
             </section>
 
             <section class="order-card">
                 <h2>Sản phẩm trong đơn</h2>
-                <div class="order-line"><div class="media media-sm media-taupe">Ảnh sản phẩm</div><div class="grow"><strong>Áo thun cotton Essential</strong><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div><span>498.000₫</span></div>
-                <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><strong>Áo khoác bomber Uniform</strong><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div><span>899.000₫</span></div>
+                {% for i in order['items'] %}
+                <div class="order-line">
+                    {% if i['image_url'] %}<img class="media media-sm" src="{{ i['image_url'] }}" alt="{{ i['name'] }}" style="object-fit:cover;">{% else %}<div class="media media-sm media-{{ i['tone'] }}">Ảnh sản phẩm</div>{% endif %}
+                    <div class="grow"><strong>{% if i['product_slug'] %}<a href="{{ url_for('store.product_detail', slug=i['product_slug']) }}">{{ i['name'] }}</a>{% else %}{{ i['name'] }}{% endif %}</strong><p class="meta">Size {{ i['size'] }} | {{ i['color'] }}<br>{{ i['price']|vnd }} × {{ i['quantity'] }}</p></div>
+                    <span>{{ i['line_total']|vnd }}</span>
+                </div>
+                {% endfor %}
             </section>
 
             <div class="row-between" style="align-items:flex-start; flex-wrap:wrap; gap:2rem;">
                 <section style="flex:1 1 18rem;">
                     <h2>Địa chỉ nhận hàng</h2>
-                    <p><strong>Nguyễn Minh Anh : 090 123 4567</strong><br>28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh<br>minhanh.nguyen@gmail.com</p>
-                    <p class="muted">Ghi chú: Vui lòng gọi trước khi giao khoảng 15 phút.</p>
+                    <p><strong>{{ order['contact']['full_name'] }} : {{ order['contact']['phone'] }}</strong><br>{{ order['address']['full'] }}<br>{{ order['contact']['email'] }}</p>
+                    {% if order['note'] %}<p class="muted">Ghi chú: {{ order['note'] }}</p>{% endif %}
                     <h2 style="margin-top:2rem;">Thanh toán &amp; giao hàng</h2>
-                    <p>Thanh toán khi nhận hàng (COD)<br><span style="color:var(--orange-600);">Chưa thanh toán · Cần trả 1.257.300₫</span><br>Giao hàng tiêu chuẩn · Miễn phí</p>
+                    <p>{{ payment_name }}<br><span style="color:var(--orange-600);">{{ order['payment_status_label'] }}{% if order['payment_status'] == 'unpaid' and order['status'] != 'cancelled' %} · Cần trả {{ order['total']|vnd }}{% endif %}</span><br>{{ order['shipping_method_name'] }} · {{ 'Miễn phí' if order['shipping_fee'] == 0 else order['shipping_fee']|vnd }}{% if order['vat_invoice'] %}<br>Có xuất hóa đơn GTGT{% endif %}</p>
                     <p class="muted">Bạn có thể yêu cầu hủy trước khi đơn được giao cho vận chuyển. Đổi size, đổi màu trong vòng 30 ngày kể từ khi nhận hàng.</p>
+                    <div class="toolbar">
+                        {% if order['can_cancel'] %}
+                        <form action="{{ url_for('account.order_cancel', order_id=order['code']) }}" method="post" onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-ghost">Hủy đơn hàng</button>
+                        </form>
+                        {% endif %}
+                        {% if order['status'] in ('delivered', 'cancelled') %}
+                        <form action="{{ url_for('account.order_reorder', order_id=order['code']) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn">Mua lại</button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </section>
                 <aside class="summary" style="flex:0 1 20rem;">
                     <h2>Tóm tắt thanh toán</h2>
-                    <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
-                    <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
-                    <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-                    <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
+                    <div class="summary-row"><span>Tạm tính ({{ order['item_count'] }} sản phẩm)</span><span>{{ order['subtotal']|vnd }}</span></div>
+                    {% if order['discount'] %}<div class="summary-row"><span>Giảm giá{% if order['coupon_code'] %} · {{ order['coupon_code'] }}{% endif %}</span><span>-{{ order['discount']|vnd }}</span></div>{% endif %}
+                    <div class="summary-row"><span>Phí vận chuyển</span><span>{{ 'Miễn phí' if order['shipping_fee'] == 0 else order['shipping_fee']|vnd }}</span></div>
+                    <div class="summary-total"><span>Tổng cộng</span><span>{{ order['total']|vnd }}</span></div>
                     <p class="muted" style="font-size:0.75rem;">Đã bao gồm thuế GTGT.</p>
                 </aside>
             </div>
@@ -66,7 +86,7 @@
             <div class="order-card" style="background:var(--stone-100);">
                 <div class="row-between">
                     <div><h2 style="margin:0;">Cần giúp với đơn hàng của bạn?</h2><p class="muted">1900 636 028 · hello@freesion.vn · 8:30–21:00 mỗi ngày</p></div>
-                    <a href="{{ url_for('auth.login') }}" class="link-underline">Liên hệ Freesion</a>
+                    <a href="{{ url_for('store.help_page') }}" class="link-underline">Liên hệ Freesion</a>
                 </div>
             </div>
         </section>

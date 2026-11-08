@@ -17,71 +17,85 @@
         <a href="{{ url_for('admin.products') }}" class="btn btn-ghost">Hủy</a>
     </header>
 
-    <form class="form-stack" action="{{ url_for('admin.product_new') }}" method="post">
+    {% set values = values or {} %}{% set errors = errors or {} %}
+    {% if errors %}<p class="alert alert-error" role="alert">Vui lòng kiểm tra lại các trường bị lỗi bên dưới.</p>{% endif %}
+    {% if not categories or not colors %}<p class="alert alert-error" role="alert">Chưa có danh mục hoặc màu sắc trong cơ sở dữ liệu. Hãy khởi động lại ứng dụng để nạp dữ liệu mặc định.</p>{% endif %}
+
+    <form class="form-stack" action="{{ url_for('admin.product_new') }}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-columns">
             <section class="admin-card form-stack form-card">
                 <h2>Thông tin cơ bản</h2>
                 <div class="field">
                     <label for="product-name">Tên sản phẩm *</label>
-                    <input class="input" id="product-name" name="name" type="text" placeholder="Áo khoác bomber Uniform" required>
+                    <input class="input{% if errors.name %} is-invalid{% endif %}" id="product-name" name="name" type="text" maxlength="150" placeholder="Áo khoác bomber Uniform" value="{{ values.name or '' }}" required>
+                    {% if errors.name %}<p class="field-error">{{ errors.name }}</p>{% endif %}
                 </div>
                 <div class="form-grid-2">
                     <div class="field">
                         <label for="product-sku">SKU *</label>
-                        <input class="input" id="product-sku" name="sku" type="text" placeholder="FR-BOM-002" required>
+                        <input class="input{% if errors.sku %} is-invalid{% endif %}" id="product-sku" name="sku" type="text" maxlength="40" placeholder="FR-BOM-002" value="{{ values.sku or '' }}" required>
+                        {% if errors.sku %}<p class="field-error">{{ errors.sku }}</p>{% endif %}
                     </div>
                     <div class="field">
                         <label for="product-category">Danh mục *</label>
-                        <select class="input" id="product-category" name="category" required>
+                        <select class="input{% if errors.category_id %} is-invalid{% endif %}" id="product-category" name="category_id" required>
                             <option value="">Chọn danh mục</option>
-                            <option>Áo sơ mi</option>
-                            <option>Áo thun</option>
-                            <option>Áo khoác</option>
-                            <option>Quần jean</option>
-                            <option>Quần dài</option>
-                            <option>Áo len</option>
+                            {% for c in categories %}<option value="{{ c['id'] }}"{% if values.category_id|string == c['id']|string %} selected{% endif %}>{{ c['name'] }}</option>{% endfor %}
                         </select>
+                        {% if errors.category_id %}<p class="field-error">{{ errors.category_id }}</p>{% endif %}
                     </div>
                 </div>
                 <div class="field">
-                    <label for="product-description">Mô tả sản phẩm</label>
-                    <textarea class="input" id="product-description" name="description" rows="5" placeholder="Chất liệu, form dáng, cách phối..."></textarea>
+                    <label for="product-description">Mô tả sản phẩm *</label>
+                    <textarea class="input{% if errors.description %} is-invalid{% endif %}" id="product-description" name="description" rows="5" maxlength="2000" placeholder="Chất liệu, form dáng, cách phối..." required>{{ values.description or '' }}</textarea>
+                    {% if errors.description %}<p class="field-error">{{ errors.description }}</p>{% endif %}
                 </div>
 
                 <h2>Giá bán</h2>
-                <div class="form-grid-2">
-                    <div class="field">
-                        <label for="product-price">Giá bán *</label>
-                        <input class="input" id="product-price" name="price" type="number" min="0" placeholder="899000" required>
-                    </div>
-                    <div class="field">
-                        <label for="product-compare-price">Giá so sánh</label>
-                        <input class="input" id="product-compare-price" name="compare_price" type="number" min="0" placeholder="1199000">
-                    </div>
+                <div class="field">
+                    <label for="product-price">Giá bán (VND) *</label>
+                    <input class="input{% if errors.price %} is-invalid{% endif %}" id="product-price" name="price" type="number" min="1000" max="100000000" step="1" placeholder="899000" value="{{ values.price or '' }}" required>
+                    {% if errors.price %}<p class="field-error">{{ errors.price }}</p>{% endif %}
                 </div>
-                <label class="form-check"><input type="checkbox" name="tax_included" checked> Giá đã bao gồm thuế GTGT</label>
+
+                <h2>Ảnh sản phẩm</h2>
+                <div class="field">
+                    <label for="product-images">Ảnh (JPG, PNG, WebP; tối đa {{ max_images }} ảnh, mỗi ảnh ≤ 3 MB) *</label>
+                    <input class="input{% if errors.images %} is-invalid{% endif %}" id="product-images" name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple required>
+                    {% if errors.images %}<p class="field-error">{{ errors.images }}</p>{% endif %}
+                    <p class="form-hint">Ảnh đầu tiên là ảnh đại diện. Cần chọn lại ảnh nếu form báo lỗi.</p>
+                </div>
             </section>
 
             <aside class="admin-card form-stack form-card">
-                <h2>Xuất bản</h2>
+                <h2>Phân loại</h2>
                 <div class="field">
-                    <label for="product-status">Trạng thái *</label>
-                    <select class="input" id="product-status" name="status">
-                        <option>Đang bán</option>
-                        <option>Bản nháp</option>
+                    <label for="product-department">Bộ phận *</label>
+                    <select class="input{% if errors.department %} is-invalid{% endif %}" id="product-department" name="department" required>
+                        <option value="">Chọn bộ phận</option>
+                        {% for key, label in departments %}<option value="{{ key }}"{% if values.department == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
                     </select>
+                    {% if errors.department %}<p class="field-error">{{ errors.department }}</p>{% endif %}
                 </div>
                 <div class="field">
-                    <label for="product-brand">Thương hiệu</label>
-                    <input class="input" id="product-brand" name="brand" type="text" value="FREESION">
+                    <label for="product-color">Màu sắc *</label>
+                    <select class="input{% if errors.color_id %} is-invalid{% endif %}" id="product-color" name="color_id" required>
+                        <option value="">Chọn màu</option>
+                        {% for c in colors %}<option value="{{ c['id'] }}"{% if values.color_id|string == c['id']|string %} selected{% endif %}>{{ c['name'] }}</option>{% endfor %}
+                    </select>
+                    {% if errors.color_id %}<p class="field-error">{{ errors.color_id }}</p>{% endif %}
                 </div>
                 <div class="field">
-                    <label for="product-stock">Tồn kho *</label>
-                    <input class="input" id="product-stock" name="stock" type="number" min="0" value="0" required>
+                    <label>Size và tồn kho *</label>
+                    {% for sz in sizes %}
+                    <div class="form-grid-2">
+                        <label class="form-check"><input type="checkbox" name="sizes" value="{{ sz }}"{% if sz in (values.sizes or []) %} checked{% endif %}> {{ sz }}</label>
+                        <input class="input" type="number" name="stock_{{ sz }}" min="0" max="99999" placeholder="Tồn kho" value="{{ values['stock_' ~ sz] or '' }}" aria-label="Tồn kho size {{ sz }}">
+                    </div>
+                    {% endfor %}
+                    {% if errors.sizes %}<p class="field-error">{{ errors.sizes }}</p>{% endif %}
                 </div>
-                <label class="form-check"><input type="checkbox" name="online" checked> Hiển thị trên cửa hàng</label>
-                <label class="form-check"><input type="checkbox" name="shipping" checked> Sản phẩm cần vận chuyển</label>
                 <p class="form-hint">* Trường bắt buộc</p>
             </aside>
         </div>

@@ -15,18 +15,21 @@
             <a href="{{ url_for('store.shop', category='tat-ca') }}" class="btn btn-outline">Xem bộ sưu tập</a>
         </div>
     </div>
-    <div class="media media-hero media-beige">Ảnh sản phẩm · Ngày mới Freesion</div>
+    {# Ảnh trang chủ: bỏ file vào app/static/images/home/ (hero.jpg, collection-new.jpg, collection-office.jpg, collection-sale.jpg).
+       Chưa có file thì giữ khối màu mẫu (không có chữ). #}
+    <div class="media media-hero media-beige"><img src="{{ url_for('static', filename='images/home/hero.jpg') }}" alt="Bộ sưu tập Freesion" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div>
 </section>
 
 <section class="section">
     <h2 class="section-title">Mua sắm theo danh mục</h2>
-    <nav class="category-tiles" aria-label="Danh mục sản phẩm">
-        <a href="{{ url_for('store.shop', category='ao-so-mi') }}"><div class="media media-tile media-beige">Ảnh sản phẩm</div><span>Áo sơ mi</span></a>
-        <a href="{{ url_for('store.shop', category='quan-jean') }}"><div class="media media-tile media-denim">Ảnh sản phẩm</div><span>Quần jean</span></a>
-        <a href="{{ url_for('store.shop', category='ao-thun') }}"><div class="media media-tile media-cream">Ảnh sản phẩm</div><span>Áo thun</span></a>
-        <a href="{{ url_for('store.shop', category='quan-dai') }}"><div class="media media-tile media-taupe">Ảnh sản phẩm</div><span>Quần dài</span></a>
-        <a href="{{ url_for('store.shop', category='ao-len') }}"><div class="media media-tile media-rose">Ảnh sản phẩm</div><span>Áo len</span></a>
-        <a href="{{ url_for('store.shop', category='ao-khoac') }}"><div class="media media-tile media-olive">Ảnh sản phẩm</div><span>Áo khoác</span></a>
+    {# home.js thay các ô danh mục và lưới sản phẩm bên dưới bằng dữ liệu thật từ /api/home. #}
+    <nav class="category-tiles" id="home-categories" aria-label="Danh mục sản phẩm">
+        <a href="{{ url_for('store.shop', category='ao-so-mi') }}"><div class="media media-tile media-beige"><img src="{{ url_for('static', filename='images/categories/ao-so-mi.jpg') }}" alt="Áo sơ mi" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><span>Áo sơ mi</span></a>
+        <a href="{{ url_for('store.shop', category='quan-jean') }}"><div class="media media-tile media-denim"><img src="{{ url_for('static', filename='images/categories/quan-jean.jpg') }}" alt="Quần jean" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><span>Quần jean</span></a>
+        <a href="{{ url_for('store.shop', category='ao-thun') }}"><div class="media media-tile media-cream"><img src="{{ url_for('static', filename='images/categories/ao-thun.jpg') }}" alt="Áo thun" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><span>Áo thun</span></a>
+        <a href="{{ url_for('store.shop', category='quan-dai') }}"><div class="media media-tile media-taupe"><img src="{{ url_for('static', filename='images/categories/quan-dai.jpg') }}" alt="Quần dài" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><span>Quần dài</span></a>
+        <a href="{{ url_for('store.shop', category='ao-len') }}"><div class="media media-tile media-rose"><img src="{{ url_for('static', filename='images/categories/ao-len.jpg') }}" alt="Áo len" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><span>Áo len</span></a>
+        <a href="{{ url_for('store.shop', category='ao-khoac') }}"><div class="media media-tile media-olive"><img src="{{ url_for('static', filename='images/categories/ao-khoac.jpg') }}" alt="Áo khoác" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><span>Áo khoác</span></a>
     </nav>
 </section>
 
@@ -34,19 +37,19 @@
     <div class="page">
         <div class="collection-grid">
             <a href="{{ url_for('store.shop', category='hang-moi') }}" class="collection-card">
-                <div class="media media-card media-denim">Ảnh sản phẩm</div>
+                <div class="media media-card media-denim"><img src="{{ url_for('static', filename='images/home/collection-new.jpg') }}" alt="Hàng mới về" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div>
                 <h2>Hàng mới về</h2>
                 <p>Những thiết kế đầu tiên của mùa Thu Đông cơ bản.</p>
                 <span class="link-underline">Xem hàng mới</span>
             </a>
             <a href="{{ url_for('store.shop', collection='cong-so') }}" class="collection-card">
-                <div class="media media-card media-cream">Ảnh sản phẩm</div>
-                <h2>Bộ sưu tập Cộng sở</h2>
+                <div class="media media-card media-cream"><img src="{{ url_for('static', filename='images/home/collection-office.jpg') }}" alt="Bộ sưu tập Công sở" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div>
+                <h2>Bộ sưu tập Công sở</h2>
                 <p>Đơn giản, thanh thoát, mặc đi làm mỗi ngày vẫn mới.</p>
                 <span class="link-underline">Khám phá ngay</span>
             </a>
             <a href="{{ url_for('store.shop', category='sale') }}" class="collection-card">
-                <div class="media media-card media-taupe">Ảnh sản phẩm</div>
+                <div class="media media-card media-taupe"><img src="{{ url_for('static', filename='images/home/collection-sale.jpg') }}" alt="Ưu đãi đến 40%" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div>
                 <h2>Ưu đãi đến 40%</h2>
                 <p>Cơ hội cuối để sở hữu mẫu yêu thích với giá tốt nhất.</p>
                 <span class="link-underline">Mua ngay</span>
@@ -60,13 +63,18 @@
         <h2>Sản phẩm được yêu thích</h2>
     </div>
 
-    <div class="product-grid">
-        <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
-        <a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h3>Áo khoác bomber Uniform</h3><p class="meta">Nâu dừa</p><p class="price">899.000₫</p></a>
-        <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
-        <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h3>Áo thun cotton Essential</h3><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
+    <div class="product-grid" id="home-featured">
+        <a href="{{ url_for('store.shop', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige"><img src="{{ url_for('static', filename='images/ao-somi-oxford.webp') }}" alt="Áo sơ mi Oxford dáng rộng" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><h3>Áo sơ mi Oxford dáng rộng</h3><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
+        <a href="{{ url_for('store.shop', sku='FR-BOM-002') }}" class="product-card"><div class="media media-card media-denim"><img src="{{ url_for('static', filename='images/ao-khoac-den.webp') }}" alt="Áo khoác bomber Uniform" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><h3>Áo khoác bomber Uniform</h3><p class="meta">Nâu dừa</p><p class="price">899.000₫</p></a>
+        <a href="{{ url_for('store.shop', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-cream"><img src="{{ url_for('static', filename='images/quan-jeans-slimfit-qj048-mau-xanh-16793.jpg') }}" alt="Quần jean ống suông Indigo" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><h3>Quần jean ống suông Indigo</h3><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
+        <a href="{{ url_for('store.shop', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe"><img src="{{ url_for('static', filename='images/ao-thun.webp') }}" alt="Áo thun cotton Essential" loading="lazy" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()"></div><h3>Áo thun cotton Essential</h3><p class="meta">Đen vintage</p><p class="price">249.000₫</p></a>
     </div>
-    <br></br>
-    <div class="shop-more" align="center"><a href="{{ url_for('store.shop') }}" class="btn btn-outline">Xem tất cả sản phẩm</a></div>
+
+    <div class="shop-more mt-8" style="text-align:center;"><a href="{{ url_for('store.shop') }}" class="btn btn-outline">Xem tất cả sản phẩm</a></div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/home.js') }}" defer></script>
 {% endblock %}

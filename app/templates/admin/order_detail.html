@@ -1,5 +1,5 @@
 {% extends "layouts/base_admin.html" %}
-{% block title %}Đơn hàng #{{ order_id }} - Freesion Admin{% endblock %}
+{% block title %}Đơn hàng #{{ order['code'] }} - Freesion Admin{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -11,9 +11,9 @@
 <main class="admin-content stack-gap">
     <header class="form-page-head">
         <div>
-            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Đơn hàng</a> / <a href="{{ url_for('admin.orders') }}">Danh sách</a> / #{{ order_id }}</p>
-            <h1 class="page-title">Đơn hàng #{{ order_id }}</h1>
-            <p class="meta">Đặt lúc 10:28, 01/11/2026 · Cửa hàng trực tuyến · 1 sản phẩm · Phụ trách: Minh Anh</p>
+            <p class="form-breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Đơn hàng</a> / <a href="{{ url_for('admin.orders') }}">Danh sách</a> / #{{ order['code'] }}</p>
+            <h1 class="page-title">Đơn hàng #{{ order['code'] }}</h1>
+            <p class="meta">Đặt lúc {{ order['created_at']|vn_datetime }} · {{ shipping_name }} · {{ item_count }} sản phẩm</p>
         </div>
         <div class="toolbar">
             <a href="{{ url_for('admin.orders') }}" class="btn btn-ghost">← Danh sách đơn</a>
@@ -22,67 +22,63 @@
 
     <section class="admin-card">
         <div class="admin-tabs">
-            <a href="{{ url_for('admin.order_detail', order_id=order_id) }}" class="is-active">Đã đặt hàng · 01/11 10:28</a>
-            <a href="{{ url_for('admin.order_detail', order_id=order_id, step='confirmed') }}">Đã xác nhận · 01/11 10:35</a>
-            <a href="{{ url_for('admin.order_detail', order_id=order_id, step='packed') }}">Đang đóng gói · 01/11 10:40</a>
-            <a href="{{ url_for('admin.order_detail', order_id=order_id, step='shipping') }}">Chờ giao hàng</a>
+            {% for e in events %}<a href="{{ url_for('admin.order_detail', order_id=order['code']) }}" class="{% if loop.last %}is-active{% endif %}">{{ order_status[e['status']][0] if e['status'] in order_status else e['status'] }} · {{ e['created_at']|vn_datetime }}</a>{% endfor %}
         </div>
     </section>
 
     <div class="form-columns">
         <div class="stack-gap">
             <section class="admin-card">
-                <div class="admin-card-head"><h2>Sản phẩm trong đơn</h2><span class="muted">1 sản phẩm</span></div>
+                <div class="admin-card-head"><h2>Sản phẩm trong đơn</h2><span class="muted">{{ item_count }} sản phẩm</span></div>
                 <div class="table-wrap">
                     <table class="admin-table">
                         <thead><tr><th>Sản phẩm</th><th>Đơn giá × Số lượng</th><th>Thành tiền</th></tr></thead>
                         <tbody>
+                            {% for i in items %}
                             <tr>
-                                <td><div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><strong>Áo khoác bomber Uniform</strong><p class="meta">Nâu dừa / M · SKU: FR-BOM-002-ND-M</p></div></div></td>
-                                <td>899.000₫ × 1</td><td>899.000₫</td>
+                                <td><div class="order-line">{% if i['image_url'] %}<img src="{{ i['image_url'] }}" alt="" width="48" height="48" style="object-fit:cover;">{% else %}<div class="media media-sm media-{{ i['tone'] }}">Ảnh sản phẩm</div>{% endif %}<div class="grow"><strong>{{ i['name'] }}</strong><p class="meta">{{ i['color'] }} / {{ i['size'] }}{% if i['variant_sku'] %} · SKU: {{ i['variant_sku'] }}{% endif %}</p></div></div></td>
+                                <td>{{ i['price']|vnd }} × {{ i['quantity'] }}</td><td>{{ (i['price'] * i['quantity'])|vnd }}</td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <div class="summary-row"><span>Tạm tính (1 sản phẩm)</span><span>899.000₫</span></div>
-                <div class="summary-row"><span>Giảm giá đơn hàng</span><span>0₫</span></div>
-                <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-                <div class="summary-total"><span>Tổng cộng</span><span>899.000₫</span></div>
+                <div class="summary-row"><span>Tạm tính ({{ item_count }} sản phẩm)</span><span>{{ order['subtotal']|vnd }}</span></div>
+                <div class="summary-row"><span>Giảm giá đơn hàng{% if order['coupon_code'] %} ({{ order['coupon_code'] }}){% endif %}</span><span>{{ order['discount']|vnd }}</span></div>
+                <div class="summary-row"><span>Phí vận chuyển</span><span>{{ 'Miễn phí' if order['shipping_fee'] == 0 else order['shipping_fee']|vnd }}</span></div>
+                <div class="summary-total"><span>Tổng cộng</span><span>{{ order['total']|vnd }}</span></div>
             </section>
 
             <section class="admin-card">
                 <h2 style="margin:0 0 1rem; font-size:1.125rem;">Thanh toán</h2>
-                <div class="summary-row"><span>Chuyển khoản ngân hàng</span><span><span class="badge badge-ok">Đã thanh toán</span></span></div>
-                <div class="summary-row"><span>Vietcombank · Mã giao dịch: VCB0112610285</span><span></span></div>
-                <div class="summary-row"><span>Đã nhận lúc 10:30, 01/11/2026</span><span>899.000₫</span></div>
-                <div class="summary-row"><span>Còn phải thu</span><span>0₫</span></div>
+                <div class="summary-row"><span>{{ payment_name }}</span><span><span class="badge {{ 'badge-ok' if order['payment_status'] == 'paid' else 'badge-warn' }}">{{ payment_status[order['payment_status']] }}</span></span></div>
+                <div class="summary-row"><span>Còn phải thu</span><span>{{ (0 if order['payment_status'] == 'paid' else order['total'])|vnd }}</span></div>
             </section>
 
             <section class="admin-card">
                 <div class="admin-card-head"><h2>Lịch sử xử lý</h2></div>
-                <div class="field"><label for="admin-note">Thêm ghi chú nội bộ</label><textarea class="input" id="admin-note" rows="3" placeholder="Nhập nội dung trao đổi với đơn hàng..."></textarea></div>
-                <p class="muted" style="margin-top:1rem;">10:40 · Minh Anh chuyển đơn sang Đang đóng gói.<br>10:35 · Minh Anh xác nhận đơn hàng.<br>10:30 · Hệ thống ghi nhận thanh toán 899.000₫.<br>10:28 · Trần Hoàng Nam đặt đơn hàng.</p>
+                <p class="muted">{% for e in events|reverse %}{{ e['created_at']|vn_datetime }} · {{ order_status[e['status']][0] if e['status'] in order_status else e['status'] }}.{% if not loop.last %}<br>{% endif %}{% endfor %}</p>
             </section>
         </div>
 
         <aside class="stack-gap">
             <section class="admin-card">
-                <div class="admin-card-head"><h2>Khách hàng</h2><a href="{{ url_for('admin.users') }}" class="link-underline">Xem hồ sơ →</a></div>
-                <p><strong>Trần Hoàng Nam</strong><br><span class="muted">KH00042 · Khách hàng quay lại</span></p>
-                <div class="summary-row"><span>090 456 7821</span><span></span></div>
-                <div class="summary-row"><span>nam.tran@gmail.com</span><span></span></div>
-                <div class="summary-row"><span>3 đơn hàng · Tổng chi tiêu 2.257.000₫</span><span></span></div>
+                <div class="admin-card-head"><h2>Khách hàng</h2>{% if customer %}<a href="{{ url_for('admin.user_detail', customer_id='KH%05d'|format(customer['id'])) }}" class="link-underline">Xem hồ sơ →</a>{% endif %}</div>
+                <p><strong>{{ order['full_name'] }}</strong>{% if customer %}<br><span class="muted">KH{{ '%05d'|format(customer['id']) }}</span>{% endif %}</p>
+                <div class="summary-row"><span>{{ order['phone'] }}</span><span></span></div>
+                <div class="summary-row"><span>{{ order['email'] }}</span><span></span></div>
+                {% if customer_stats %}<div class="summary-row"><span>{{ customer_stats['n'] }} đơn hàng · Tổng chi tiêu {{ customer_stats['spent']|vnd }}</span><span></span></div>{% endif %}
             </section>
             <section class="admin-card">
                 <div class="admin-card-head"><h2>Địa chỉ nhận hàng</h2></div>
-                <p>Trần Hoàng Nam<br>090 456 7821<br>45 Nguyễn Đình Chiểu, Phường Xuân Hòa, TP. Hồ Chí Minh<br>Việt Nam</p>
-                <p class="muted">Ghi chú của khách: Vui lòng gọi trước khi giao khoảng 15 phút.</p>
+                <p>{{ order['full_name'] }}<br>{{ order['phone'] }}<br>{{ order['street'] }}, {{ order['ward'] }}, {{ order['province'] }}<br>Việt Nam</p>
+                {% if order['note'] %}<p class="muted">Ghi chú của khách: {{ order['note'] }}</p>{% endif %}
             </section>
             <section class="admin-card">
                 <h2 style="margin:0 0 1rem; font-size:1.125rem;">Thông tin bổ sung</h2>
-                <div class="summary-row"><span>Nguồn</span><span>Cửa hàng trực tuyến</span></div>
-                <div class="summary-row"><span>Thiết bị</span><span>Điện thoại</span></div>
-                <div class="summary-row"><span>Mã khuyến mãi</span><span>Không áp dụng</span></div>
+                <div class="summary-row"><span>Trạng thái</span><span><span class="badge {{ order_status[order['status']][1] }}">{{ order_status[order['status']][0] }}</span></span></div>
+                <div class="summary-row"><span>Mã khuyến mãi</span><span>{{ order['coupon_code'] or 'Không áp dụng' }}</span></div>
+                <div class="summary-row"><span>Hóa đơn VAT</span><span>{{ 'Có' if order['vat_invoice'] else 'Không' }}</span></div>
             </section>
         </aside>
     </div>

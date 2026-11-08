@@ -72,9 +72,16 @@ def can_view_order(order) -> bool:
 @api_bp.post("/orders")
 @login_required
 def create_order():
+    order, payment = place_order(json_body())
+    response = jsonify(order=order_json(get_db(), order), requires_online_payment=payment != "cod")
+    response.status_code = 201
+    return response
+
+
+def place_order(data: dict):
+    """Tạo đơn từ giỏ hiện tại. Trả về (dòng orders, phương thức thanh toán); ném ApiError nếu không hợp lệ."""
     db = get_db()
     user = current_user()
-    data = json_body()
 
     # Dùng địa chỉ trong sổ địa chỉ nếu gửi address_id; các trường gửi kèm sẽ ghi đè.
     if data.get("address_id") is not None:
@@ -166,10 +173,7 @@ def create_order():
                 db, user["id"], {"full_name": full_name, "phone": phone, "province": province, "ward": ward, "street": street}
             )
 
-    order = db.execute("SELECT * FROM orders WHERE id = ?", (order_id,)).fetchone()
-    response = jsonify(order=order_json(db, order), requires_online_payment=payment != "cod")
-    response.status_code = 201
-    return response
+    return db.execute("SELECT * FROM orders WHERE id = ?", (order_id,)).fetchone(), payment
 
 
 @api_bp.get("/orders/<code>")

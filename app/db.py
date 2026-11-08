@@ -94,4 +94,7 @@ def init_app(app: Flask) -> None:
     if not app.config.get("TESTING"):
         with app.app_context():
             init_db()
+            from .seed import seed_reference
+
+            seed_reference(get_db())
             close_db()

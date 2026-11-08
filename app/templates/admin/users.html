@@ -15,7 +15,6 @@
             <h1 class="page-title">Quản lý khách hàng</h1>
         </div>
         <div class="toolbar">
-            <a href="{{ url_for('admin.reports') }}" class="btn btn-ghost">Xuất dữ liệu</a>
             <a href="{{ url_for('admin.user_new') }}" class="btn">+ Thêm khách hàng</a>
         </div>
     </header>
@@ -25,45 +24,47 @@
     {% endif %}
 
     <section class="stat-grid">
-        <article class="stat-card"><p>Tổng khách hàng</p><strong>1.248</strong><p>1.236 tài khoản đang hoạt động</p></article>
-        <article class="stat-card"><p>Khách mới tuần này</p><strong>48</strong><p>↑ 8,2% so với tuần trước</p></article>
-        <article class="stat-card"><p>Khách quay lại</p><strong>386</strong><p>30,9% tổng khách hàng</p></article>
-        <article class="stat-card"><p>Khách thân thiết</p><strong>126</strong><p>Từ 4 đơn hàng đã mua</p></article>
+        <article class="stat-card"><p>Tổng khách hàng</p><strong>{{ summary['total'] or 0 }}</strong><p>Tài khoản vai trò khách hàng</p></article>
+        <article class="stat-card"><p>Khách mới 7 ngày</p><strong>{{ summary['week'] or 0 }}</strong><p>Đăng ký trong 7 ngày qua</p></article>
+        <article class="stat-card"><p>Khách quay lại</p><strong>{{ summary['returning'] or 0 }}</strong><p>Từ 2 đến 3 đơn hàng</p></article>
+        <article class="stat-card"><p>Khách thân thiết</p><strong>{{ summary['loyal'] or 0 }}</strong><p>Từ 4 đơn hàng</p></article>
     </section>
 
     <section class="admin-card" style="padding:0;">
         <nav class="admin-tabs" aria-label="Nhóm khách hàng">
-            <a href="{{ url_for('admin.users', group='all') }}" class="is-active">Tất cả (1.248)</a>
-            <a href="{{ url_for('admin.users', group='active') }}">Hoạt động (1.236)</a>
-            <a href="{{ url_for('admin.users', group='loyal') }}">Thân thiết (126)</a>
-            <a href="{{ url_for('admin.users', group='locked') }}">Tạm khóa (12)</a>
+            <a href="{{ link('admin.users', group='all') }}" class="{% if group == 'all' %}is-active{% endif %}">Tất cả ({{ summary['total'] or 0 }})</a>
+            {% for key, (label, _) in groups.items() %}<a href="{{ link('admin.users', group=key) }}" class="{% if group == key %}is-active{% endif %}">{{ label }} ({{ summary[key] or 0 }})</a>{% endfor %}
         </nav>
 
         <form class="admin-filters" action="{{ url_for('admin.users') }}" method="get" style="padding:1.5rem;">
-            <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm tên, email hoặc số điện thoại...">
-            <select class="input input-rounded" name="group"><option>Nhóm khách hàng</option><option>Khách mới</option><option>Thân thiết</option></select>
-            <select class="input input-rounded" name="status"><option>Trạng thái</option><option>Hoạt động</option><option>Tạm khóa</option></select>
+            <input class="input input-rounded grow" type="search" name="q" value="{{ q }}" placeholder="Tìm tên, email hoặc số điện thoại...">
+            <select class="input input-rounded" name="group">
+                <option value="all">Nhóm khách hàng</option>
+                {% for key, (label, _) in groups.items() %}<option value="{{ key }}"{% if group == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
             <button type="submit" class="btn btn-ghost">Lọc</button>
         </form>
 
         <div class="table-wrap">
             <table class="admin-table">
-                <thead><tr><th>Khách hàng</th><th>Liên hệ</th><th>Số đơn</th><th>Tổng chi tiêu</th><th>Mua gần nhất</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <thead><tr><th>Khách hàng</th><th>Liên hệ</th><th>Số đơn</th><th>Tổng chi tiêu</th><th>Mua gần nhất</th><th>Thao tác</th></tr></thead>
                 <tbody>
-                    <tr><td><div class="order-line"><div class="avatar media-cream">MA</div><div class="grow"><a href="{{ url_for('admin.user_detail', customer_id='KH00057') }}"><strong>Nguyễn Minh Anh</strong></a><p class="meta">KH00057 · Thân thiết</p></div></div></td><td>minhanh.nguyen@gmail.com<p class="meta">090 123 4567</p></td><td>4</td><td>3.565.300₫</td><td>01/11/2026</td><td><span class="badge badge-ok">Hoạt động</span></td><td><a href="{{ url_for('admin.user_detail', customer_id='KH00057') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="order-line"><div class="avatar media-beige">TN</div><div class="grow"><a href="{{ url_for('admin.user_detail', customer_id='KH00042') }}"><strong>Trần Hoàng Nam</strong></a><p class="meta">KH00042 · Quay lại</p></div></div></td><td>nam.tran@gmail.com<p class="meta">090 456 7821</p></td><td>3</td><td>2.257.000₫</td><td>01/11/2026</td><td><span class="badge badge-ok">Hoạt động</span></td><td><a href="{{ url_for('admin.user_detail', customer_id='KH00042') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="order-line"><div class="avatar media-rose">LH</div><div class="grow"><a href="{{ url_for('admin.user_detail', customer_id='KH00081') }}"><strong>Lê Thu Hà</strong></a><p class="meta">KH00081 · Khách mới</p></div></div></td><td>ha.le@gmail.com<p class="meta">093 207 1890</p></td><td>2</td><td>1.816.000₫</td><td>01/11/2026</td><td><span class="badge badge-ok">Hoạt động</span></td><td><a href="{{ url_for('admin.user_detail', customer_id='KH00081') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="order-line"><div class="avatar media-denim">PK</div><div class="grow"><a href="{{ url_for('admin.user_detail', customer_id='KH00108') }}"><strong>Phạm Khánh Linh</strong></a><p class="meta">KH00108 · Khách mới</p></div></div></td><td>linh.pham@gmail.com<p class="meta">098 342 5601</p></td><td>1</td><td>459.000₫</td><td>01/11/2026</td><td><span class="badge badge-ok">Hoạt động</span></td><td><a href="{{ url_for('admin.user_detail', customer_id='KH00108') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><div class="order-line"><div class="avatar media-olive">QB</div><div class="grow"><a href="{{ url_for('admin.user_detail', customer_id='KH00036') }}"><strong>Vũ Quốc Bảo</strong></a><p class="meta">KH00036 · Thân thiết</p></div></div></td><td>bao.vu@gmail.com<p class="meta">091 782 3045</p></td><td>6</td><td>5.149.000₫</td><td>01/11/2026</td><td><span class="badge badge-ok">Hoạt động</span></td><td><a href="{{ url_for('admin.user_detail', customer_id='KH00036') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    {% for c in customers %}
+                    <tr>
+                        <td><div class="order-line"><div class="avatar media-cream">{{ c['initials'] }}</div><div class="grow"><a href="{{ url_for('admin.user_detail', customer_id=c['code']) }}"><strong>{{ c['full_name'] }}</strong></a><p class="meta">{{ c['code'] }} · {{ c['group'] }}</p></div></div></td>
+                        <td>{{ c['email'] }}<p class="meta">{{ c['phone'] or '—' }}</p></td>
+                        <td>{{ c['order_count'] }}</td>
+                        <td>{{ c['spent']|vnd }}</td>
+                        <td>{{ (c['last_order']|vn_datetime(false)) if c['last_order'] else 'Chưa mua' }}</td>
+                        <td><a href="{{ url_for('admin.user_detail', customer_id=c['code']) }}" class="link-underline">Xem chi tiết</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="muted">Không có khách hàng nào phù hợp.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-        <nav class="pagination" aria-label="Phân trang khách hàng" style="padding:0 1.5rem 1.5rem;">
-            <a href="{{ url_for('admin.users', page=1) }}" class="page-num page-num-sm is-active">1</a>
-            <a href="{{ url_for('admin.users', page=2) }}" class="page-num page-num-sm">2</a>
-            <a href="{{ url_for('admin.users', page=3) }}" class="page-num page-num-sm">3</a>
-            <a href="{{ url_for('admin.users', page=2) }}" class="page-num page-num-sm">Tiếp →</a>
-        </nav>
+        {% include "layouts/partials/_admin_pager.html" %}
     </section>
 </main>
 {% endblock %}

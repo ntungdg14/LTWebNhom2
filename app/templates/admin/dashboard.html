@@ -13,7 +13,6 @@
             <h1 class="page-title">Tổng quan cửa hàng</h1>
         </div>
         <div class="toolbar">
-            <a href="{{ url_for('admin.reports') }}" class="btn btn-ghost">Xuất báo cáo</a>
         </div>
     </header>
 
@@ -43,7 +42,7 @@
             <div class="admin-card-head"><h2>Cần xử lý</h2></div>
             <p class="muted">Những việc cần bạn chú ý hôm nay.</p>
             <div class="summary-row"><a href="{{ url_for('admin.orders', status='pending') }}"><strong>12</strong> Đơn chờ xác nhận</a><span>→</span></div>
-            <div class="summary-row"><a href="{{ url_for('admin.inventory') }}"><strong>08</strong> Sản phẩm sắp hết hàng</a><span>→</span></div>
+            <div class="summary-row"><a href="{{ url_for('admin.products') }}"><strong>08</strong> Sản phẩm sắp hết hàng</a><span>→</span></div>
             <div class="summary-row"><a href="{{ url_for('admin.orders', status='returns') }}"><strong>03</strong> Yêu cầu đổi trả</a><span>→</span></div>
         </aside>
     </section>

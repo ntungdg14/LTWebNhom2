@@ -6,10 +6,7 @@
     <a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint.startswith('admin.order') %}is-active{% endif %}">Đơn hàng</a>
     <a href="{{ url_for('admin.products') }}" class="{% if request.endpoint.startswith('admin.product') %}is-active{% endif %}">Sản phẩm</a>
     <a href="{{ url_for('admin.categories') }}" class="admin-sub-item {% if request.endpoint.startswith('admin.categor') %}is-active{% endif %}">Danh mục</a>
-    <a href="{{ url_for('admin.inventory') }}" class="{% if request.endpoint == 'admin.inventory' %}is-active{% endif %}">Kho hàng</a>
     <a href="{{ url_for('admin.users') }}" class="{% if request.endpoint.startswith('admin.user') %}is-active{% endif %}">Khách hàng</a>
-    <a href="{{ url_for('admin.promotions') }}" class="{% if request.endpoint == 'admin.promotions' %}is-active{% endif %}">Khuyến mãi</a>
-    <a href="{{ url_for('admin.reports') }}" class="{% if request.endpoint == 'admin.reports' %}is-active{% endif %}">Báo cáo</a>
 
     <a href="{{ url_for('admin.permissions') }}" class="{% if request.endpoint == 'admin.permissions' %}is-active{% endif %}">Phân quyền tài khoản</a>
 

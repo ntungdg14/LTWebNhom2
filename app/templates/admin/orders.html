@@ -13,34 +13,35 @@
         <div>
             <h1 class="page-title">Quản lý đơn hàng</h1>
         </div>
-        <div class="toolbar">
-            <a href="{{ url_for('admin.reports') }}" class="btn btn-ghost">Xuất đơn hàng</a>
-            <a href="{{ url_for('admin.order_detail', order_id='FR10286') }}" class="btn">+ Tạo đơn hàng</a>
-        </div>
     </header>
 
     <section class="stat-grid">
-        <article class="stat-card"><p>Đơn hàng tuần này</p><strong>186</strong><p>↑ 12,0% so với tuần trước</p></article>
-        <article class="stat-card"><p>Chờ xác nhận</p><strong>12</strong><p>Cần xử lý trong hôm nay</p></article>
-        <article class="stat-card"><p>Đang xử lý</p><strong>26</strong><p>Đang chuẩn bị và đóng gói</p></article>
-        <article class="stat-card"><p>Đang giao</p><strong>34</strong><p>Đã bàn giao cho vận chuyển</p></article>
+        <article class="stat-card"><p>Đơn hàng 7 ngày qua</p><strong>{{ week }}</strong><p>Tổng cộng {{ all_count }} đơn</p></article>
+        <article class="stat-card"><p>Chờ xác nhận</p><strong>{{ counts.get('pending', 0) }}</strong><p>Cần xử lý trong hôm nay</p></article>
+        <article class="stat-card"><p>Đang xử lý</p><strong>{{ counts.get('preparing', 0) }}</strong><p>Đang chuẩn bị và đóng gói</p></article>
+        <article class="stat-card"><p>Đang giao</p><strong>{{ counts.get('shipping', 0) }}</strong><p>Đã bàn giao cho vận chuyển</p></article>
     </section>
 
     <section class="admin-card" style="padding:0;">
         <nav class="admin-tabs" aria-label="Trạng thái đơn hàng">
-            <a href="{{ url_for('admin.orders', status='all') }}" class="is-active">Tất cả</a>
-            <a href="{{ url_for('admin.orders', status='pending') }}">Chờ xác nhận</a>
-            <a href="{{ url_for('admin.orders', status='processing') }}">Đang xử lý</a>
-            <a href="{{ url_for('admin.orders', status='shipping') }}">Đang giao</a>
-            <a href="{{ url_for('admin.orders', status='done') }}">Hoàn thành</a>
-            <a href="{{ url_for('admin.orders', status='cancelled') }}">Đã hủy</a>
+            <a href="{{ link('admin.orders', status='all') }}" class="{% if status == 'all' %}is-active{% endif %}">Tất cả ({{ all_count }})</a>
+            {% for key, (label, _) in order_status.items() %}<a href="{{ link('admin.orders', status=key) }}" class="{% if status == key %}is-active{% endif %}">{{ label }} ({{ counts.get(key, 0) }})</a>{% endfor %}
         </nav>
 
         <form class="admin-filters" action="{{ url_for('admin.orders') }}" method="get" style="padding:1.5rem;">
-            <input class="input input-rounded grow" type="search" name="q" placeholder="Tìm mã đơn, tên hoặc SĐT khách hàng...">
-            <select class="input input-rounded" name="date"><option>26/10 – 01/11/2026</option><option>Tháng 10/2026</option></select>
-            <select class="input input-rounded" name="payment"><option>Thanh toán</option><option>Đã thanh toán</option><option>Chưa thu tiền</option></select>
-            <select class="input input-rounded" name="shipping"><option>Giao hàng</option><option>Giao hàng nhanh</option><option>Tiêu chuẩn</option></select>
+            <input class="input input-rounded grow" type="search" name="q" value="{{ q }}" placeholder="Tìm mã đơn, tên hoặc SĐT khách hàng...">
+            <select class="input input-rounded" name="status">
+                <option value="all">Tất cả trạng thái</option>
+                {% for key, (label, _) in order_status.items() %}<option value="{{ key }}"{% if status == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <select class="input input-rounded" name="payment">
+                <option value="all">Thanh toán</option>
+                {% for key, label in payment_status.items() %}<option value="{{ key }}"{% if payment == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <select class="input input-rounded" name="shipping">
+                <option value="all">Giao hàng</option>
+                {% for key, m in shipping_methods.items() %}<option value="{{ key }}"{% if shipping == key %} selected{% endif %}>{{ m['name'] }}</option>{% endfor %}
+            </select>
             <button type="submit" class="btn btn-ghost">Lọc</button>
         </form>
 
@@ -48,22 +49,22 @@
             <table class="admin-table">
                 <thead><tr><th>Mã đơn / Ngày</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thanh toán</th><th>Thao tác</th></tr></thead>
                 <tbody>
-                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10286') }}"><strong>#FR10286</strong></a><p class="meta">01/11/2026 · 10:42</p></td><td>Nguyễn Minh Anh<p class="meta">Cửa hàng trực tuyến</p></td><td>1.108.000₫</td><td><span class="badge badge-danger">Chờ xác nhận</span></td><td>Chưa thu tiền</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10286') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10285') }}"><strong>#FR10285</strong></a><p class="meta">01/11/2026 · 10:28</p></td><td>Trần Hoàng Nam<p class="meta">Cửa hàng trực tuyến</p></td><td>899.000₫</td><td><span class="badge badge-warn">Đang đóng gói</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10285') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10284') }}"><strong>#FR10284</strong></a><p class="meta">01/11/2026 · 10:15</p></td><td>Lê Thu Hà<p class="meta">Cửa hàng trực tuyến</p></td><td>1.357.000₫</td><td><span class="badge badge-warn">Đang giao</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10284') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10283') }}"><strong>#FR10283</strong></a><p class="meta">01/11/2026 · 09:56</p></td><td>Phạm Khánh Linh<p class="meta">Cửa hàng trực tuyến</p></td><td>459.000₫</td><td><span class="badge badge-ok">Hoàn thành</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10283') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10282') }}"><strong>#FR10282</strong></a><p class="meta">01/11/2026 · 09:32</p></td><td>Vũ Quốc Bảo<p class="meta">Cửa hàng trực tuyến</p></td><td>898.000₫</td><td><span class="badge badge-ok">Hoàn thành</span></td><td>Đã thanh toán</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10282') }}" class="link-underline">Xem chi tiết</a></td></tr>
-                    <tr><td><a href="{{ url_for('admin.order_detail', order_id='FR10281') }}"><strong>#FR10281</strong></a><p class="meta">01/11/2026 · 09:18</p></td><td>Đặng Ngọc Mại<p class="meta">Cửa hàng trực tuyến</p></td><td>589.000₫</td><td><span class="badge badge-danger">Chờ xác nhận</span></td><td>Chưa thu tiền</td><td><a href="{{ url_for('admin.order_detail', order_id='FR10281') }}" class="link-underline">Xem chi tiết</a></td></tr>
+                    {% for o in orders %}
+                    <tr>
+                        <td><a href="{{ url_for('admin.order_detail', order_id=o['code']) }}"><strong>#{{ o['code'] }}</strong></a><p class="meta">{{ o['created_at']|vn_datetime }}</p></td>
+                        <td>{{ o['full_name'] }}<p class="meta">{{ o['phone'] }}</p></td>
+                        <td>{{ o['total']|vnd }}</td>
+                        <td><span class="badge {{ order_status[o['status']][1] }}">{{ order_status[o['status']][0] }}</span></td>
+                        <td>{{ payment_status[o['payment_status']] }}</td>
+                        <td><a href="{{ url_for('admin.order_detail', order_id=o['code']) }}" class="link-underline">Xem chi tiết</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="muted">Không có đơn hàng nào phù hợp.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-        <nav class="pagination" aria-label="Phân trang đơn hàng" style="padding:0 1.5rem 1.5rem;">
-            <a href="{{ url_for('admin.orders', page=1) }}" class="page-num page-num-sm is-active">1</a>
-            <a href="{{ url_for('admin.orders', page=2) }}" class="page-num page-num-sm">2</a>
-            <a href="{{ url_for('admin.orders', page=3) }}" class="page-num page-num-sm">3</a>
-            <a href="{{ url_for('admin.orders', page=2) }}" class="page-num page-num-sm">Tiếp →</a>
-        </nav>
+        {% include "layouts/partials/_admin_pager.html" %}
     </section>
-
 </main>
 {% endblock %}

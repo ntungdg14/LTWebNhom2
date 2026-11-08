@@ -16,8 +16,6 @@
             <p class="meta">Quản lý danh mục hàng hóa, giá bán và tồn kho trên cửa hàng.</p>
         </div>
         <div class="toolbar">
-            <a href="{{ url_for('admin.inventory') }}" class="btn btn-ghost">Nhập sản phẩm</a>
-            <a href="{{ url_for('admin.reports') }}" class="btn btn-ghost">Xuất dữ liệu</a>
             <a href="{{ url_for('admin.product_new') }}" class="btn">+ Thêm sản phẩm</a>
         </div>
     </header>
@@ -27,24 +25,35 @@
     {% endif %}
 
     <section class="stat-grid">
-        <article class="stat-card"><p>Tổng sản phẩm</p><strong>142</strong><p>6 danh mục sản phẩm</p></article>
-        <article class="stat-card"><p>Đang bán</p><strong>128</strong><p>Đang hiển thị trên cửa hàng</p></article>
-        <article class="stat-card"><p>Sắp hết hàng</p><strong>8</strong><p>Tồn kho dưới 10 sản phẩm</p></article>
-        <article class="stat-card"><p>Bản nháp</p><strong>14</strong><p>Chưa xuất bản trên cửa hàng</p></article>
+        <article class="stat-card"><p>Tổng sản phẩm</p><strong>{{ stats['total'] or 0 }}</strong><p>{{ category_count }} danh mục sản phẩm</p></article>
+        <article class="stat-card"><p>Đang bán</p><strong>{{ stats['active'] or 0 }}</strong><p>Đang hiển thị trên cửa hàng</p></article>
+        <article class="stat-card"><p>Sắp hết hàng</p><strong>{{ stats['low'] or 0 }}</strong><p>Tồn kho dưới {{ low_stock }} sản phẩm</p></article>
+        <article class="stat-card"><p>Bản nháp</p><strong>{{ stats['draft'] or 0 }}</strong><p>Chưa xuất bản trên cửa hàng</p></article>
     </section>
 
     <section class="admin-card" style="padding:0;">
         <nav class="admin-tabs" aria-label="Trạng thái sản phẩm">
-            <a href="{{ url_for('admin.products', status='all') }}" class="is-ac120705tive">Tất cả</a>
-            <a href="{{ url_for('admin.products', status='selling') }}">Đang bán</a>
-            <a href="{{ url_for('admin.products', status='draft') }}">Bản nháp</a>
-            <a href="{{ url_for('admin.products', status='archived') }}">Đã lưu trữ</a>
+            <a href="{{ link('admin.products', status='all') }}" class="{% if status == 'all' %}is-active{% endif %}">Tất cả</a>
+            {% for key, (label, _) in product_status.items() %}<a href="{{ link('admin.products', status=key) }}" class="{% if status == key %}is-active{% endif %}">{{ label }}</a>{% endfor %}
         </nav>
 
         <form class="admin-filters" action="{{ url_for('admin.products') }}" method="get" style="padding:1.5rem;">
-            <select class="input input-rounded" name="category"><option>Tất cả danh mục</option><option>Áo sơ mi</option><option>Áo khoác</option><option>Quần jean</option></select>
-            <select class="input input-rounded" name="status"><option>Tất cả trạng thái</option><option>Đang bán</option><option>Bản nháp</option></select>
-            <select class="input input-rounded" name="stock"><option>Tồn kho</option><option>Còn hàng</option><option>Sắp hết</option></select>
+            <input class="input input-rounded grow" type="search" name="q" value="{{ q }}" placeholder="Tìm tên hoặc SKU...">
+            <select class="input input-rounded" name="category">
+                <option value="">Tất cả danh mục</option>
+                {% for c in category_options %}<option value="{{ c['id'] }}"{% if category == c['id'] %} selected{% endif %}>{{ c['name'] }}</option>{% endfor %}
+            </select>
+            <select class="input input-rounded" name="status">
+                <option value="all">Tất cả trạng thái</option>
+                {% for key, (label, _) in product_status.items() %}<option value="{{ key }}"{% if status == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <select class="input input-rounded" name="stock">
+                <option value="all">Tồn kho</option>
+                <option value="in"{% if stock == 'in' %} selected{% endif %}>Còn hàng</option>
+                <option value="low"{% if stock == 'low' %} selected{% endif %}>Sắp hết</option>
+                <option value="out"{% if stock == 'out' %} selected{% endif %}>Hết hàng</option>
+            </select>
+            <button type="submit" class="btn btn-ghost">Lọc</button>
         </form>
 
         <div class="table-wrap">
@@ -53,21 +62,23 @@
                     <tr><th>Hình ảnh</th><th>Tên sản phẩm / SKU</th><th>Danh mục</th><th>Giá bán</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td><div class="media media-xs media-beige">Ảnh</div></td><td><a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}"><strong>Áo sơ mi Oxford dáng rộng</strong></a><p class="meta">FR-OXF-001 · Trắng kem</p></td><td>Áo sơ mi</td><td>459.000₫</td><td>86</td><td><span class="badge badge-ok">Đang bán</span></td><td><a href="{{ url_for('admin.product_edit', sku='FR-OXF-001') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin.products', remove='FR-OXF-001') }}" class="link-underline">Ẩn</a></td></tr>
-                    <tr><td><div class="media media-xs media-denim">Ảnh</div></td><td><a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}"><strong>Áo khoác bomber Uniform</strong></a><p class="meta">FR-BOM-002 · Nâu dừa</p></td><td>Áo khoác</td><td>899.000₫</td><td>24</td><td><span class="badge badge-ok">Đang bán</span></td><td><a href="{{ url_for('admin.product_edit', sku='FR-BOM-002') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin.products', remove='FR-BOM-002') }}" class="link-underline">Ẩn</a></td></tr>
-                    <tr><td><div class="media media-xs media-cream">Ảnh</div></td><td><a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}"><strong>Quần jean ống suông Indigo</strong></a><p class="meta">FR-JEA-003 · Xanh đậm</p></td><td>Quần jean</td><td>649.000₫</td><td>8 <span class="warn">Sắp hết</span></td><td><span class="badge badge-ok">Đang bán</span></td><td><a href="{{ url_for('admin.product_edit', sku='FR-JEA-003') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin.products', remove='FR-JEA-003') }}" class="link-underline">Ẩn</a></td></tr>
-                    <tr><td><div class="media media-xs media-taupe">Ảnh</div></td><td><a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}"><strong>Áo thun cotton Essential</strong></a><p class="meta">FR-TEE-004 · Den vintage</p></td><td>Áo thun</td><td>249.000₫</td><td>64</td><td><span class="badge badge-ok">Đang bán</span></td><td><a href="{{ url_for('admin.product_edit', sku='FR-TEE-004') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin.products', remove='FR-TEE-004') }}" class="link-underline">Ẩn</a></td></tr>
-                    <tr><td><div class="media media-xs media-rose">Ảnh</div></td><td><a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}"><strong>Áo len dệt waffle cổ tròn</strong></a><p class="meta">FR-KNT-005 · Hồng đất</p></td><td>Áo len</td><td>589.000₫</td><td>32</td><td><span class="badge badge-ok">Đang bán</span></td><td><a href="{{ url_for('admin.product_edit', sku='FR-KNT-005') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin.products', remove='FR-KNT-005') }}" class="link-underline">Ẩn</a></td></tr>
-                    <tr><td><div class="media media-xs media-olive">Ảnh</div></td><td><a href="{{ url_for('store.product_detail', sku='FR-OVS-006') }}"><strong>Áo overshirt Heavyweight</strong></a><p class="meta">FR-OVS-006 · Rêu</p></td><td>Áo khoác</td><td>799.000₫</td><td>0 <span class="warn">Hết hàng</span></td><td><span class="badge badge-ok">Đang bán</span></td><td><a href="{{ url_for('admin.product_edit', sku='FR-OVS-006') }}" class="link-underline">Sửa</a> <a href="{{ url_for('admin.products', remove='FR-OVS-006') }}" class="link-underline">Ẩn</a></td></tr>
+                    {% for p in products %}
+                    <tr>
+                        <td>{% if p['image_url'] %}<img src="{{ p['image_url'] }}" alt="{{ p['name'] }}" width="48" height="48" style="object-fit:cover;">{% else %}<div class="media media-xs media-{{ p['image_tone'] or p['tone'] }}">Ảnh</div>{% endif %}</td>
+                        <td><a href="{{ url_for('store.product_detail', sku=p['sku']) }}"><strong>{{ p['name'] }}</strong></a><p class="meta">{{ p['sku'] }}{% if p['colors'] %} · {{ p['colors'] }}{% endif %}</p></td>
+                        <td>{{ p['category_name'] }}</td>
+                        <td>{{ p['price']|vnd }}</td>
+                        <td>{{ p['stock'] }}{% if p['stock'] == 0 %} <span class="warn">Hết hàng</span>{% elif p['stock'] < low_stock %} <span class="warn">Sắp hết</span>{% endif %}</td>
+                        <td><span class="badge {{ product_status[p['status']][1] }}">{{ product_status[p['status']][0] }}</span></td>
+                        <td><a href="{{ url_for('admin.product_edit', sku=p['sku']) }}" class="link-underline">Sửa</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="muted">Không có sản phẩm nào phù hợp.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-        <nav class="pagination" aria-label="Phân trang sản phẩm" style="padding:0 1.5rem 1.5rem;">
-            <a href="{{ url_for('admin.products', page=1) }}" class="page-num page-num-sm is-active">1</a>
-            <a href="{{ url_for('admin.products', page=2) }}" class="page-num page-num-sm">2</a>
-            <a href="{{ url_for('admin.products', page=3) }}" class="page-num page-num-sm">3</a>
-            <a href="{{ url_for('admin.products', page=2) }}" class="page-num page-num-sm">Tiếp →</a>
-        </nav>
+        {% include "layouts/partials/_admin_pager.html" %}
     </section>
 </main>
 {% endblock %}
