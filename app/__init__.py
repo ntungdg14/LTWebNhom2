@@ -19,9 +19,16 @@ def create_app(config_name: str | None = None) -> Flask:
 
     db.init_app(app)
 
+    from .common.helpers import current_user
+
+    app.jinja_env.globals["current_user"] = current_user
+
     from .common.errors import register_error_handlers
 
     register_error_handlers(app)
+
+    from .common.jwt_auth import init_app as init_jwt
+    init_jwt(app)
 
     # Import ở đây để tránh vòng lặp import giữa app và các blueprint.
     from .blueprints import blueprints

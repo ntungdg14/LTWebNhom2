@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS users (
     created_at          TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Logout của JWT hiện tại; session_version dùng cho logout-all/đổi mật khẩu.
+CREATE TABLE IF NOT EXISTS revoked_tokens (
+    jti TEXT PRIMARY KEY,
+    expires_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS password_resets (
     token      TEXT PRIMARY KEY,                    -- lưu SHA-256 của token
     user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

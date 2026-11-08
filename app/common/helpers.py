@@ -1,4 +1,4 @@
-"""Tiện ích dùng chung cho API: lỗi JSON, đăng nhập theo session, kiểm tra dữ liệu.
+"""Tiện ích dùng chung cho API: lỗi JSON, xác thực JWT, kiểm tra dữ liệu.
 
 Quy ước phản hồi lỗi::
 
@@ -191,30 +191,43 @@ class Fields:
 
 # ------------------------------------------------------------ đăng nhập
 def login_user(user, remember: bool = False) -> None:
-    session["uid"] = user["id"]
-    session["sv"] = user["session_version"]
-    session.permanent = bool(remember)
+    # Cookie được ghi trên response cuối request (kể cả sau khi gộp giỏ khách).
+    from .jwt_auth import verify, revoke, COOKIE
+
+    revoke(verify(request.cookies.get(COOKIE)))  # đổi mật khẩu thay token hiện tại
+    g.jwt_issue = (user, remember)
+    g.jwt_payload = None
     g.user = user
+    # Phiên Flask chỉ lưu giỏ khách/mã đơn, không chứa thông tin xác thực.
+    session.pop("uid", None)
+    session.pop("sv", None)
+    session.permanent = False
 
 
 def logout_user() -> None:
+    from .jwt_auth import COOKIE, revoke, verify
+
+    revoke(verify(request.cookies.get(COOKIE)))
+    g.jwt_clear = True
+    g.jwt_issue = None
+    g.jwt_payload = None
     session.clear()
     g.user = None
 
 
 def current_user():
-    """Trả về hàng users của người đang đăng nhập (hoặc None)."""
+    """Chỉ tin JWT HS256 trong cookie, không tin uid trong Flask session cũ."""
+    from .jwt_auth import COOKIE, verify
+
     if "user" in g:
         return g.user
+    payload = verify(request.cookies.get(COOKIE))
     user = None
-    uid = session.get("uid")
-    if uid is not None:
-        row = get_db().execute("SELECT * FROM users WHERE id = ?", (uid,)).fetchone()
-        if row is not None and row["session_version"] == session.get("sv"):
+    if payload is not None:
+        row = get_db().execute("SELECT * FROM users WHERE id = ?", (int(payload["sub"]),)).fetchone()
+        if row is not None and row["session_version"] == payload["sv"]:
             user = row
-        else:  # tài khoản bị xóa hoặc đã "đăng xuất mọi thiết bị"
-            session.pop("uid", None)
-            session.pop("sv", None)
+            g.jwt_payload = payload
     g.user = user
     return user
 

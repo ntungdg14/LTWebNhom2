@@ -20,7 +20,7 @@ from __future__ import annotations
 import math
 import sqlite3
 
-from flask import jsonify, request, session
+from flask import jsonify, request, g
 from flask.views import MethodView
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -107,7 +107,7 @@ def change_password():
         (generate_password_hash(new), user["id"]),
     )
     # Thiết bị hiện tại vẫn đăng nhập; các thiết bị khác bị đăng xuất do session_version đổi.
-    login_user(db.execute("SELECT * FROM users WHERE id = ?", (user["id"],)).fetchone(), remember=session.permanent)
+    login_user(db.execute("SELECT * FROM users WHERE id = ?", (user["id"],)).fetchone(), remember=g.jwt_payload["remember"] if g.get("jwt_payload") else False)
     return jsonify(ok=True, message="Đã cập nhật mật khẩu.")
 
 
@@ -117,7 +117,8 @@ def logout_all():
     db = get_db()
     user = current_user()
     db.execute("UPDATE users SET session_version = session_version + 1 WHERE id = ?", (user["id"],))
-    session.clear()
+    from ...common.helpers import logout_user
+    logout_user()
     return jsonify(ok=True)
 
 

@@ -10,59 +10,7 @@
 {% block content %}
 {% set active_step = 4 %}
 {% include "layouts/partials/_checkout_steps.html" %}
-
-<div class="page-success">
-    <div class="success-icon" aria-label="Đặt hàng thành công">✓</div>
-    <h1 class="page-title mt-4">Cảm ơn bạn đã chọn Freesion.</h1>
-    <p class="muted">Đơn hàng của bạn đã được đặt thành công!</p>
-    <p class="muted">Chúng tôi đã gửi xác nhận đến minhanh.nguyen@gmail.com.</p>
-    <p class="success-meta">Mã đơn: <strong>#FR261101028</strong> &nbsp; Ngày đặt: 01/11/2026, 10:32 &nbsp; <span class="badge badge-warn">Đã tiếp nhận</span></p>
-
-    <section class="success-delivery">
-        <p class="eyebrow">Món đồ mới đang ghé bạn</p>
-        <strong>Dự kiến nhận hàng: 04–06/11/2026</strong>
-        <span>Giao hàng tiêu chuẩn · Miễn phí</span>
-    </section>
-
-    <div class="success-columns">
-        <section>
-            <h2>Thông tin giao nhận</h2>
-            <p><strong>Nguyễn Minh Anh</strong> · 090 123 4567<br>
-            28 Nguyễn Thị Minh Khai, Phường Sài Gòn, TP. Hồ Chí Minh<br>
-            minhanh.nguyen@gmail.com</p>
-            <p class="muted">Ghi chú: Vui lòng gọi trước khi giao khoảng 15 phút.</p>
-        </section>
-        <section>
-            <h2>Thông tin thanh toán</h2>
-            <p>Thanh toán khi nhận hàng (COD)<br>
-            Thanh toán 1.257.300₫ cho nhân viên giao hàng.<br>
-            Trạng thái: Chưa thanh toán</p>
-            <p class="muted">Bạn sẽ nhận được thông báo khi đơn hàng được bàn giao cho đơn vị vận chuyển.</p>
-        </section>
-    </div>
-
-    <section class="success-products">
-        <h2>Sản phẩm đã đặt</h2>
-        <p class="muted">2 dòng sản phẩm · Tổng số lượng: 3</p>
-        <div class="order-line"><div class="media media-sm media-taupe">Ảnh sản phẩm</div><div class="grow"><h3>Áo thun cotton Essential</h3><p class="meta">Size M | Den vintage<br>249.000₫ × 2</p></div><span>498.000₫</span></div>
-        <div class="order-line"><div class="media media-sm media-beige">Ảnh sản phẩm</div><div class="grow"><h3>Áo khoác bomber Uniform</h3><p class="meta">Size L | Nâu dừa<br>899.000₫ × 1</p></div><span>899.000₫</span></div>
-        <div class="summary-row"><span>Tạm tính (3 sản phẩm)</span><span>1.397.000₫</span></div>
-        <div class="summary-row"><span>Giảm giá · TUDO10 (10%)</span><span>-139.700₫</span></div>
-        <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-        <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
-    </section>
-
-    <div class="success-actions">
-        <a href="{{ url_for('account.order_detail', order_id='FR261101028') }}" class="btn">Xem chi tiết đơn hàng</a>
-        <a href="{{ url_for('store.shop') }}" class="btn btn-ghost">Tiếp tục mua sắm</a>
-    </div>
-
-    <div class="success-support">
-        <div>
-            <h2>Cần giúp với đơn hàng của bạn?</h2>
-            <p>1900 636 028 · hello@freesion.vn · 8:30–21:00 mỗi ngày</p>
-        </div>
-        <a href="{{ url_for('auth.login') }}" class="link-underline">Liên hệ Freesion</a>
-    </div>
-</div>
+<div class="page page-narrow"><h1 class="page-title">Đặt hàng thành công</h1>
+<p id="order-result" role="status">Đang tải thông tin đơn hàng…</p>
+<a href="{{ url_for('account.order_history') }}" class="btn">Xem đơn hàng</a></div>
 {% endblock %}

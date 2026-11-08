@@ -2,7 +2,8 @@
 
 Ngoài ra có 3 trang thông tin tĩnh dùng cho các liên kết chân trang / biểu mẫu.
 """
-from flask import render_template
+from flask import render_template, redirect, request, url_for
+from ...common.helpers import current_user
 
 from . import store_bp
 
@@ -41,6 +42,8 @@ def product_detail():
 
 @store_bp.route("/cart")
 def cart():
+    if current_user() is None:
+        return redirect(url_for("auth.login", next=request.full_path.rstrip("?")))
     return render_template("store/cart.html")
 
 

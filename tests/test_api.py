@@ -39,6 +39,9 @@ class ApiTestCase(unittest.TestCase):
     def call(self, method, url, body=None, client=None, expect=None):
         client = client or self.client
         kwargs = {"json": body} if body is not None else {}
+        csrf = client.get_cookie("csrf_token")
+        if csrf and method.lower() not in ("get", "head"):
+            kwargs["headers"] = {"X-CSRF-Token": csrf.value}
         response = getattr(client, method)(url, **kwargs)
         if expect is not None:
             self.assertEqual(response.status_code, expect, response.get_data(as_text=True))

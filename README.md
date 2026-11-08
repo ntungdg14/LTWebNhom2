@@ -60,7 +60,7 @@ python -m unittest discover -s tests -v
 │   │       └── routes.py        # view + render_template
 │   ├── common/                  # dùng chung cho các file api.py
 │   │   ├── errors.py            # lỗi JSON cho mọi URL /api/...
-│   │   ├── helpers.py           # ApiError, kiểm tra dữ liệu, đăng nhập theo session
+│   │   ├── helpers.py           # ApiError, kiểm tra dữ liệu, xác thực JWT
 │   │   ├── serializers.py       # định dạng JSON trả về
 │   │   ├── services.py          # giỏ hàng, giá, mã giảm giá, phí ship
 │   │   └── tracking.py          # theo dõi đơn (mô phỏng): timeline từ orders.status, đẩy đơn sang bước kế
@@ -119,7 +119,7 @@ flask --app run seed-db     # nạp dữ liệu mẫu (chỉ khi chưa có sản
 
 File CSDL mặc định `instance/freesion.db`; đổi bằng biến môi trường `DATABASE`.
 
-Quy ước: body gửi lên là JSON (`Content-Type: application/json`); đăng nhập bằng cookie session.
+Quy ước: body gửi lên là JSON (`Content-Type: application/json`); đăng nhập bằng JWT HS256 trong cookie `access_token` HttpOnly (không gửi Bearer token).
 Lỗi luôn có dạng `{"error": {"code", "message", "fields"?}}` (400 sai tham số, 401 chưa đăng nhập,
 404 không thấy, 409 xung đột như hết hàng, 422 dữ liệu không hợp lệ).
 
@@ -247,3 +247,19 @@ checklist).
 ## Đóng góp
 
 Xem [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
+
+### Tích hợp giao diện khách hàng (JWT)
+
+Giao diện Jinja/JavaScript gọi API cùng origin; `API_BASE_URL` mặc định rỗng (không cần thiết lập khi chạy Flask trực tiếp). Nếu triển khai khác origin, phải cấu hình proxy cùng origin để JWT trong cookie HttpOnly được gửi đúng; không dùng localStorage. Đăng ký hiện tạo phiên ngay trên backend, giao diện **không gọi thêm đăng nhập** và quay về URL `next` (chỉ nhận đường dẫn tương đối nội bộ). Mật khẩu: tối thiểu 8 ký tự có chữ hoa, chữ thường và số.
+
+Trang giỏ hàng, thanh toán và tài khoản được bảo vệ tại route Flask; các nút mua hàng kiểm tra phiên trước khi thao tác. Giỏ hàng và quy trình đặt hàng giao diện dùng API thực, không còn hiển thị mặt hàng mẫu trên các trang này. Một số trang khác (shop, chi tiết sản phẩm, hồ sơ/lịch sử đơn) vẫn có nội dung demo: việc chuyển toàn bộ các trang này sang dữ liệu API cần thực hiện ở giai đoạn tiếp theo. API backend giỏ hàng/đặt hàng vốn hỗ trợ khách vãng lai và vẫn như cũ; giới hạn đăng nhập hiện áp dụng cho **giao diện**, không phải bảo mật trực tiếp các endpoint đó. Thanh toán online chưa có cổng thanh toán; nên dùng COD khi kiểm thử.
+
+Kiểm thử thủ công: mở `/register` nhập email mới và mật khẩu mạnh, thử xác nhận sai và email trùng; mở `/login` thử mật khẩu sai; mở `/cart?coupon=ABC` khi chưa đăng nhập để xác minh chuyển `/login?next=...`, đăng nhập rồi kiểm tra quay về giỏ; F5 để xác minh cookie JWT; tại `/product` bấm Thêm vào giỏ hoặc Mua ngay khi chưa đăng nhập và sau khi đăng nhập; trong giỏ thử tăng/giảm số lượng, mã giảm giá, qua giao hàng → thanh toán COD → nhận mã đơn. Đăng xuất bằng header rồi thử `/account/orders`. Để thử phiên hết hạn, ở tab khác gọi `POST /api/account/logout-all` với header `X-CSRF-Token` (hoặc xóa cookie `access_token` trong DevTools), sau đó thực hiện request được bảo vệ trên tab cũ.
+
+
+#### JWT và CSRF
+
+- Backend tạo JWT HS256 (claim `sub`, `sv`, `iat`, `exp`, `jti`, `csrf`, `iss`) tại đăng ký/đăng nhập. Cookie `access_token` luôn HttpOnly; cookie `csrf_token` để JavaScript đọc và gửi `X-CSRF-Token` trên POST/PATCH/DELETE. Backend đối chiếu header với claim đã ký trong JWT, kiểm tra `Origin` và từ chối 403 khi sai. Không trả JWT trong JSON, không lưu token trong localStorage.
+- JWT có hạn 12 giờ; chọn “Ghi nhớ đăng nhập” thì 30 ngày. Logout thu hồi riêng JWT qua bảng `revoked_tokens`; logout-all/đổi mật khẩu tăng `session_version` để vô hiệu JWT cũ trên mọi thiết bị (đổi mật khẩu cấp JWT mới cho thiết bị hiện tại). Cookie Flask `session` vẫn dùng cho giỏ khách/mã đơn vừa đặt nhưng **không dùng để xác thực**; cookie phiên xác thực cũ không còn hiệu lực.
+- Chạy local HTTP: mặc định `SESSION_COOKIE_SAMESITE=Lax`, `SESSION_COOKIE_SECURE=0`. Với Live Preview trong iframe HTTPS: khởi động bằng `SESSION_COOKIE_SAMESITE=None SESSION_COOKIE_SECURE=1 python run.py`. Trình duyệt tắt hoàn toàn third-party cookies cần mở preview trong tab riêng. Production cần đặt `SECRET_KEY` mạnh, dùng HTTPS (production luôn bật Secure).
+- Các endpoint dành cho khách (giỏ khách, đặt hàng khách theo API gốc) vẫn giữ hợp đồng cũ; khi có JWT, request ghi dữ liệu phải có CSRF header. Các trang HTML bảo vệ và tất cả API cần tài khoản đều xác thực bằng JWT.

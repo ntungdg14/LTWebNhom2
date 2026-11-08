@@ -1,5 +1,6 @@
 """Khu vực tài khoản cá nhân (URL bắt đầu bằng /account)."""
-from flask import render_template
+from flask import render_template, redirect, request, url_for
+from ...common.helpers import current_user
 
 from . import account_bp
 
@@ -27,3 +28,9 @@ def address():
 @account_bp.route("/wishlist")
 def wishlist():
     return render_template("account/wishlist.html")
+
+
+@account_bp.before_request
+def require_page_login():
+    if current_user() is None:
+        return redirect(url_for("auth.login", next=request.full_path.rstrip("?")))

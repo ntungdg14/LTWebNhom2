@@ -5,6 +5,7 @@
   Chỉ dùng 5 mục của Freesion; không lấy CANIFA S / LICENSE / SCHOOL /
   ĐỒNG PHỤC và không dùng ảnh chân dung trong panel.
 #}
+{% set signed_in_user = current_user() %}
 {% set quick_links = ['Sản phẩm mới', 'Giá tốt', 'Mua sắm tiết kiệm', 'Sale corner'] %}
 {% set accessories = ['Túi xách', 'Mũ', 'Khăn quàng cổ', 'Thắt lưng', 'Khẩu trang', 'Khăn mặt', 'Tất / Vớ'] %}
 {% set collections = ['Thu Đông 2026', 'Freesion Essentials', 'Linen Basic', 'Denim Edit', 'Tối giản hằng ngày'] %}
@@ -112,15 +113,17 @@
                 </svg>
                 <span class="nav-action-label">Cửa hàng</span>
             </a>
-            <a class="nav-action" href="{{ url_for('account.profile') }}">
+            <a class="nav-action" data-auth-guest {% if signed_in_user %}hidden{% endif %} href="{{ url_for('auth.login') }}">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <circle cx="12" cy="12" r="9"></circle>
                     <circle cx="12" cy="9.5" r="2.75"></circle>
                     <path d="M5.5 19a7 7 0 0 1 13 0"></path>
                 </svg>
-                <span class="nav-action-label">Tài khoản</span>
+                <span class="nav-action-label">Đăng nhập</span>
             </a>
-            <a class="nav-action" href="{{ url_for('store.cart') }}">
+            <a class="nav-action" data-auth-user {% if not signed_in_user %}hidden{% endif %} href="{{ url_for('account.profile') }}"><span data-auth-name{% if signed_in_user %} title="{{ signed_in_user['full_name'] }}"{% endif %}>Tài khoản</span></a>
+            <a class="nav-action" data-auth-user {% if not signed_in_user %}hidden{% endif %} data-logout href="{{ url_for('store.home') }}">Đăng xuất</a>
+            <a class="nav-action" data-require-auth href="{{ url_for('store.cart') }}">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d="M5 8h14l-1 12H6L5 8z"></path>
                     <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>

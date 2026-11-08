@@ -112,3 +112,14 @@ select {
 .grow {
     flex: 1; min-width: 0;
 }
+
+/* Thuộc tính hidden phải thắng các quy tắc display của header. */
+[hidden] { display: none !important; }
+#auth-notice:not(:empty), #cart-status:not(:empty), #checkout-status:not(:empty) {
+    padding: 0.75rem 1rem;
+    margin: 1rem auto;
+    max-width: 74rem;
+    background: #fff4e8;
+    color: #683816;
+}
+.auth-form-message:not(:empty) { color: #9b2828; margin: 0.5rem 0; }

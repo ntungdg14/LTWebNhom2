@@ -13,6 +13,7 @@ class Config:
     """Cấu hình dùng chung."""
 
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
+    API_BASE_URL = os.environ.get("API_BASE_URL", "")  # để trống khi API cùng origin
     TEMPLATES_AUTO_RELOAD = True
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
 
@@ -20,7 +21,10 @@ class Config:
 
     # Phiên đăng nhập (cookie ký bởi SECRET_KEY).
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Lax"
+    # Live Preview chạy trong iframe HTTPS khác site: cần SameSite=None + Secure.
+    # Mặc định Lax để chạy trực tiếp trên localhost HTTP như trước.
+    SESSION_COOKIE_SAMESITE = os.environ.get("SESSION_COOKIE_SAMESITE", "Lax")
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
     PERMANENT_SESSION_LIFETIME = 30 * 24 * 3600  # "Ghi nhớ đăng nhập": 30 ngày
 
     # Quy tắc cửa hàng.
