@@ -30,3 +30,8 @@
     </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/pages/cart.js') }}" defer></script>
+{% endblock %}

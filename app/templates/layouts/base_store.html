@@ -19,8 +19,7 @@
 {% block scripts %}
 {{ super() }}
 <script>window.API_BASE_URL = {{ (config.get('API_BASE_URL', '') or '')|tojson }};</script>
-<script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/shop.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/nav-indicator.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/core/api.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/core/auth.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/components/nav-indicator.js') }}" defer></script>
 {% endblock %}

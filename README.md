@@ -76,10 +76,15 @@ python -m unittest discover -s tests -v
 │   │   ├── store/  auth/  checkout/  account/  admin/   # trang theo từng blueprint
 │   └── static/
 │       ├── css/                 # (xem sơ đồ bên dưới)
-│       ├── js/nav-indicator.js  # đo vị trí tab; hiệu ứng trượt do CSS đảm nhận
+│       ├── js/
+│       │   ├── core/            # api.js (fetch + CSRF), auth.js (phiên và form xác thực)
+│       │   ├── components/      # nav-indicator.js (hiệu ứng navbar)
+│       │   └── pages/           # cart.js, product.js, checkout.js (chỉ nạp ở trang tương ứng)
 │       └── images/              # dành cho ảnh sản phẩm về sau
 ├── tests/test_routes.py         # 29 test: route, link, form, header, footer
-├── tests/test_api.py            # 46 test API (SQLite tạm + dữ liệu mẫu)
+├── tests/test_api.py            # test API (SQLite tạm + dữ liệu mẫu)
+├── tests/test_frontend_auth.py  # test form, header và route guard
+├── tests/test_jwt_auth.py       # test JWT/CSRF/thu hồi token
 ├── .github/
 │   ├── workflows/ci.yml         # build + test trên mỗi PR (GitHub Actions)
 │   └── pull_request_template.md # mẫu mô tả PR
@@ -235,7 +240,7 @@ Các liên kết lọc/phân trang dùng query string riêng biệt (`?page=2`, 
 
 ## Hiệu ứng navbar
 
-Giữ nguyên cấu trúc, vị trí và nội dung header/navbar. Các nút navbar dùng cùng hiệu ứng chuyển màu mượt (`transition: color 0.2s ease`) với Cửa hàng / Tài khoản / Giỏ hàng; thêm `.nav-indicator` — thanh ngang `var(--stone-950)` trượt theo tab đang hover nhờ `transition: transform, width` trong `store.css`. `static/js/nav-indicator.js` (JavaScript thuần, không thư viện) chỉ đo vị trí/độ rộng bằng `getBoundingClientRect()`; không có JS thì navbar vẫn hoạt động bình thường.
+Giữ nguyên cấu trúc, vị trí và nội dung header/navbar. Các nút navbar dùng cùng hiệu ứng chuyển màu mượt (`transition: color 0.2s ease`) với Cửa hàng / Tài khoản / Giỏ hàng; thêm `.nav-indicator` — thanh ngang `var(--stone-950)` trượt theo tab đang hover nhờ `transition: transform, width` trong `store.css`. `static/js/components/nav-indicator.js` (JavaScript thuần, không thư viện) chỉ đo vị trí/độ rộng bằng `getBoundingClientRect()`; không có JS thì navbar vẫn hoạt động bình thường.
 ## CI
 
 `.github/workflows/ci.yml` chạy trên mỗi PR vào `master` (và khi push `master`):
@@ -263,3 +268,15 @@ Kiểm thử thủ công: mở `/register` nhập email mới và mật khẩu m
 - JWT có hạn 12 giờ; chọn “Ghi nhớ đăng nhập” thì 30 ngày. Logout thu hồi riêng JWT qua bảng `revoked_tokens`; logout-all/đổi mật khẩu tăng `session_version` để vô hiệu JWT cũ trên mọi thiết bị (đổi mật khẩu cấp JWT mới cho thiết bị hiện tại). Cookie Flask `session` vẫn dùng cho giỏ khách/mã đơn vừa đặt nhưng **không dùng để xác thực**; cookie phiên xác thực cũ không còn hiệu lực.
 - Chạy local HTTP: mặc định `SESSION_COOKIE_SAMESITE=Lax`, `SESSION_COOKIE_SECURE=0`. Với Live Preview trong iframe HTTPS: khởi động bằng `SESSION_COOKIE_SAMESITE=None SESSION_COOKIE_SECURE=1 python run.py`. Trình duyệt tắt hoàn toàn third-party cookies cần mở preview trong tab riêng. Production cần đặt `SECRET_KEY` mạnh, dùng HTTPS (production luôn bật Secure).
 - Các endpoint dành cho khách (giỏ khách, đặt hàng khách theo API gốc) vẫn giữ hợp đồng cũ; khi có JWT, request ghi dữ liệu phải có CSRF header. Các trang HTML bảo vệ và tất cả API cần tài khoản đều xác thực bằng JWT.
+
+
+### Cấu trúc JavaScript
+
+Script dùng chung chỉ nạp một lần từ `templates/layouts/base_store.html`, theo thứ tự
+`core/api.js` → `core/auth.js` → `components/nav-indicator.js`. Script thuộc trang
+được nạp qua block `scripts` ở template tương ứng: `pages/cart.js` tại giỏ hàng,
+`pages/product.js` tại chi tiết sản phẩm và `pages/checkout.js` tại các bước đặt hàng.
+HTML/Jinja và CSS vẫn được nhóm theo Blueprint (`store`, `auth`, `account`, `checkout`,
+`admin`), không dồn phẳng như ví dụ minh họa vì các route và stylesheet đã tham chiếu
+các đường dẫn phân nhóm này. `__pycache__`, `.venv`, `instance` là dữ liệu sinh ra
+khi chạy và được `.gitignore` bỏ qua.

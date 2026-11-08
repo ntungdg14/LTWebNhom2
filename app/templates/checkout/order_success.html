@@ -14,3 +14,8 @@
 <p id="order-result" role="status">Đang tải thông tin đơn hàng…</p>
 <a href="{{ url_for('account.order_history') }}" class="btn">Xem đơn hàng</a></div>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/pages/checkout.js') }}" defer></script>
+{% endblock %}

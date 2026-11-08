@@ -59,8 +59,8 @@ class AuthMarkupTests(unittest.TestCase):
             self.assertIn('data-auth-form="' + page + '"', html)
             self.assertIn('type="submit"', html)
             self.assertIn('name="email"', html)
-            self.assertIn('/static/js/api.js', html)
-            self.assertIn('/static/js/auth.js', html)
+            self.assertIn('/static/js/core/api.js', html)
+            self.assertIn('/static/js/core/auth.js', html)
         register = self.client.get('/register').get_data(as_text=True)
         self.assertIn('name="terms" checked required', register)
         self.assertIn('data-auth-switch href="/login"', register)
@@ -71,3 +71,22 @@ class AuthMarkupTests(unittest.TestCase):
         header = html.split('</header>', 1)[0]
         self.assertIn('href="/login"', header)
         self.assertNotIn('href="/register"', header)
+
+class PageScriptTests(unittest.TestCase):
+    def setUp(self):
+        self.client = create_app('testing').test_client()
+
+    def test_page_scripts_are_loaded_only_where_needed(self):
+        for page, path in (('/product', 'pages/product.js'),
+                           ('/cart', 'pages/cart.js'),
+                           ('/checkout', 'pages/checkout.js')):
+            # Guest routes redirect; the fragment is present in the page template.
+            from pathlib import Path
+            template = Path(__file__).resolve().parents[1] / 'app' / 'templates'
+            name = {'/product': 'store/product_detail.html', '/cart': 'store/cart.html',
+                    '/checkout': 'checkout/checkout.html'}[page]
+            self.assertIn("filename='js/" + path + "'", (template / name).read_text())
+            self.assertTrue((template.parent / 'static' / 'js' / path).is_file())
+        home = self.client.get('/').get_data(as_text=True)
+        self.assertNotIn('/static/js/pages/', home)
+        self.assertIn('/static/js/core/api.js', home)

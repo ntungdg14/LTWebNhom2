@@ -182,8 +182,8 @@ class NavIndicatorTests(unittest.TestCase):
 
     def test_indicator_markup_and_assets(self):
         self.assertEqual(self.html.count('class="nav-indicator"'), 1)
-        self.assertIn("/static/js/nav-indicator.js", self.html)
-        self.assertTrue((STATIC_DIR / "js/nav-indicator.js").is_file())
+        self.assertIn("/static/js/components/nav-indicator.js", self.html)
+        self.assertTrue((STATIC_DIR / "js/components/nav-indicator.js").is_file())
 
     def test_slide_is_driven_by_css_transition(self):
         css = (STATIC_DIR / "css/layouts/store.css").read_text(encoding="utf-8")
@@ -191,7 +191,7 @@ class NavIndicatorTests(unittest.TestCase):
         self.assertIn("background: var(--stone-950)", css)
         self.assertIn("transition: transform", css)
         self.assertIn("transition: color 0.2s ease", css)  # giống header actions
-        js = (STATIC_DIR / "js/nav-indicator.js").read_text(encoding="utf-8")
+        js = (STATIC_DIR / "js/components/nav-indicator.js").read_text(encoding="utf-8")
         self.assertIn("getBoundingClientRect", js)
         self.assertIn("mouseenter", js)
 
