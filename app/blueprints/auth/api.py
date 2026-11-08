@@ -20,7 +20,9 @@ from ...db import get_db
 from . import auth_api_bp as api_bp
 from ...common.helpers import ApiError, Fields, current_user, json_body, login_user, logout_user
 from ...common.serializers import user_json
-from ...common.services import merge_guest_cart
+from ...common.login_limiter import (
+    clear_failures, locked_message, normalize_email, record_failure, seconds_locked,
+)
 
 RESET_TOKEN_MINUTES = 60
 # Hash giả để thời gian phản hồi khi email không tồn tại gần giống khi sai mật khẩu.
@@ -53,7 +55,6 @@ def register():
         raise ApiError("Email này đã được đăng ký.", 409, "email_taken", {"email": "Email này đã được đăng ký."})
     user = db.execute("SELECT * FROM users WHERE id = ?", (cur.lastrowid,)).fetchone()
     login_user(user)
-    merge_guest_cart(db, user["id"])
     response = jsonify(user=user_json(user))
     response.status_code = 201
     return response
@@ -70,12 +71,17 @@ def login():
     f.done()
 
     db = get_db()
+    email = normalize_email(email)
+    locked = seconds_locked(db, email)
+    if locked:
+        raise ApiError(locked_message(locked), 429, "too_many_attempts")
     user = db.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
     ok = check_password_hash(user["password_hash"] if user else _DUMMY_HASH, password)
     if not user or not ok:
+        record_failure(db, email)
         raise ApiError("Email hoặc mật khẩu không đúng.", 401, "invalid_credentials")
+    clear_failures(db, email)
     login_user(user, remember=f.boolean("remember"))
-    merge_guest_cart(db, user["id"])
     return jsonify(user=user_json(user))
 
 

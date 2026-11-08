@@ -81,16 +81,17 @@
         }
     }
 
-    // Icon con mắt ở ô mật khẩu: bấm để hiện / ẩn.
-    document.querySelectorAll('.password-field').forEach((wrap) => {
-        const input = wrap.querySelector('input');
-        const icon = wrap.querySelector('svg');
-        if (!input || !icon) return;
-        icon.style.cursor = 'pointer';
-        icon.addEventListener('click', () => {
+    // Nút con mắt ở ô mật khẩu: bấm để hiện / ẩn (xử lý ở một chỗ duy nhất, gắn vào nút).
+    document.querySelectorAll('.password-toggle').forEach((btn) => {
+        const input = document.getElementById(btn.dataset.target);
+        if (!input) return;
+        btn.addEventListener('click', () => {
             const show = input.type === 'password';
             input.type = show ? 'text' : 'password';
-            icon.classList.toggle('is-visible', show);
+            btn.classList.toggle('is-visible', show);
+            btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+            btn.setAttribute('aria-label', show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+            input.focus();
         });
     });
 

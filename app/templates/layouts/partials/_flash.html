@@ -1,0 +1,10 @@
+{# Thông báo flash (thành công / lỗi). Dùng chung cho base_store và base_auth (kế thừa base_store). #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-stack">
+    {% for category, message in messages %}
+    <p class="alert alert-{{ 'success' if category == 'success' else 'error' }}" role="{{ 'status' if category == 'success' else 'alert' }}">{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}

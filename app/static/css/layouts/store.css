@@ -409,3 +409,45 @@
         gap: 1.25rem;
     }
 }
+
+/* Khối tài khoản trong header: khách thấy Đăng nhập / Đăng ký, thành viên thấy tên + Đăng xuất. */
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+}
+
+.nav-auth a,
+.nav-auth button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.nav-auth a:hover,
+.nav-auth button:hover {
+    color: var(--stone-600);
+}
+
+.nav-auth-user {
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.nav-auth form {
+    margin: 0;
+}
+
+@media (max-width: 640px) {
+    .nav-auth-user {
+        max-width: 5rem;
+    }
+}

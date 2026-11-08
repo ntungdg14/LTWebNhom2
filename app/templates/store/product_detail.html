@@ -8,13 +8,8 @@
 {% endblock %}
 
 {% block content %}
-{# data-product-slug: sản phẩm mặc định của trang mẫu; mở /product?slug=<slug> để xem sản phẩm khác.
-   product-detail.js nạp chi tiết + sản phẩm gợi ý, chọn màu/size, thêm vào giỏ / mua ngay;
-   reviews.js dùng slug này để gọi /api/products/<slug>/reviews; chat.js để gắn sản phẩm vào tin nhắn.
-   Các id pd-* là chỗ product-detail.js thay nội dung mẫu bằng dữ liệu thật. #}
 <div class="page" data-product-slug="ao-khoac-bomber-uniform">
-    <p class="shop-breadcrumb" id="pd-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / <a href="{{ url_for('store.shop', category='nu') }}">Nữ</a> / Áo khoác bomber Uniform</p>
-
+    <p class="shop-breadcrumb" id="pd-breadcrumb"><a href="{{ url_for('store.home') }}">Trang chủ</a> / Cửa hàng</p>
     <div class="detail-layout">
         <section aria-label="Hình ảnh sản phẩm">
             <div class="product-gallery" id="pd-gallery">
@@ -60,10 +55,10 @@
             </div>
 
             <div class="form-stack">
-                <p id="pd-stock" class="pd-stock" role="status" hidden></p>
-                <p id="pd-msg" class="pd-msg" role="status" hidden></p>
-                <button type="button" id="pd-add" class="btn btn-block">Thêm vào giỏ hàng</button>
-                <button type="button" id="pd-buy" class="btn btn-accent btn-block">Mua ngay</button>
+                <p class="pd-stock" id="pd-stock" hidden></p>
+                <p class="pd-msg" id="pd-msg" hidden></p>
+                <button type="button" class="btn btn-block" id="pd-add">Thêm vào giỏ hàng</button>
+                <button type="button" class="btn btn-accent btn-block" id="pd-buy">Mua ngay</button>
             </div>
 
             <div class="product-perks">

@@ -10,3 +10,51 @@
     font-size: 0.75rem;
     color: var(--stone-600);
 }
+
+.password-field {
+    position: relative;
+    display: block;
+}
+
+.password-field .input {
+    padding-right: 44px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+    opacity: 1;
+}
+
+.password-toggle .icon {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.password-toggle .icon-eye { display: none; }
+.password-toggle .icon-eye-off { display: block; }
+
+.password-toggle.is-visible .icon-eye { display: block; }
+.password-toggle.is-visible .icon-eye-off { display: none; }

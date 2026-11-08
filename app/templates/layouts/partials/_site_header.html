@@ -109,6 +109,20 @@
                 </svg>
                 <span class="nav-action-label">Giỏ hàng</span>
             </a>
+            {# Trạng thái đăng nhập: khối riêng, không đổi class của 3 tiện ích trên #}
+            <div class="nav-auth">
+                {% if current_user %}
+                <a class="nav-auth-user" href="{{ url_for('account.profile') }}" title="{{ current_user['full_name'] }}">{{ current_user['full_name']|truncate(18, true, '…') }}</a>
+                <form action="{{ url_for('auth.logout') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Đăng xuất</button>
+                </form>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}">Đăng nhập</a>
+                <span aria-hidden="true">/</span>
+                <a href="{{ url_for('auth.register') }}">Đăng ký</a>
+                {% endif %}
+            </div>
         </nav>
     </div>
 

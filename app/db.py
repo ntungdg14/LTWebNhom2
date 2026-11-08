@@ -87,6 +87,24 @@ def _seed_if_empty() -> None:
     seed_extra(db)
 
 
+ADMIN_EMAIL = "admin@freesion.vn"
+ADMIN_PASSWORD = "Admin@123"  # chỉ để demo/thử nghiệm, hãy đổi khi triển khai thật
+
+
+def _ensure_admin() -> None:
+    """Tạo sẵn tài khoản quản trị mẫu nếu chưa có (không ghi đè nếu đã tồn tại)."""
+    from werkzeug.security import generate_password_hash
+
+    db = get_db()
+    if db.execute("SELECT 1 FROM users WHERE email = ?", (ADMIN_EMAIL,)).fetchone():
+        return
+    db.execute(
+        "INSERT INTO users (full_name, email, password_hash, role, password_updated_at) "
+        "VALUES (?, ?, ?, 'admin', datetime('now'))",
+        ("Quản trị viên", ADMIN_EMAIL, generate_password_hash(ADMIN_PASSWORD)),
+    )
+
+
 def init_app(app: Flask) -> None:
     default_path = os.environ.get("DATABASE") or str(Path(app.instance_path) / "freesion.db")
     app.config.setdefault("DATABASE", default_path)
@@ -114,4 +132,5 @@ def init_app(app: Flask) -> None:
         with app.app_context():
             init_db()
             _seed_if_empty()
+            _ensure_admin()
             close_db()

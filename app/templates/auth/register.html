@@ -8,32 +8,53 @@
 
 {% block content %}
 <div class="page-narrow">
-    <div class="auth-topline"><a href="{{ url_for('store.home') }}" class="logo">FREESION</a><a href="{{ url_for('store.home') }}" class="link-underline">Về cửa hàng ↗</a></div>
     <header class="auth-header">
         <h1>Tạo tài khoản mới</h1>
     </header>
-    <form id="register-form" class="form-stack mt-8" action="{{ url_for('auth.login') }}" method="get">
-        <div class="field"><label for="full-name">Họ và tên *</label><input id="full-name" class="input" type="text" autocomplete="name" required></div>
-        <div class="field"><label for="email">Email công việc *</label><input id="email" class="input" type="email" autocomplete="email" required></div>
+    <form class="form-stack mt-8" action="{{ url_for('auth.register') }}" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+            <label for="full-name">Họ và tên *</label>
+            <input id="full-name" name="full_name" class="input{% if errors.full_name %} is-invalid{% endif %}" type="text" placeholder="Nguyễn Văn A" value="{{ values.full_name or '' }}" autocomplete="name" required>
+            {% if errors.full_name %}<p class="field-error">{{ errors.full_name }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="email">Email *</label>
+            <input id="email" name="email" class="input{% if errors.email %} is-invalid{% endif %}" type="email" placeholder="example@gmail.com.vn" value="{{ values.email or '' }}" autocomplete="email" required>
+            {% if errors.email %}<p class="field-error">{{ errors.email }}</p>{% endif %}
+        </div>
         <div class="field">
             <label for="password">Mật khẩu *</label>
             <span class="password-field">
-                <input id="password" class="input" type="password" minlength="8" autocomplete="new-password" required>
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle><line x1="4" y1="20" x2="20" y2="4"></line></svg>
+                <input id="password" name="password" class="input{% if errors.password %} is-invalid{% endif %}" type="password" minlength="8" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-target="password" aria-label="Hiện mật khẩu" aria-pressed="false">
+                    <svg class="icon icon-eye-off" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle><line x1="4" y1="20" x2="20" y2="4"></line></svg>
+                    <svg class="icon icon-eye" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                </button>
             </span>
+            {% if errors.password %}<p class="field-error">{{ errors.password }}</p>{% endif %}
             <p class="form-hint">Mật khẩu mạnh: Có ít nhất 8 ký tự, chữ hoa, chữ thường và số</p>
         </div>
         <div class="field">
             <label for="password-confirmation">Xác nhận mật khẩu *</label>
             <span class="password-field">
-                <input id="password-confirmation" class="input" type="password" minlength="8" autocomplete="new-password" required>
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle><line x1="4" y1="20" x2="20" y2="4"></line></svg>
+                <input id="password-confirmation" name="password_confirmation" class="input{% if errors.password_confirmation %} is-invalid{% endif %}" type="password" minlength="8" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-target="password-confirmation" aria-label="Hiện mật khẩu" aria-pressed="false">
+                    <svg class="icon icon-eye-off" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle><line x1="4" y1="20" x2="20" y2="4"></line></svg>
+                    <svg class="icon icon-eye" viewBox="0 0 24 24" aria-hidden="true" focusable="false" hidden><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                </button>
             </span>
+            {% if errors.password_confirmation %}<p class="field-error">{{ errors.password_confirmation }}</p>{% endif %}
         </div>
-        <label class="remember terms"><input id="terms" type="checkbox" checked> <span>Tôi đồng ý với <a href="{{ url_for('store.terms') }}" class="link-underline">Điều khoản sử dụng</a> và <a href="{{ url_for('store.privacy') }}" class="link-underline">Chính sách bảo mật dành cho nhân sự</a> Freesion.</span></label>
+        <label class="remember terms"><input type="checkbox" name="terms" value="1"{% if values.terms %} checked{% endif %}> <span>Tôi đồng ý với <a href="{{ url_for('store.terms') }}" class="link-underline">Điều khoản sử dụng</a> và <a href="{{ url_for('store.privacy') }}" class="link-underline">Chính sách bảo mật</a></span></label>
+        {% if errors.terms %}<p class="field-error">{{ errors.terms }}</p>{% endif %}
         <button type="submit" class="btn btn-block">Tạo tài khoản</button>
     </form>
     <p class="auth-switch mt-4">Đã có tài khoản? <a href="{{ url_for('auth.login') }}" class="link-underline">Đăng nhập</a></p>
     <div class="auth-footnote"><a href="{{ url_for('store.privacy') }}">Chính sách bảo mật</a><a href="{{ url_for('store.help_page') }}">Hỗ trợ kỹ thuật</a></div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
 {% endblock %}

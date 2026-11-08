@@ -194,7 +194,13 @@ class CatalogTests(ApiTestCase):
 
 
 class CartTests(ApiTestCase):
-    def test_guest_cart_flow(self):
+    """Giỏ hàng luôn thuộc user_id: khách chưa đăng nhập nhận 401 (xem test_auth.py)."""
+
+    def setUp(self):
+        super().setUp()
+        self.register()
+
+    def test_cart_flow(self):
         vid = self.variant_id()
         empty = self.call("get", "/api/cart", expect=200)["cart"]
         self.assertEqual((empty["item_count"], empty["total"]), (0, 0))
@@ -232,26 +238,20 @@ class CartTests(ApiTestCase):
         cart = self.call("delete", "/api/cart/coupon", expect=200)["cart"]
         self.assertEqual(cart["discount"], 0)
 
-    def test_cart_is_private_per_session(self):
+    def test_cart_is_private_per_user(self):
         self.add_to_cart(self.variant_id())
         other = self.app.test_client()
+        self.register("khac@example.com", client=other)
         self.assertEqual(self.call("get", "/api/cart", client=other)["cart"]["item_count"], 0)
         item_id = self.call("get", "/api/cart")["cart"]["items"][0]["id"]
         self.call("delete", f"/api/cart/items/{item_id}", client=other, expect=404)
 
-    def test_guest_cart_merges_on_login(self):
-        self.register()
-        self.add_to_cart(self.variant_id(), 1)
-        self.call("post", "/api/auth/logout", {})
-        self.add_to_cart(self.variant_id(), 2)
-        self.add_to_cart(self.variant_id("ao-thun-cotton-essential", "L"), 1)
-        self.call("post", "/api/auth/login", {"email": "minhanh@example.com", "password": PASSWORD}, expect=200)
-        cart = self.call("get", "/api/cart")["cart"]
-        self.assertEqual(cart["item_count"], 4)
-        self.assertEqual(cart["line_count"], 2)
-
 
 class CheckoutTests(ApiTestCase):
+    def setUp(self):
+        super().setUp()
+        self.register()
+
     def test_options(self):
         self.add_to_cart(self.variant_id(), 1)
         res = self.call("get", "/api/checkout/options", expect=200)
@@ -259,7 +259,7 @@ class CheckoutTests(ApiTestCase):
         self.assertEqual(fees, {"standard": 30_000, "express": 35_000})
         self.assertEqual({p["id"] for p in res["payment_methods"]}, {"cod", "vnpay", "momo", "card"})
 
-    def test_guest_order_end_to_end(self):
+    def test_order_end_to_end(self):
         vid = self.variant_id()
         self.add_to_cart(vid, 2)
         self.add_to_cart(self.variant_id("ao-khoac-bomber-uniform", "L", "nau-dua"), 1)
@@ -273,13 +273,16 @@ class CheckoutTests(ApiTestCase):
         self.assertEqual(order["events"][0]["status"], "pending")
         self.assertEqual(order["item_count"], 3)
         self.assertFalse(res["requires_online_payment"])
-        # giỏ đã trống, kho đã trừ, khách xem lại được đơn vừa đặt
+        # giỏ đã trống, kho đã trừ, chủ đơn xem lại được đơn vừa đặt
         self.assertEqual(self.call("get", "/api/cart")["cart"]["line_count"], 0)
         stock = {s["size"]: s["stock"] for c in self.call("get", "/api/products/ao-thun-cotton-essential")["product"]["colors"]
                  for s in c["sizes"] if c["slug"] == "trang"}  # variant_id() lấy màu đầu tiên: Trắng
         self.assertEqual(stock["M"], 23)
         self.call("get", f"/api/orders/{order['code']}", expect=200)
-        self.call("get", f"/api/orders/{order['code']}", client=self.app.test_client(), expect=404)
+        self.call("get", f"/api/orders/{order['code']}", client=self.app.test_client(), expect=401)  # chưa đăng nhập
+        other = self.app.test_client()
+        self.register("khac@example.com", client=other)
+        self.call("get", f"/api/orders/{order['code']}", client=other, expect=404)  # người khác
         second = self.call("post", "/api/orders", self.SHIPPING, expect=409)  # giỏ trống
         self.assertEqual(second["error"]["code"], "cart_empty")
 
@@ -465,7 +468,10 @@ class TrackingTests(ApiTestCase):
 
     def test_tracking_is_private(self):
         code = self._order()["code"]
-        self.call("get", f"/api/orders/{code}/tracking", client=self.app.test_client(), expect=404)
+        self.call("get", f"/api/orders/{code}/tracking", client=self.app.test_client(), expect=401)
+        other = self.app.test_client()
+        self.register("khac@example.com", client=other)
+        self.call("get", f"/api/orders/{code}/tracking", client=other, expect=404)
         self.call("get", "/api/orders/FR000000000/tracking", expect=404)
 
     def test_simulate_advance_to_delivered(self):

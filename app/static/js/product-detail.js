@@ -162,6 +162,7 @@
         const res = await api('POST', '/api/cart/items', { variant_id: v.variant_id, quantity: 1 });
         state.busy = false;
         renderStock();
+        if (res.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); return; }
         if (!res.ok) { showMsg(errorMessage(res), 'error'); return; }
         if (goCheckout) { location.href = '/checkout/shipping'; return; }
         showMsg('Đã thêm vào giỏ hàng.', 'ok', true);

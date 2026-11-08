@@ -6,6 +6,7 @@ import sqlite3
 
 from flask import render_template
 
+from ...common.helpers import login_required_page
 from ...db import get_db
 from . import store_bp
 
@@ -43,6 +44,7 @@ def product_detail():
 
 
 @store_bp.route("/cart")
+@login_required_page
 def cart():
     return render_template("store/cart.html")
 

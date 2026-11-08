@@ -1,4 +1,4 @@
-"""Giỏ hàng cho cả khách (cookie session) lẫn người đã đăng nhập.
+"""Giỏ hàng của người dùng đã đăng nhập (chưa đăng nhập: 401 JSON).
 
     GET    /api/cart                 giỏ + tạm tính + giảm giá + phí ship + tổng (?shipping_method=standard|express)
     DELETE /api/cart                 xóa toàn bộ giỏ
@@ -17,7 +17,7 @@ from flask.views import MethodView
 
 from ...db import get_db
 from . import store_api_bp as api_bp
-from ...common.helpers import ApiError, Fields, json_body
+from ...common.helpers import ApiError, Fields, json_body, login_required
 from ...common.serializers import cart_json
 from ...common.services import (
     evaluate_coupon,
@@ -46,6 +46,8 @@ def respond_cart(db, status: int = 200):
 
 
 class CartView(MethodView):
+    decorators = [login_required]
+
     def get(self):
         return respond_cart(get_db())
 
@@ -60,6 +62,8 @@ class CartView(MethodView):
 
 
 class CartItemsView(MethodView):
+    decorators = [login_required]
+
     def post(self):
         db = get_db()
         data = json_body()
@@ -73,6 +77,8 @@ class CartItemsView(MethodView):
 
 
 class CartItemView(MethodView):
+    decorators = [login_required]
+
     def _item(self, db, item_id):
         cart = find_cart(db)
         item = (
@@ -106,6 +112,8 @@ class CartItemView(MethodView):
 
 
 class CartCouponView(MethodView):
+    decorators = [login_required]
+
     def post(self):
         db = get_db()
         f = Fields(json_body())
