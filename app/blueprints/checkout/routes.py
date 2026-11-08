@@ -179,4 +179,10 @@ def checkout():
 
 @checkout_bp.route("/order-success")
 def order_success():
-    return render_template("checkout/order_success.html")
+    db = get_db()
+    code = (request.args.get("code") or "").strip().upper()
+    user = current_user()
+    order = db.execute("SELECT code FROM orders WHERE code = ? AND user_id = ?", (code, user["id"])).fetchone() if code else None
+    if order is None:  # không có/không đúng mã: lấy đơn mới nhất của chính khách
+        order = db.execute("SELECT code FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user["id"],)).fetchone()
+    return render_template("checkout/order_success.html", order_code=order["code"] if order else None)

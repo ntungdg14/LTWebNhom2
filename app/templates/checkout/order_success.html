@@ -17,7 +17,7 @@
     <p class="muted">Đơn hàng của bạn đã được đặt thành công!</p>
 
     <div class="success-actions">
-        <a href="{{ url_for('account.order_detail', order_id='FR261101028') }}" class="btn">Xem chi tiết đơn hàng</a>
+        <a href="{{ url_for('account.order_detail', order_id=order_code) if order_code else url_for('account.order_history') }}" class="btn">Xem chi tiết đơn hàng</a>
         <a href="{{ url_for('store.shop') }}" class="btn btn-ghost">Tiếp tục mua sắm</a>
     </div>
 </div>

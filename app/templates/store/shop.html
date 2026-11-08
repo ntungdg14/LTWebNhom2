@@ -1,5 +1,5 @@
 {% extends "layouts/base_store.html" %}
-{% block title %}Hàng mới về - FREESION{% endblock %}
+{% block title %}Cửa hàng - FREESION{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -8,69 +8,81 @@
 
 {% block content %}
 <div class="page">
+    <div class="shop-head">
+        <div>
+            <h1>{% if sel.q %}Kết quả cho “{{ sel.q }}”{% elif sel.is_new %}Hàng mới về{% elif sel.sale %}Đang giảm giá{% else %}Tất cả sản phẩm{% endif %}</h1>
+            <p class="meta">{{ total }} sản phẩm</p>
+        </div>
+        <label class="sort-form">Sắp xếp
+            <select class="input" name="sort" form="filter-form" onchange="this.form.submit()">
+                {% for key, label in sort_labels.items() %}<option value="{{ key }}"{% if sel.sort == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </label>
+    </div>
+
     <div class="shop-layout">
         <aside class="filters">
-            <form action="{{ url_for('store.shop') }}" method="get">
+            <form id="filter-form" action="{{ url_for('store.shop') }}" method="get">
+                {% if sel.q %}<input type="hidden" name="q" value="{{ sel.q }}">{% endif %}
+                {% if sel.is_new %}<input type="hidden" name="is_new" value="1">{% endif %}
+                {% if sel.sale %}<input type="hidden" name="sale" value="1">{% endif %}
+                <section class="filter-group">
+                    <div class="row-between"><h2>Dành cho</h2></div>
+                    <div class="filter-list">
+                        <label><input type="radio" name="department" value=""{% if not sel.department %} checked{% endif %}> Tất cả</label>
+                        {% for key, label in departments.items() %}<label><input type="radio" name="department" value="{{ key }}"{% if sel.department == key %} checked{% endif %}> {{ label }}</label>{% endfor %}
+                    </div>
+                </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Danh mục</h2></div>
                     <div class="filter-list">
-                        <label><input type="checkbox" name="cat" value="ao-so-mi" checked> Áo sơ mi</label>
-                        <label><input type="checkbox" name="cat" value="ao-thun"> Áo thun</label>
-                        <label><input type="checkbox" name="cat" value="quan-dai"> Quần dài</label>
-                        <label><input type="checkbox" name="cat" value="quan-jean"> Quần jean</label>
-                        <label><input type="checkbox" name="cat" value="ao-len"> Áo len</label>
-                        <label><input type="checkbox" name="cat" value="ao-khoac"> Áo khoác</label>
+                        {% for c in categories %}<label><input type="checkbox" name="category" value="{{ c['slug'] }}"{% if c['slug'] in sel.category %} checked{% endif %}> {{ c['name'] }} <span class="meta">({{ c['count'] }})</span></label>{% endfor %}
                     </div>
                 </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Màu sắc</h2></div>
                     <div class="color-swatches">
-                        <a href="{{ url_for('store.shop', color='den') }}" class="color-swatch media-stone" aria-label="Đen"></a>
-                        <a href="{{ url_for('store.shop', color='trang') }}" class="color-swatch media-cream" aria-label="Trắng"></a>
-                        <a href="{{ url_for('store.shop', color='be') }}" class="color-swatch media-beige" aria-label="Be"></a>
-                        <a href="{{ url_for('store.shop', color='xanh-dam') }}" class="color-swatch media-denim" aria-label="Xanh đậm"></a>
-                        <a href="{{ url_for('store.shop', color='xanh-reu') }}" class="color-swatch media-olive" aria-label="Xanh rêu"></a>
-                        <a href="{{ url_for('store.shop', color='hong-dat') }}" class="color-swatch media-rose" aria-label="Hồng đất"></a>
-                        <a href="{{ url_for('store.shop', color='nau') }}" class="color-swatch media-taupe" aria-label="Nâu"></a>
+                        {% for f in families %}<label class="color-swatch-pick" title="{{ f['name'] }}"><input type="checkbox" name="color" value="{{ f['slug'] }}"{% if f['slug'] in sel.color %} checked{% endif %}><span class="color-swatch" style="background:{{ f['hex'] }}" aria-label="{{ f['name'] }}"></span></label>{% endfor %}
                     </div>
                 </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Kích cỡ</h2></div>
                     <div class="size-chips">
-                        <a href="{{ url_for('store.shop', size='S') }}" class="chip">S</a>
-                        <a href="{{ url_for('store.shop', size='M') }}" class="chip is-active">M</a>
-                        <a href="{{ url_for('store.shop', size='L') }}" class="chip">L</a>
-                        <a href="{{ url_for('store.shop', size='XL') }}" class="chip">XL</a>
-                        <a href="{{ url_for('store.shop', size='XXL') }}" class="chip">XXL</a>
+                        {% for z in sizes %}<label class="chip-pick"><input type="checkbox" name="size" value="{{ z }}"{% if z in sel.size %} checked{% endif %}><span class="chip">{{ z }}</span></label>{% endfor %}
                     </div>
                 </section>
                 <section class="filter-group">
                     <div class="row-between"><h2>Mức giá</h2></div>
                     <div class="filter-list">
-                        <label><input type="radio" name="price"> Dưới 500.000₫</label>
-                        <label><input type="radio" name="price" checked> 500.000₫ – 1.000.000₫</label>
-                        <label><input type="radio" name="price"> Trên 1.000.000₫</label>
+                        <label><input type="radio" name="price" value=""{% if not sel.price %} checked{% endif %}> Tất cả mức giá</label>
+                        {% for key, (label, _, _) in price_ranges.items() %}<label><input type="radio" name="price" value="{{ key }}"{% if sel.price == key %} checked{% endif %}> {{ label }}</label>{% endfor %}
                     </div>
                 </section>
                 <button type="submit" class="btn btn-ghost btn-block">Áp dụng bộ lọc</button>
+                <a href="{{ url_for('store.shop') }}" class="link-underline">Xóa bộ lọc</a>
             </form>
         </aside>
 
         <section class="product-grid-3">
-            <a href="{{ url_for('store.product_detail', sku='FR-OXF-001') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h2>Áo sơ mi Oxford dáng rộng</h2><p class="meta">Trắng kem</p><p class="price">459.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-BOM-002') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h2>Áo khoác bomber Uniform</h2><p class="meta">Nâu dừa</p><p class="price">899.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-JEA-003') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h2>Quần jean ống suông Indigo</h2><p class="meta">Xanh đậm</p><p class="price">649.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-TEE-004') }}" class="product-card"><div class="media media-card media-taupe">Ảnh sản phẩm</div><h2>Áo thun cotton Essential</h2><p class="meta">Den vintage</p><p class="price">249.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-KNT-005') }}" class="product-card"><div class="media media-card media-rose">Ảnh sản phẩm</div><h2>Áo len dệt waffle cổ tròn</h2><p class="meta">Hồng đất</p><p class="price">589.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-OVS-006') }}" class="product-card"><div class="media media-card media-olive">Ảnh sản phẩm</div><h2>Áo overshirt Heavyweight</h2><p class="meta">Rêu</p><p class="price">799.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-CHI-007') }}" class="product-card"><div class="media media-card media-beige">Ảnh sản phẩm</div><h2>Quần dài ống đứng Chino</h2><p class="meta">Be cát</p><p class="price">529.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-BOX-008') }}" class="product-card"><div class="media media-card media-cream">Ảnh sản phẩm</div><h2>Áo thun Boxy dày dặn</h2><p class="meta">Trắng</p><p class="price">289.000₫</p></a>
-            <a href="{{ url_for('store.product_detail', sku='FR-SKI-009') }}" class="product-card"><div class="media media-card media-denim">Ảnh sản phẩm</div><h2>Quần jean slim co giãn</h2><p class="meta">Indigo đậm</p><p class="price">699.000₫</p></a>
+            {% for p in products %}
+            <a href="{{ url_for('store.product_detail', sku=p['sku']) }}" class="product-card">
+                {% if p['image']['url'] %}<img class="media media-card" src="{{ p['image']['url'] }}" alt="{{ p['name'] }}" loading="lazy" style="object-fit:cover;">{% else %}<div class="media media-card media-{{ p['image']['tone'] or p['tone'] }}">Ảnh sản phẩm</div>{% endif %}
+                <h2>{{ p['name'] }}</h2>
+                <p class="meta">{{ p['colors']|map(attribute='name')|join(', ') }}{% if not p['in_stock'] %} · Hết hàng{% endif %}</p>
+                <p class="price">{{ p['price']|vnd }}{% if p['compare_price'] %} <s class="meta">{{ p['compare_price']|vnd }}</s> <span class="badge badge-danger">-{{ p['discount_percent'] }}%</span>{% endif %}</p>
+            </a>
+            {% else %}
+            <p class="muted">Không có sản phẩm phù hợp. <a href="{{ url_for('store.shop') }}" class="link-underline">Xóa bộ lọc</a></p>
+            {% endfor %}
         </section>
     </div>
 
-    <div class="shop-more">
-        <a href="{{ url_for('store.shop', page=2) }}" class="btn btn-outline">Xem thêm sản phẩm</a>
-    </div>
+    {% if pages > 1 %}
+    <nav class="shop-more" aria-label="Phân trang">
+        {% if prev_url %}<a href="{{ prev_url }}" class="btn btn-outline">← Trước</a>{% endif %}
+        {% for n, url in page_links %}<a href="{{ url }}" class="chip{% if n == page %} is-active{% endif %}">{{ n }}</a>{% endfor %}
+        {% if next_url %}<a href="{{ next_url }}" class="btn btn-outline">Tiếp →</a>{% endif %}
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}
