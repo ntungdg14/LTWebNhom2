@@ -230,3 +230,66 @@
     .product-perks { grid-template-columns: 1fr 1fr; }
     .reviews-grid { grid-template-columns: 14rem 1fr; }
 }
+
+/* Phần do product-detail.js điều khiển: nút chọn màu/size, báo tồn kho, thông báo thêm giỏ */
+button.swatch {
+    padding: 0;
+    cursor: pointer;
+    background: var(--stone-200);
+}
+
+button.swatch.is-active {
+    outline: 2px solid var(--stone-900);
+    outline-offset: 2px;
+}
+
+button.swatch.is-soldout {
+    opacity: 0.4;
+}
+
+button.size-btn {
+    cursor: pointer;
+}
+
+.size-btn.is-soldout,
+.size-btn:disabled {
+    color: var(--stone-400);
+    background: var(--stone-100);
+    border-style: dashed;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.size-btn:disabled:hover {
+    border-color: var(--stone-300);
+}
+
+.pd-stock {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--orange-600);
+}
+
+.pd-msg {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--red-600);
+    background: var(--red-100);
+    color: var(--red-600);
+    font-size: 0.8125rem;
+}
+
+.pd-msg.is-ok {
+    border-color: var(--green-600);
+    background: var(--green-100);
+    color: var(--green-700);
+}
+
+.pd-stock[hidden],
+.pd-msg[hidden],
+.related[hidden] { display: none; }
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

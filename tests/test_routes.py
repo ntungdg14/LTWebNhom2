@@ -5,11 +5,16 @@ Chạy: python -m unittest discover -s tests -v
 """
 from __future__ import annotations
 
+import atexit
+import os
 import re
+import tempfile
 import unittest
 from pathlib import Path
 
 from app import create_app
+from app.db import connect, init_db
+from app.seed import seed
 
 STATIC_DIR = Path(__file__).resolve().parents[1] / "app" / "static"
 
@@ -52,6 +57,37 @@ PAGES = (
 STORE_LAYOUT_PAGES = PAGES[:18]  # các trang dùng base_store.html (trừ 17 trang admin)
 ADMIN_PAGES = PAGES[18:]
 
+
+
+def logged_in_client():
+    """Client đã đăng nhập (dùng DB tạm, không đụng instance/freesion.db): /account bắt buộc đăng nhập."""
+    fd, db_path = tempfile.mkstemp(suffix=".db")
+    os.close(fd)
+
+    def cleanup():
+        for suffix in ("", "-wal", "-shm"):
+            try:
+                os.remove(db_path + suffix)
+            except FileNotFoundError:
+                pass
+
+    atexit.register(cleanup)
+    app = create_app("testing")
+    app.config["DATABASE"] = db_path
+    with app.app_context():
+        init_db()
+    conn = connect(db_path)
+    seed(conn)
+    conn.close()
+    client = app.test_client()
+    res = client.post("/api/auth/register", json={
+        "full_name": "Nguyễn Minh Anh", "email": "minhanh@example.com",
+        "phone": "090 123 4567", "password": "Matkhau123",
+    })
+    assert res.status_code == 201, res.get_data(as_text=True)
+    return client
+
+
 STYLESHEET_RE = re.compile(r'<link rel="stylesheet" href="([^"]+)"')
 INTERNAL_LINK_RE = re.compile(r'(?:href|action)="([^"]*)"')
 
@@ -59,7 +95,7 @@ INTERNAL_LINK_RE = re.compile(r'(?:href|action)="([^"]*)"')
 class StructureTests(unittest.TestCase):
     def setUp(self):
         self.app = create_app("testing")
-        self.client = self.app.test_client()
+        self.client = logged_in_client()
 
     def test_blueprints_registered(self):
         expected = {"store", "auth", "account", "checkout", "admin"}
@@ -82,7 +118,8 @@ class StructureTests(unittest.TestCase):
         for url in PAGES:
             html = self.client.get(url).get_data(as_text=True)
             for href in INTERNAL_LINK_RE.findall(html):
-                if href.startswith("/") and not href.startswith("//"):
+                # /logout chuyển hướng (302) và xóa phiên, đã có test riêng ở AccountGuardTests.
+                if href.startswith("/") and not href.startswith("//") and href != "/logout":
                     links.add(href.replace("&amp;", "&"))
         self.assertGreater(len(links), 100)
         for href in sorted(links):
@@ -131,7 +168,7 @@ class HeaderLayoutTests(unittest.TestCase):
     """Header 2 hàng: logo - ô tìm kiếm - tiện ích, bên dưới là thanh danh mục."""
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        self.client = logged_in_client()
 
     def test_header_has_two_rows_on_every_store_page(self):
         for url in STORE_LAYOUT_PAGES:
@@ -152,7 +189,8 @@ class HeaderLayoutTests(unittest.TestCase):
 
     def test_actions_have_inline_svg_icons_and_labels(self):
         html = self.client.get("/").get_data(as_text=True)
-        self.assertEqual(html.count('class="nav-action"'), 3)
+        self.assertEqual(html.count('class="nav-action"'), 4)
+        self.assertIn("Yêu thích", html)
         self.assertIn("Cửa hàng", html)
         self.assertIn("Tài khoản", html)
         self.assertIn("Giỏ hàng", html)
@@ -177,7 +215,7 @@ class NavIndicatorTests(unittest.TestCase):
     """Task 4: thanh ngang đen trượt theo nút navbar đang hover."""
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        self.client = logged_in_client()
         self.html = self.client.get("/").get_data(as_text=True)
 
     def test_indicator_markup_and_assets(self):
@@ -205,7 +243,7 @@ class MegaMenuTests(unittest.TestCase):
     """Menu thả xuống khi di chuột: thuần CSS, một panel cho mỗi mục."""
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        self.client = logged_in_client()
         self.html = self.client.get("/").get_data(as_text=True)
 
     def test_each_tab_has_one_panel(self):
@@ -243,7 +281,7 @@ class AdminFormTests(unittest.TestCase):
     }
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        self.client = logged_in_client()
 
     def test_forms_render_with_existing_input_and_button_styles(self):
         for url, (title, field_id) in self.FORMS.items():
@@ -304,7 +342,7 @@ class CheckoutFlowTests(unittest.TestCase):
     STEPS = ("/cart", "/checkout/shipping", "/checkout", "/order-success")
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        self.client = logged_in_client()
 
     def test_step_bar_on_checkout_pages(self):
         for step, url in enumerate(("/checkout/shipping", "/checkout", "/order-success"), start=2):
@@ -323,7 +361,7 @@ class FooterLayoutTests(unittest.TestCase):
     CSS_DIR = STATIC_DIR / "css"
 
     def setUp(self):
-        self.client = create_app("testing").test_client()
+        self.client = logged_in_client()
 
     def test_footer_stylesheet_is_loaded(self):
         for url in STORE_LAYOUT_PAGES:
@@ -354,3 +392,27 @@ class FooterLayoutTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AccountGuardTests(unittest.TestCase):
+    """Chưa đăng nhập mà vào /account thì được chuyển tới trang đăng nhập."""
+
+    def test_anonymous_is_redirected_to_login(self):
+        client = create_app("testing").test_client()
+        for url in ("/account", "/account/orders", "/account/address", "/account/wishlist"):
+            with self.subTest(url=url):
+                res = client.get(url)
+                self.assertEqual(res.status_code, 302)
+                self.assertTrue(res.headers["Location"].startswith("/login?next="), res.headers["Location"])
+
+    def test_logged_in_user_can_open_account(self):
+        self.assertEqual(logged_in_client().get("/account").status_code, 200)
+
+    def test_logout_link_really_logs_out(self):
+        client = logged_in_client()
+        self.assertEqual(client.get("/account").status_code, 200)
+        self.assertIn('href="/logout"', client.get("/account").get_data(as_text=True))
+        res = client.get("/logout")
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res.headers["Location"], "/login")
+        self.assertEqual(client.get("/account").status_code, 302)  # đã đăng xuất nên bị chuyển về /login

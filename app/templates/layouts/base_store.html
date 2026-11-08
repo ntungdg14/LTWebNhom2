@@ -4,6 +4,7 @@
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/store.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/footer.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/chat.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -14,9 +15,14 @@
     </main>
 
     {% include "layouts/partials/_site_footer.html" %}
+
+    {# Khung chat nổi với shop; trang nào không cần (đăng nhập, đăng ký) thì ghi đè block này bằng nội dung rỗng. #}
+    {% block chat_widget %}{% include "layouts/partials/_chat_widget.html" %}{% endblock %}
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
+<script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/nav-indicator.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>
 {% endblock %}

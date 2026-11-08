@@ -13,9 +13,33 @@
         <section class="grow">
             <header class="row-between mb-6">
                 <h1 class="page-title">Sổ địa chỉ của tôi</h1>
-                <a href="{{ url_for('account.address', action='new') }}" class="btn">Thêm địa chỉ mới</a>
+                <a href="{{ url_for('account.address', action='new') }}" class="btn" id="address-add">Thêm địa chỉ mới</a>
             </header>
-            <div class="address-grid">
+            <p id="address-notice" class="fs-notice" hidden></p>
+
+            {# address.js mở form này khi thêm / sửa; provinces và wards lấy từ /api/provinces. #}
+            <section class="address-form-panel" id="address-form-panel" hidden>
+                <h2 id="address-form-title">Thêm địa chỉ mới</h2>
+                <form class="form-stack" id="address-form" action="{{ url_for('account.address') }}" method="get">
+                    <div class="form-grid-2">
+                        <div class="field"><label for="addr-name">Họ và tên *</label><input id="addr-name" class="input" type="text" maxlength="100"></div>
+                        <div class="field"><label for="addr-phone">Số điện thoại *</label><input id="addr-phone" class="input" type="tel" maxlength="20"></div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="field"><label for="addr-province">Tỉnh / Thành phố *</label><select id="addr-province" class="input"></select></div>
+                        <div class="field"><label for="addr-ward">Phường / Xã *</label><select id="addr-ward" class="input"></select></div>
+                    </div>
+                    <div class="field"><label for="addr-street">Địa chỉ cụ thể *</label><input id="addr-street" class="input" type="text" maxlength="200" placeholder="Số nhà, tên đường"></div>
+                    <div class="field"><label for="addr-label">Nhãn (tùy chọn)</label><input id="addr-label" class="input" type="text" maxlength="40" placeholder="Nhà riêng, Văn phòng..."></div>
+                    <label class="form-check"><input type="checkbox" id="addr-default"> Đặt làm địa chỉ mặc định</label>
+                    <div class="toolbar">
+                        <button type="submit" class="btn">Lưu địa chỉ</button>
+                        <button type="button" class="btn btn-ghost" id="address-cancel">Hủy</button>
+                    </div>
+                </form>
+            </section>
+
+            <div class="address-grid" id="address-grid">
                 <article class="address-card">
                     <div class="row-between">
                         <h2>Nguyễn Minh Anh</h2>
@@ -45,4 +69,9 @@
         </section>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/address.js') }}" defer></script>
 {% endblock %}

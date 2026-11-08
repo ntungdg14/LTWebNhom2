@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Theo dõi đơn hàng (account/order_detail.html): dòng thời gian các bước giao hàng.
+   Trạng thái từng bước do order-tracking.js đặt: is-done / is-current / (mặc định = chưa tới) / is-cancelled.
+   ========================================================================== */
+
+.order-notice {
+    margin: 1rem 0 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--orange-600);
+    background: var(--orange-100);
+    font-size: 0.8125rem;
+}
+
+.order-notice[hidden] { display: none; }
+
+.tracking-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 0.75rem;
+    padding: 0;
+    list-style: none;
+}
+
+.tracking-steps li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: 1.25rem;
+    color: var(--stone-400);
+    font-size: 0.8125rem;
+}
+
+/* thanh nối giữa các bước */
+.tracking-steps li::before {
+    content: "";
+    position: absolute;
+    top: 0.4rem;
+    left: 1rem;
+    right: -1rem;
+    height: 2px;
+    background: var(--stone-200);
+}
+
+.tracking-steps li:last-child::before { display: none; }
+.tracking-steps li.is-done::before { background: var(--green-600); }
+
+.tracking-dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    border: 2px solid var(--stone-300);
+    background: var(--white);
+    z-index: 1;
+}
+
+.tracking-steps li.is-done { color: var(--stone-900); }
+.tracking-steps li.is-done .tracking-dot { background: var(--green-600); border-color: var(--green-600); }
+.tracking-steps li.is-current { color: var(--orange-600); }
+.tracking-steps li.is-current .tracking-dot { background: var(--orange-600); border-color: var(--orange-600); }
+.tracking-steps li.is-cancelled { color: var(--red-600); }
+.tracking-steps li.is-cancelled .tracking-dot { background: var(--red-600); border-color: var(--red-600); }
+.tracking-steps small { color: var(--stone-500); }
+
+.tracking-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.tracking-actions[hidden], .tracking-actions .btn[hidden] { display: none; }
+
+.order-line .line-actions { margin-top: 0.5rem; }
+.order-line .line-actions .btn { padding: 0.375rem 0.875rem; font-size: 0.75rem; }
+.order-line .reviewed-tag { font-size: 0.75rem; color: var(--green-700); }

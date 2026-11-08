@@ -107,3 +107,43 @@
         flex-wrap: wrap;
     }
 }
+
+/* Phần do cart.js điều khiển: thông báo, giỏ trống, mã giảm giá, nút thanh toán bị khóa */
+.cart-notice {
+    margin: 0 0 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--orange-600);
+    background: var(--orange-100);
+    font-size: 0.8125rem;
+}
+
+.cart-notice[hidden],
+.cart-head[hidden],
+.cart-coupon [hidden],
+.cart-coupon-msg[hidden],
+.summary-row[hidden] { display: none; }
+
+.cart-empty {
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.cart-empty p { margin: 0 0 1.5rem; color: var(--stone-600); }
+
+.cart-issue {
+    margin: 0.25rem 0;
+    color: var(--red-600);
+    font-size: 0.75rem;
+}
+
+.cart-coupon-msg {
+    margin: 0 0 0.75rem;
+    color: var(--red-600);
+    font-size: 0.75rem;
+}
+
+.cart-coupon-msg.is-ok { color: var(--green-700); }
+
+#cart-items.is-busy { opacity: 0.6; pointer-events: none; }
+
+#cart-checkout[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }

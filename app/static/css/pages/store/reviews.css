@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Đánh giá sản phẩm (store/product_detail.html): form gửi/sửa đánh giá và thao tác trên từng đánh giá.
+   Phần thống kê/danh sách dùng lại style trong product_detail.css.
+   ========================================================================== */
+
+.review-form {
+    border: 1px solid var(--stone-200);
+    background: var(--white);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: grid;
+    gap: 0.875rem;
+}
+
+.review-form h3 { margin: 0; font-size: 0.9375rem; }
+.review-form .field { margin: 0; }
+
+.review-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.875rem;
+}
+
+.star-picker {
+    display: flex;
+    flex-direction: row-reverse;   /* để hover/chọn tô sáng từ trái sang phải */
+    justify-content: flex-end;
+    gap: 0.125rem;
+}
+
+.star-picker input { position: absolute; opacity: 0; pointer-events: none; }
+
+.star-picker label {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--stone-300);
+    cursor: pointer;
+}
+
+.star-picker input:checked ~ label,
+.star-picker label:hover,
+.star-picker label:hover ~ label { color: var(--orange-600); }
+
+.star-picker input:focus-visible + label { outline: 2px solid var(--stone-900); outline-offset: 2px; }
+
+.review-form-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.review-form-msg { font-size: 0.8125rem; color: var(--red-600); margin: 0; }
+.review-form-msg.is-ok { color: var(--green-700); }
+
+.review-login-hint {
+    border: 1px dashed var(--stone-300);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.review-list article.is-mine { border-left: 3px solid var(--stone-900); padding-left: 0.875rem; }
+.review-tools { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+.review-tools button {
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--stone-600);
+}
+.review-tools button:hover { color: var(--stone-900); }
+.review-fit { font-size: 0.75rem; color: var(--stone-500); }
+.review-empty { color: var(--stone-500); font-size: 0.875rem; }
+#review-more { margin-top: 1rem; }
+#review-more[hidden] { display: none; }

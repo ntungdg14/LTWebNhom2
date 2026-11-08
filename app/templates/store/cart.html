@@ -14,8 +14,10 @@
     <br></br>
     <div class="split">
         <section class="split-main" aria-label="Danh sách sản phẩm trong giỏ hàng">
-            <div class="cart-head"><span>Sản phẩm</span><span>Số lượng</span><span>Thành tiền</span></div>
+            <p id="cart-notice" class="cart-notice" role="alert" hidden></p>
+            <div id="cart-head" class="cart-head"><span>Sản phẩm</span><span>Số lượng</span><span>Thành tiền</span></div>
 
+            <div id="cart-items">
             <article class="cart-item">
                 <div class="media media-thumb media-taupe">Ảnh sản phẩm</div>
                 <div class="grow">
@@ -47,23 +49,31 @@
                 </div>
                 <span class="cart-line-total">899.000₫</span>
             </article>
+            </div>
 
             <a href="{{ url_for('store.shop') }}" class="link-underline">Tiếp tục mua sắm</a>
         </section>
 
         <aside class="summary split-side">
             <h2>Tóm tắt đơn hàng</h2>
-            <div class="summary-row"><span>Tạm tính (2 sản phẩm)</span><span>1.397.000₫</span></div>
-            <div class="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
-            <form class="cart-coupon" action="{{ url_for('store.cart') }}" method="get">
-                <input class="input" type="text" name="coupon" value="TUDO10" aria-label="Nhập mã giảm giá">
+            <div class="summary-row"><span id="cart-subtotal-label">Tạm tính (2 sản phẩm)</span><span id="cart-subtotal">1.397.000₫</span></div>
+            <div class="summary-row"><span>Phí vận chuyển</span><span id="cart-shipping">Miễn phí</span></div>
+            <form id="cart-coupon-form" class="cart-coupon" action="{{ url_for('store.cart') }}" method="get">
+                <input id="cart-coupon-code" class="input" type="text" name="coupon" value="TUDO10" autocomplete="off" aria-label="Nhập mã giảm giá">
                 <button type="submit" class="btn btn-ghost">Áp dụng</button>
+                <button type="button" id="cart-coupon-remove" class="btn btn-ghost" hidden>Bỏ mã</button>
             </form>
-            <div class="summary-row"><span>Giảm giá (TUDO10 · 10%)</span><span>-139.700₫</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span>1.257.300₫</span></div>
-            <a href="{{ url_for('checkout.shipping') }}" class="btn btn-block mt-4">Thanh toán</a>
-            <p class="muted" style="font-size:0.75rem;">Đơn hàng đã đủ điều kiện miễn phí vận chuyển. Bạn có 30 ngày để đổi trả.</p>
+            <p id="cart-coupon-msg" class="cart-coupon-msg" role="status" hidden></p>
+            <div id="cart-discount-row" class="summary-row"><span id="cart-discount-label">Giảm giá (TUDO10 · 10%)</span><span id="cart-discount">-139.700₫</span></div>
+            <div class="summary-total"><span>Tổng cộng</span><span id="cart-total">1.257.300₫</span></div>
+            <a id="cart-checkout" href="{{ url_for('checkout.shipping') }}" class="btn btn-block mt-4">Thanh toán</a>
+            <p id="cart-shipping-note" class="muted" style="font-size:0.75rem;">Đơn hàng đã đủ điều kiện miễn phí vận chuyển. Bạn có 30 ngày để đổi trả.</p>
         </aside>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/cart.js') }}" defer></script>
 {% endblock %}

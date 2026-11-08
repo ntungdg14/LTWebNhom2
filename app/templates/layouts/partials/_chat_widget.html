@@ -1,0 +1,47 @@
+{# Khung chat nổi kiểu Messenger: màn "Đoạn chat" (danh sách, chỉ có shop Freesion) -> bấm vào để mở cuộc trò chuyện.
+   Toàn bộ hành vi nằm trong static/js/chat.js, gọi /api/chat/... Chưa đăng nhập thì danh sách hiện lời mời đăng nhập. #}
+<div class="chat-widget" id="chat-widget">
+    <section class="chat-panel" id="chat-panel" hidden aria-label="Đoạn chat">
+        {# ---- Màn 1: danh sách đoạn chat ---- #}
+        <div class="chat-view" id="chat-list-view">
+            <header class="chat-list-head">
+                <h2>Đoạn chat</h2>
+                <button type="button" class="chat-icon-btn" id="chat-list-close" aria-label="Đóng khung chat">×</button>
+            </header>
+            <label class="chat-search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+                <input type="search" id="chat-search" placeholder="Tìm kiếm trên Freesion" autocomplete="off" aria-label="Tìm kiếm đoạn chat">
+            </label>
+            <div class="chat-tabs" role="tablist">
+                <button type="button" class="chat-tab is-active" data-chat-tab="all" role="tab" aria-selected="true">Tất cả</button>
+                <button type="button" class="chat-tab" data-chat-tab="unread" role="tab" aria-selected="false">Chưa đọc</button>
+            </div>
+            <div class="chat-threads" id="chat-threads" aria-live="polite"></div>
+        </div>
+
+        {# ---- Màn 2: cuộc trò chuyện với shop ---- #}
+        <div class="chat-view" id="chat-conv-view" hidden>
+            <header class="chat-head">
+                <button type="button" class="chat-icon-btn" id="chat-back" aria-label="Quay lại danh sách đoạn chat">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg>
+                </button>
+                <span class="chat-avatar" aria-hidden="true">F</span>
+                <div class="chat-head-text"><strong>Freesion</strong><small>Phản hồi trong giờ làm việc 8:30–21:00</small></div>
+                <button type="button" class="chat-icon-btn" id="chat-close" aria-label="Đóng khung chat">×</button>
+            </header>
+            <div class="chat-body" id="chat-messages" aria-live="polite"></div>
+            <div class="chat-context" id="chat-context" hidden></div>
+            <form class="chat-form" id="chat-form" hidden>
+                <textarea id="chat-input" rows="1" maxlength="2000" placeholder="Aa" aria-label="Nội dung tin nhắn"></textarea>
+                <button type="submit" class="chat-send" id="chat-send" aria-label="Gửi">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20.5v-6.8l9-1.7-9-1.7V3.5L22 12z"/></svg>
+                </button>
+            </form>
+        </div>
+    </section>
+    <button type="button" class="chat-toggle" id="chat-toggle" aria-expanded="false" aria-controls="chat-panel" aria-label="Chat với shop">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/></svg>
+        <span>Chat với shop</span>
+        <span class="chat-badge" id="chat-badge" hidden>0</span>
+    </button>
+</div>

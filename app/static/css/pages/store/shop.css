@@ -117,3 +117,73 @@
     justify-content: center;
     padding: 3rem 0;
 }
+
+/* Phần do shop.js điều khiển: ô màu / chip size là <button>, trạng thái đang chọn, danh sách trống */
+.color-swatch {
+    padding: 0;
+    cursor: pointer;
+}
+
+.color-swatch.is-active {
+    border-color: var(--stone-900);
+    outline: 2px solid var(--stone-900);
+    outline-offset: 2px;
+}
+
+button.chip {
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+button.chip:hover {
+    border-color: var(--stone-900);
+}
+
+.shop-layout > .grow {
+    min-width: 0;
+}
+
+.shop-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 2rem 0;
+}
+
+.shop-more button[hidden] {
+    display: none;
+}
+
+/* Khung chờ khi sản phẩm đang tải (thay cho dữ liệu mẫu cứng) */
+.skeleton-card .media,
+.skeleton-card h2,
+.skeleton-card .meta {
+    background: var(--stone-200);
+    border-radius: 0.25rem;
+    color: transparent;
+    animation: shop-skeleton 1.2s ease-in-out infinite alternate;
+}
+
+.skeleton-card h2,
+.skeleton-card .meta {
+    height: 1rem;
+    margin-top: 0.75rem;
+}
+
+.skeleton-card .meta {
+    width: 60%;
+}
+
+@keyframes shop-skeleton {
+    from { opacity: 0.45; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-card .media,
+    .skeleton-card h2,
+    .skeleton-card .meta { animation: none; }
+}

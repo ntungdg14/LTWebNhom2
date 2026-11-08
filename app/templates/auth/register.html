@@ -12,13 +12,13 @@
     <header class="auth-header">
         <h1>Tạo tài khoản mới</h1>
     </header>
-    <form class="form-stack mt-8" action="{{ url_for('auth.login') }}" method="get">
-        <div class="field"><label for="full-name">Họ và tên *</label><input id="full-name" class="input" type="text" value="Nguyễn Tùng Dương" required></div>
-        <div class="field"><label for="email">Email công việc *</label><input id="email" class="input" type="email" value="tungduong@freesion.vn" required></div>
+    <form id="register-form" class="form-stack mt-8" action="{{ url_for('auth.login') }}" method="get">
+        <div class="field"><label for="full-name">Họ và tên *</label><input id="full-name" class="input" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="email">Email công việc *</label><input id="email" class="input" type="email" autocomplete="email" required></div>
         <div class="field">
             <label for="password">Mật khẩu *</label>
             <span class="password-field">
-                <input id="password" class="input" type="password" minlength="8" required>
+                <input id="password" class="input" type="password" minlength="8" autocomplete="new-password" required>
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle><line x1="4" y1="20" x2="20" y2="4"></line></svg>
             </span>
             <p class="form-hint">Mật khẩu mạnh: Có ít nhất 8 ký tự, chữ hoa, chữ thường và số</p>
@@ -26,11 +26,11 @@
         <div class="field">
             <label for="password-confirmation">Xác nhận mật khẩu *</label>
             <span class="password-field">
-                <input id="password-confirmation" class="input" type="password" minlength="8" required>
+                <input id="password-confirmation" class="input" type="password" minlength="8" autocomplete="new-password" required>
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="2.5"></circle><line x1="4" y1="20" x2="20" y2="4"></line></svg>
             </span>
         </div>
-        <label class="remember terms"><input type="checkbox" checked> <span>Tôi đồng ý với <a href="{{ url_for('store.terms') }}" class="link-underline">Điều khoản sử dụng</a> và <a href="{{ url_for('store.privacy') }}" class="link-underline">Chính sách bảo mật dành cho nhân sự</a> Freesion.</span></label>
+        <label class="remember terms"><input id="terms" type="checkbox" checked> <span>Tôi đồng ý với <a href="{{ url_for('store.terms') }}" class="link-underline">Điều khoản sử dụng</a> và <a href="{{ url_for('store.privacy') }}" class="link-underline">Chính sách bảo mật dành cho nhân sự</a> Freesion.</span></label>
         <button type="submit" class="btn btn-block">Tạo tài khoản</button>
     </form>
     <p class="auth-switch mt-4">Đã có tài khoản? <a href="{{ url_for('auth.login') }}" class="link-underline">Đăng nhập</a></p>

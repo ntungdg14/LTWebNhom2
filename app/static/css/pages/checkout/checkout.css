@@ -34,3 +34,42 @@
         grid-template-columns: 1fr 1fr;
     }
 }
+
+/* Phần do checkout.js điều khiển: thông báo, lỗi từng ô, nút bị khóa */
+.form-alert {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--red-600);
+    background: var(--red-100);
+    color: var(--red-600);
+    font-size: 0.8125rem;
+}
+
+.form-alert.is-ok {
+    border-color: var(--green-600);
+    background: var(--green-100);
+    color: var(--green-700);
+}
+
+.form-alert a { color: inherit; }
+
+.form-alert[hidden],
+.summary-row[hidden],
+.form-check[hidden],
+#ok-content[hidden],
+#ok-empty[hidden] { display: none; }
+
+.form-error {
+    margin: 0.375rem 0 0;
+    color: var(--red-600);
+    font-size: 0.75rem;
+}
+
+.input[aria-invalid="true"] { border-color: var(--red-600); }
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-success .form-alert { margin-bottom: 1.5rem; text-align: left; }
